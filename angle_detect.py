@@ -79,7 +79,7 @@ while True:
         angle = math.atan2(-(center[1] - cy), center[0] - cx) * 180 / np.pi
         print(f"{-(center[1] - cy)},{center[0] - cx},{angle}")
         current_time = dt.datetime.now()
-        file.write(f"{current_time.strftime("%H:%M:%S")},{angle}\n")
+        file.write(f"{current_time.strftime("%H:%M:%S.%f")},{angle}\n")
             
     cv2.imshow('frame', frame)
     cv2.imwrite('images/frame.jpg', frame)
@@ -90,17 +90,32 @@ while True:
 file.close()
 capture.release()
 cv2.destroyAllWindows()
-x = []
-y = []
+
+time = []
+angleseries = []
 with open ('data/angle.csv', 'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
-        datetime_data = [dt.datetime.strptime(row[0], "%H:%M:%S")]
-        x.append(datetime_data)
-        y.append(float(row[1]))
+        datetime_data = dt.datetime.strptime(row[0], "%H:%M:%S.%f")
+        time.append(datetime_data)
+        angleseries.append(float(row[1]))
 
-plt.plot(x, y)
+plt.plot(time, angleseries)
 plt.xlabel('Time')
 plt.ylabel('Angle')
-plt.show()
 plt.savefig('images/anglevstime.png')
+plt.show()
+
+omegaseries = []
+omegaseries.append(0)
+for i in range(1, len(angleseries)):
+    diff = time[i] - time[i-1]
+    diff_secs = diff.total_seconds()
+    omegaseries.append((angleseries[i] - angleseries[i-1]) / diff_secs)
+
+plt.plot(time, omegaseries)
+plt.xlabel('Time')
+plt.ylabel('Angular Velocity')
+plt.savefig('images/omegavstime.png')
+plt.show()
+
