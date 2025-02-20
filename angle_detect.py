@@ -112,6 +112,8 @@ for i in range(1, len(angleseries)):
     diff = time[i] - time[i-1]
     diff_secs = diff.total_seconds()
     omegaseries.append((angleseries[i] - angleseries[i-1]) / diff_secs)
+    if i < len(angleseries):
+        omegaseries[i] = sum(omegaseries[i-1:i+1]) / 3
 
 plt.plot(time, omegaseries)
 plt.xlabel('Time')
