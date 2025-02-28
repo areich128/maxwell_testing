@@ -53,6 +53,8 @@ void loop() {
     
    
    for(int b = 0; b<72; b++){
+    Serial.print("Entering new Iteration:");
+    Serial.println(b);
     for(int i = 0; i<3; i++){ //rotate 5 degrees assuming we are using a 200 step/revolution stepper motor, 3 steps is approx 5 degrees  
       digitalWrite(MOTOR_PIN,HIGH); //10hz
       delay(50);
