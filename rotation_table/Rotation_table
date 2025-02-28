@@ -53,7 +53,6 @@ void loop() {
     
    
    for(int b = 0; b<72; b++){
-     counter_time = millis(); 
     for(int i = 0; i<3; i++){ //rotate 5 degrees assuming we are using a 200 step/revolution stepper motor, 3 steps is approx 5 degrees  
       digitalWrite(MOTOR_PIN,HIGH); //10hz
       delay(50);
@@ -62,9 +61,8 @@ void loop() {
       delay(50);
       RecordData(b,i);
       
-
-    
-     }
+}
+      counter_time = millis(); 
       
       while(millis()-counter_time<5000){ //5 degrees every 5 seconds
         RecordData(b,0);
