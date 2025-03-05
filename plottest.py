@@ -11,6 +11,8 @@ def lowpass(data, cutoff, order=5):
     sos = butter(order, cutoff, 'low', output='sos')
     return sosfilt(sos, data)
 
+testnum = input("Enter test number: ")
+
 time = []
 angleseries = []
 with open ('data/angle.csv', 'r') as csvfile:
@@ -20,10 +22,23 @@ with open ('data/angle.csv', 'r') as csvfile:
         time.append(datetime_data)
         angleseries.append(float(row[1]))
 
+angleseries = np.array(angleseries)
+angleseries = lowpass(angleseries, 0.7, order=5)
+angleseries_smooth = np.array(angleseries)
+offset = 0
+for i in range(1, len(angleseries)):
+    if angleseries_smooth[i-1] - angleseries_smooth[i] > 300:
+        offset += 360
+        print("INCREASING OFFSET")
+    elif angleseries_smooth[i-1] - angleseries_smooth[i] < -300:
+        offset += -360
+        print("DECREASING OFFSET")
+    angleseries_smooth[i:] = angleseries[i:] + offset
+
 # plt.plot(time, angleseries)
 # plt.xlabel('Time')
 # plt.ylabel('Angle')
-# # plt.savefig('images/anglevstime.png')
+# plt.savefig(f'images/anglevstime{testnum}.png')
 # plt.show()
 
 omegaseries = []
@@ -32,16 +47,21 @@ omegaseries.append(0)
 for i in range(1, len(angleseries)):
     diff = time[i] - time[i-1]
     diff_secs = diff.total_seconds()
-    omegaseries.append((angleseries[i] - angleseries[i-1]) / diff_secs)
-    if i < len(angleseries)-10 | i > 10:
+    # if angleseries[i] - angleseries[i-1] > 355:
+    #     omegaseries.append((angleseries[i] - angleseries[i-1] - 360) / diff_secs)
+    omegaseries.append((angleseries_smooth[i] - angleseries_smooth[i-1]) / diff_secs)
+    if i < len(angleseries_smooth)-10 | i > 10:
         omegaseries_avg[i] = sum(omegaseries[i-10:i+10]) / 10
-    omegaseries_lowpass = lowpass(omegaseries, 0.1, order=2)
+    omegaseries_lowpass = lowpass(omegaseries, 0.2, order=5)
 
-plt.plot(time, omegaseries)
+# plt.plot(time, omegaseries)
 plt.plot(time, omegaseries_lowpass)
-plt.plot(time, omegaseries_avg)
-plt.legend(['Omega', 'Omega Lowpass', 'Omega Average'])
+# plt.plot(time, omegaseries_avg)
+# plt.plot(time, angleseries)
+plt.plot(time, angleseries_smooth)
+plt.plot(time, np.zeros(len(time)))
+plt.legend(['Omega Lowpass','Angle Smooth'])
 plt.xlabel('Time')
 plt.ylabel('Angular Velocity')
-plt.savefig('images/omegavstime.png')
+plt.savefig(f'images/omegavstime{testnum}.png')
 plt.show()
