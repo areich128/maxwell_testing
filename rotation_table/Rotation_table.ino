@@ -12,6 +12,7 @@ unsigned int counter_time;
 
 
 void setup() {
+  Serial.begin(9600);
   pinMode(MOTOR_PIN,OUTPUT);
   pinMode(BUTTON_PIN,INPUT);
   pinMode(DIRECTION_PIN,OUTPUT);
@@ -58,16 +59,16 @@ void loop() {
     for(int i = 0; i<3; i++){ //rotate 5 degrees assuming we are using a 200 step/revolution stepper motor, 3 steps is approx 5 degrees  
       digitalWrite(MOTOR_PIN,HIGH); //10hz
       delay(50);
-      RecordData(b,i);
+      RecordData(b+1,i+1);
       digitalWrite(MOTOR_PIN, LOW);
       delay(50);
-      RecordData(b,i);
+      RecordData(b+1,i+1);
       
 }
       counter_time = millis(); 
       
       while(millis()-counter_time<5000){ //5 degrees every 5 seconds
-        RecordData(b,0);
+        RecordData(b+1,0);
      }
    }
   
