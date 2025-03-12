@@ -27,10 +27,10 @@ angleseries = lowpass(angleseries, 0.7, order=5)
 angleseries_smooth = np.array(angleseries)
 offset = 0
 for i in range(1, len(angleseries)):
-    if angleseries_smooth[i-1] - angleseries_smooth[i] > 300:
+    if angleseries_smooth[i-1] - angleseries_smooth[i] > 180:
         offset += 360
         print("INCREASING OFFSET")
-    elif angleseries_smooth[i-1] - angleseries_smooth[i] < -300:
+    elif angleseries_smooth[i-1] - angleseries_smooth[i] < -180:
         offset += -360
         print("DECREASING OFFSET")
     angleseries_smooth[i:] = angleseries[i:] + offset
@@ -52,7 +52,7 @@ for i in range(1, len(angleseries)):
     omegaseries.append((angleseries_smooth[i] - angleseries_smooth[i-1]) / diff_secs)
     if i < len(angleseries_smooth)-10 | i > 10:
         omegaseries_avg[i] = sum(omegaseries[i-10:i+10]) / 10
-    omegaseries_lowpass = lowpass(omegaseries, 0.2, order=5)
+    omegaseries_lowpass = lowpass(omegaseries, 0.1, order=5)
 
 # plt.plot(time, omegaseries)
 plt.plot(time, omegaseries_lowpass)

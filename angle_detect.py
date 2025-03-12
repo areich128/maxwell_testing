@@ -15,7 +15,8 @@ import math
 # print("PYTHONPATH:", os.environ.get('PYTHONPATH'))
 # print("PATH:", os.environ.get('PATH'))
 
-capture = cv2.VideoCapture(0)
+capture = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+
 
 if not capture.isOpened():
     print("Cannot open camera")
@@ -36,23 +37,23 @@ if not capture.isOpened():
 lower_black = np.array([0, 0, 0])
 upper_black = np.array([255, 255, 75])
 
-lower_white = np.array([0, 0, 180])
+lower_white = np.array([0, 0, 225])
 upper_white = np.array([255, 255, 255])
 
 def detect_circle(frame, lower1, upper1, lower2, upper2):
     frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     # Detect center of black circle
-    mask_black = cv2.inRange(frame_hsv, lower1, upper1)
-    blurred_black = cv2.GaussianBlur(mask_black, (9, 9), 0)
-    circles_black = cv2.HoughCircles(blurred_black, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=5, maxRadius=100)
-    if circles_black is not None:
-        print("Black circle detected")
-        circles_black = np.int32(np.around(circles_black))
-        for i in circles_black[0, :]:
-            cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
-            cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
-        coords_black = circles_black[0][0][:2]
+    # mask_black = cv2.inRange(frame_hsv, lower1, upper1)
+    # blurred_black = cv2.GaussianBlur(mask_black, (9, 9), 0)
+    # circles_black = cv2.HoughCircles(blurred_black, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=5, maxRadius=100)
+    # if circles_black is not None:
+    #     print("Black circle detected")
+    #     circles_black = np.int32(np.around(circles_black))
+    #     for i in circles_black[0, :]:
+    #         cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
+    #         cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
+    #     coords_black = circles_black[0][0][:2]
 
     # Detect center of white circle
     mask_white = cv2.inRange(frame_hsv, lower2, upper2)
