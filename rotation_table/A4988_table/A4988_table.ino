@@ -7,59 +7,36 @@
 #define MS2 11
 #define MS3 12
 
-// unsigned int initial_time;
-// unsigned int log_time;
-// unsigned int counter_time;
-
-A4988 stepper(400, 0, MOTOR_PIN, MS1, MS2, MS3);
-
-int initial_time = millis();
-int log_time = millis();
+unsigned int initial_time;
+A4988 stepper(400, DIRECTION_PIN, MOTOR_PIN, MS1, MS2, MS3);
 
 void setup() {
   Serial.begin(9600);
-  pinMode(BUTTON_PIN,INPUT);
-  Serial.println("Starting stepper motor");
-  stepper.begin(5,1); //NOTE: Gear ratio 36:72 motor:table
-  Serial.println("motor started");
-}
-
-void RecordData(int b){
-  if(millis()- log_time >= 50){ //log every 50 ms
-          Serial.print(millis()-initial_time);       
-          Serial.print(",\t");
-          Serial.println(b*5);
-          log_time=millis();
-       
-        }
-  }
+  stepper.begin(5,1); //set RPM 
   
 
-static int count = 0;
-int b = 0;
+}
+void RecordData(int b){
+Serial.print("TIME: ");
+ Serial.print(millis()-initial_time);       
+ Serial.print(",\t");
+ Serial.println(b*10);
+       
+ }
+  
+
+
 
 void loop() {
-  // if(digitalRead(BUTTON_PIN)==HIGH){ //if button is pressed, move 5 degrees every 5 seconds 
-  // initial_time = millis();
-  // log_time = millis();
-  // int b = 0;
-  Serial.print("Entering new Iteration:");
-  Serial.println(b);
-  stepper.rotate(720); // x * pi/180 degrees at 2 rad/s
-  delay(10000);
-
-  // counter_time = millis(); 
-  // while(millis()-counter_time<2000){ //wait for 5 seconds after 5 degrees
-  //   RecordData(b+1);
-  // }
-  b++;
-
-  // }
-  // Serial.println("Rotating motor");
-  // stepper.rotate(360);
-  // Serial.println(count);
-  // Serial.println("motor rotated");
-  // ++count;
-  // delay(1000);
+    initial_time = millis();
+    static int count = 1;
+    Serial.print("Entering revolution number:");
+    Serial.println(count);
+    for(int b = 0; b<36; b++){ //360 degrees
+      stepper.rotate(20); //rotate 10 degrees (2:1 ratio)
+      delay(6000); //delay 6 sec
+      RecordData(b);
+     }
+      count++;
 
 }
