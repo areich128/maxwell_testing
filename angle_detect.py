@@ -15,6 +15,8 @@ import math
 # print("PYTHONPATH:", os.environ.get('PYTHONPATH'))
 # print("PATH:", os.environ.get('PATH'))
 
+testnum = input("Enter test number: ")
+
 capture = cv2.VideoCapture(1, cv2.CAP_DSHOW)
 
 
@@ -37,8 +39,11 @@ if not capture.isOpened():
 lower_black = np.array([0, 0, 0])
 upper_black = np.array([255, 255, 75])
 
-lower_white = np.array([0, 0, 225])
+lower_white = np.array([0, 0, 230])
 upper_white = np.array([255, 255, 255])
+
+lower_pink = np.array([140, 0, 0])
+upper_pink = np.array([160, 255, 255])
 
 def detect_circle(frame, lower1, upper1, lower2, upper2):
     frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -58,7 +63,7 @@ def detect_circle(frame, lower1, upper1, lower2, upper2):
     # Detect center of white circle
     mask_white = cv2.inRange(frame_hsv, lower2, upper2)
     blurred_white = cv2.GaussianBlur(mask_white, (9, 9), 0)
-    circles_white = cv2.HoughCircles(blurred_white, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=5, maxRadius=100)
+    circles_white = cv2.HoughCircles(blurred_white, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=25)
     if circles_white is not None:
         print("White circle detected")
         circles_white = np.int32(np.around(circles_white))
@@ -105,7 +110,7 @@ def detect_marker(frame, object):
 
     return frame
 
-file = open("data/angle.csv", "w")
+file = open(f"CSS_4-4-25/test_data{testnum}.csv", "w")
 
 while True:
     ret, frame = capture.read()
@@ -125,10 +130,10 @@ while True:
         angle = math.atan2(-(center[1] - cy), center[0] - cx) * 180 / np.pi
         print(f"{-(center[1] - cy)},{center[0] - cx},{angle}")
         current_time = dt.datetime.now()
-        file.write(f"{current_time.strftime("%H:%M:%S.%f")},{angle}\n")
+        file.write(f"{current_time.strftime('%H:%M:%S.%f')},{angle}\n")
 
     cv2.imshow('result frame', frame)
-    cv2.imwrite('images/frame_detect.jpg', frame)
+    # cv2.imwrite('images/frame_detect.jpg', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
