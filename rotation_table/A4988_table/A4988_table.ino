@@ -8,11 +8,11 @@
 #define MS3 12
 
 unsigned int initial_time;
-A4988 stepper(400, DIRECTION_PIN, MOTOR_PIN, MS1, MS2, MS3);
+A4988 stepper(400,0, MOTOR_PIN, MS1, MS2, MS3);
 
 void setup() {
   Serial.begin(9600);
-  stepper.begin(5,1); //set RPM 
+  stepper.begin(3,1); //set RPM 
   
 
 }
@@ -34,7 +34,7 @@ void loop() {
     Serial.println(count);
     for(int b = 0; b<36; b++){ //360 degrees
       stepper.rotate(20); //rotate 10 degrees (2:1 ratio)
-      delay(6000); //delay 6 sec
+      delay(10000); //delay 10 sec
       RecordData(b);
      }
       count++;
