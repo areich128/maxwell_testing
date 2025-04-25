@@ -110,7 +110,7 @@ def detect_marker(frame, object):
 
     return frame
 
-file = open(f"CSS_4-4-25/test_data{testnum}.csv", "w")
+file = open(f"CSS_4-24-25/test_data{testnum}.csv", "w")
 
 while True:
     ret, frame = capture.read()

@@ -19,7 +19,7 @@ testnum = input("Enter test number: ")
 
 time = []
 angleseries = []
-with open (f'CSS_4-4-25/test_data{testnum}.csv', 'r') as csvfile:
+with open (f'CSS_4-24-25/test_data{testnum}.csv', 'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
         datetime_data = dt.datetime.strptime(row[0], "%H:%M:%S.%f")
