@@ -12,7 +12,7 @@ A4988 stepper(400,0, MOTOR_PIN, MS1, MS2, MS3);
 
 void setup() {
   Serial.begin(9600);
-  stepper.begin(3,1); //set RPM 
+  stepper.begin(1,1); //set RPM 
   
 
 }

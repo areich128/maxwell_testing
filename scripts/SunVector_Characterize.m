@@ -1,0 +1,665 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ----------------- Created by Braden Nelson on 2/14/2025 -----------------
+% Goal: Produces normal vectors for each photodiode based on sun vector
+% characterization test. See testing documentation in drive on how data was
+% obtained and stored.
+%
+% Inputs:
+%       - STOR files that are ~3 minutes in length (duration of a test)
+%       that are named based on the CSS board and photodiodes being tested
+%       - Geometry/angles of the system. Each board/photodiode has an angle
+%       relative to the collimated light source and it is necessary to
+%       include it for the normal vector calculation.
+%
+% Outputs: 
+%       - Normal vectors assinged to each photodiode based on cosine fitted
+%       curves
+%
+% Notes: 
+%
+% CSS Faces:
+% - X-: SS2
+% - Y-: SS1, Y+: SS3
+% - Z-: SS5, Z+: SS4
+%
+% SS4 = ADS7924 only
+% SS5 = AD7991 only
+%
+% Program flow:
+% Inputs required:
+% - STOR data for each of 20 photodiodes
+% - OpenCV data
+% 
+% ONE OF THE ADCs HAS WEIRD JUMPS IN THE DATA-- COME BACK TO THIS
+% - grab some data with PDs in all darkness
+% - bias voltage?
+% - consider earth albedo case?
+% - bad photodiode: debug with multimeter, etc.
+% - dropping bits? or whatever that issue is... continue thinking about it
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%% PSEUDOCODE: Givens %%%%%
+
+% Input givens:
+% Geometric angles: pyramid angle (top/bottom vertical pyramid,left/right horizontal pyramid)
+% Board angles: Top angle board, bottom angle board -- may be different for certain faces 
+%
+
+
+%%%%% PSEUDOCODE: Loading Data %%%%%
+
+% Load STOR folder(s)
+% Only use the lines that matter in each folder (depends on test)
+    % Can maybe name folders in a certain way that tells which board was
+    % tested, extract that portion, and then use it to pull the correct
+    % portion of the data to plot
+% Parse data for the correct tests and store them in variables
+
+% Input/Create a variable that has the rotation angles for each test
+    % Correlate these angles accurately to the test data
+    % Make sure angle vectors are same length as data vectors
+
+% Plot the data of each test -- do 2x1 subplots
+    % First subplot is one orgthogonal test on a given board
+        % Do I need to have separate plots for each individual photodiode??
+    % Second subplot is the second orthogonal test on a given board
+% Plot (fitted?) cosine curve to each subplot
+
+% Use the fitted curve to create a new "normal" vector for the photodiodes
+    % LSE estimation
+    % Ax = b --> x_hat = b\A
+        % A = sun vector in body frame
+        % b = Voltage/PD Output?
+        % x_hat = NEW body vector
+    % x = inv((A'*A))*A'*b
+
+% Convert 3x1 body vector to quaternion vector
+clc;
+clear;
+close all;
+
+
+%% Parameters %%
+% Load Parameters
+Parameters = Data_Parameters();
+
+%% Data Parsing
+% Taking ADCS Data over specified time span
+% (used for high-res data, don't use a large span of time)
+
+Root_dir = pwd;
+
+% Day = 484;
+Day = 0;
+% Use increments of 1 hour
+First_Hour = 0;     % (0 to any number)
+Last_Hour = 16;      % (0 to any number greater than first_hour)
+
+% File range in each hour folder
+First_File = 0;   % (0 is lowest)
+Last_File = 302;   
+% (302 is highest file seen as of 4/22/25, can make higher and it wont affect processes)
+
+File_range = First_File:1:Last_File;
+Time_range_hours = First_Hour:1:Last_Hour;
+
+%%%%% NOTES: On data directories %%%%%
+% - 4/4/25: Rotation was fast, with a pause every 360 degrees. Likely
+%   unsuitable for analysis
+%   - STOR_X_Rot, STOR_Y_Rot, STOR_Z_Rot
+%
+% - 4/18/25: 
+%
+% - 4/22/25:
+%   - STOR_XROT, STOR_Board3Retest_XROT
+%
+% - 4/24/25
+%   - STOR_ZROT, STOR_YROT_L, 
+
+% directories of test data
+STOR_folders = ["STOR_XROT_6-6-25", "STOR_YROT_6-2", "STOR_ZROT_6-6-25"];
+CV_folders = ["CSS_6-6-25/test_datafacezaxisx","CSS_6-2-25/test_dataYROT_X", "CSS_6-6-25/test_datafacexaxisz"];
+
+test_begin_times = [37, 62, 7];
+
+% AD, ADS
+valid_ADCs = [1, 1;
+              1, 1;
+              1, 1;
+              0, 1;
+              1, 0];
+
+% 1 = x, 2 = y, 3 = z
+PD_testaxes = [1, 3; 2, 3; 1, 3; 1, 2; 1, 2]; 
+% making sure that only data from the axes about which
+% the CSS board rotates is used
+
+for k = 1:length(STOR_folders)
+    for i = 1:length(Time_range_hours)
+        for j = 1:length(File_range)
+            
+            hour_path = fullfile(Root_dir,'STOR_folders',STOR_folders(k),num2str(Day),num2str(Time_range_hours(i)));
+            % hour_path = fullfile(Root_dir, 'STOR_YROT_5-19','LOW/'); % Can plot low res data
+            FP = fullfile(hour_path,strcat(num2str(File_range(j))));
+            Data_filepaths = dir(FP);
+            
+            adcs_data{k,i}(:,j) = ADCSDataParseDir(Data_filepaths);
+        end
+    end
+end
+
+SYS_data = cell(length(STOR_folders), 1);
+CSS_data = cell(length(STOR_folders), 1);
+GYRO_data = cell(length(STOR_folders), 1);
+MAG_data = cell(length(STOR_folders), 1);
+GPS_data = cell(length(STOR_folders), 1);
+
+for k = 1:length(STOR_folders)
+    % Initialize empty arrays in each cell
+    SYS_data{k}.global_err = [];
+    SYS_data{k}.op_mode = [];
+    SYS_data{k}.sensor_use = [];
+
+    CSS_data{k}.ad7991_1 = [];
+    CSS_data{k}.ad7991_2 = [];
+    CSS_data{k}.ad7991_3 = [];
+    CSS_data{k}.ad7991_4 = [];
+    CSS_data{k}.ads7924_1 = [];
+    CSS_data{k}.ads7924_2 = [];
+    CSS_data{k}.ads7924_3 = [];
+    CSS_data{k}.ads7924_4 = [];
+
+    GPS_data{k}.J2000_time = [];
+    GPS_data{k}.J2000_frac_time = [];
+    GPS_data{k}.eci_pos = [];
+    GPS_data{k}.eci_vel = [];
+
+    for i = 1:length(adcs_data) % hour
+        for j = 1:length(adcs_data{k,i}) % minute
+            % SYS
+            SYS_data{k}.global_err = [SYS_data{k}.global_err adcs_data{k,i}(:,j).SYS.global_err];
+            SYS_data{k}.op_mode = [SYS_data{k}.op_mode adcs_data{k,i}(:,j).SYS.op_mode];
+            SYS_data{k}.sensor_use = [SYS_data{k}.sensor_use adcs_data{k,i}(:,j).SYS.sensor_use];
+
+            % CSS
+            CSS_data{k}.ad7991_1 = [CSS_data{k}.ad7991_1 adcs_data{k,i}(:,j).CSS.css_ad7991_1];
+            CSS_data{k}.ad7991_2 = [CSS_data{k}.ad7991_2 adcs_data{k,i}(:,j).CSS.css_ad7991_2];
+            CSS_data{k}.ad7991_3 = [CSS_data{k}.ad7991_3 adcs_data{k,i}(:,j).CSS.css_ad7991_3];
+            CSS_data{k}.ad7991_4 = [CSS_data{k}.ad7991_4 adcs_data{k,i}(:,j).CSS.css_ad7991_4];
+            CSS_data{k}.ads7924_1 = [CSS_data{k}.ads7924_1  adcs_data{k,i}(:,j).CSS.css_ads7924_1];
+            CSS_data{k}.ads7924_2 = [CSS_data{k}.ads7924_2  adcs_data{k,i}(:,j).CSS.css_ads7924_2];
+            CSS_data{k}.ads7924_3 = [CSS_data{k}.ads7924_3  adcs_data{k,i}(:,j).CSS.css_ads7924_3];
+            CSS_data{k}.ads7924_4 = [CSS_data{k}.ads7924_4  adcs_data{k,i}(:,j).CSS.css_ads7924_4];
+
+            % GPS
+            GPS_data{k}.J2000_time = [GPS_data{k}.J2000_time adcs_data{k,i}(:,j).GPS.J2000_time];
+            GPS_data{k}.J2000_frac_time = [GPS_data{k}.J2000_frac_time adcs_data{k,i}(:,j).GPS.J2000_frac_time];
+            GPS_data{k}.eci_pos = [GPS_data{k}.eci_pos adcs_data{k,i}(:,j).GPS.eci_pos];
+            GPS_data{k}.eci_vel = [GPS_data{k}.eci_vel adcs_data{k,i}(:,j).GPS.eci_vel];
+        end
+    end
+
+    for i = 1:4
+        CSS_data{k}.ad7991_1(i, :) = movmean(CSS_data{k}.ad7991_1(i,:), 1);
+        CSS_data{k}.ad7991_2(i,:) = movmean(CSS_data{k}.ad7991_2(i,:), 1);
+        CSS_data{k}.ad7991_3(i,:) = movmean(CSS_data{k}.ad7991_3(i,:), 1);
+        CSS_data{k}.ad7991_4(i,:) = movmean(CSS_data{k}.ad7991_4(i,:), 1);
+        CSS_data{k}.ads7924_1(i,:) = movmean(CSS_data{k}.ads7924_1(i,:), 1);
+        CSS_data{k}.ads7924_2(i,:) = movmean(CSS_data{k}.ads7924_2(i,:), 1);
+        CSS_data{k}.ads7924_3(i,:) = movmean(CSS_data{k}.ads7924_3(i,:), 1);
+        CSS_data{k}.ads7924_4(i,:) = movmean(CSS_data{k}.ads7924_4(i,:), 1);
+    end
+end
+
+for i = 1:length(STOR_folders)
+    CSS_data{i}.ad7991_1 = CSS_data{i}.ad7991_1; % Currently in volts
+    CSS_data{i}.ad7991_2 = CSS_data{i}.ad7991_2; % Can normalize based on max int12 value
+    CSS_data{i}.ad7991_3 = CSS_data{i}.ad7991_3; 
+    CSS_data{i}.ad7991_4 = CSS_data{i}.ad7991_4;
+    
+    CSS_data{i}.ads7924_1 = CSS_data{i}.ads7924_1;
+    CSS_data{i}.ads7924_2 = CSS_data{i}.ads7924_2;
+    CSS_data{i}.ads7924_3 = CSS_data{i}.ads7924_3;
+    CSS_data{i}.ads7924_4 = CSS_data{i}.ads7924_4;
+end
+
+ad7991_data = cell(length(STOR_folders), 4);
+ads7924_data = cell(length(STOR_folders), 4);
+
+for i = 1:length(STOR_folders)
+    ad7991_data{i, 1} = CSS_data{i}.ad7991_1;
+    ad7991_data{i, 2} = CSS_data{i}.ad7991_2;
+    ad7991_data{i, 3} = CSS_data{i}.ad7991_3;
+    ad7991_data{i, 4} = CSS_data{i}.ad7991_4;
+
+    ads7924_data{i, 1} = CSS_data{i}.ads7924_1;
+    ads7924_data{i, 2} = CSS_data{i}.ads7924_2;
+    ads7924_data{i, 3} = CSS_data{i}.ads7924_3;
+    ads7924_data{i, 4} = CSS_data{i}.ads7924_4;
+end
+
+hour_path = [];
+
+% for k = 1:length(STOR_folders)
+
+% for k = 1:1
+%     for i = 1:length(Time_range_hours)  % i should only ever be == 1 (no longer than an hour)
+%         for j=1:length(File_range)
+% 
+%         hour_path = fullfile(Root_dir,'STOR_folders', STOR_folders,num2str(Day),num2str(Time_range_hours(i)));
+%         % hour_path = fullfile(Root_dir, 'STOR_X_New','LOW/'); % Can plot low res data
+%         FP = fullfile(hour_path,strcat(num2str(File_range(j))));
+%         Data_filepaths = dir(FP);
+% 
+%             % NOTE: Can change to only take in CSS data by changing the row
+%             % of the cell
+%             adcs_data{k,i} = ADCSDataParseDir(Data_filepaths);
+%         end
+%     end
+% end
+
+% Put data into correct vectors
+    % Take out data points at even times (want to pull out the PD readings when
+    % the table is settled at a given angle)
+    CSS_data_iter = 1;  % Used to input data in correct locations
+
+    % Code / concept below may not work for all tests -- may have to edit
+    % the placeholder value between tests
+
+for i=1:length(adcs_data)         % number of files (== 3 for 3 total rotations)
+    for j=1:length(adcs_data(i))  % minutes      % 50 is equivalent to a log every ~5 seconds
+        if rem(j,50) == 0               % 50 is PLACEHOLDER value, want a value that will take a single data point from each tested angle
+            CSS_ang_data{1,i}(:,CSS_data_iter) = adcs_data{i}(:,j).CSS;   % Take in all photodiode values
+            % {1,i} will only pull in the first file of data
+        end
+    end
+end
+
+opencv_data = cell(length(CV_folders), 1);
+s_body = cell(length(CV_folders), 1);
+s_body_interp = cell(length(CV_folders), 1);
+stor_secs = cell(length(CV_folders), 1);
+
+for j = 1:length(CV_folders)
+    FP = fullfile(Root_dir,'OpenCV/',CV_folders(j));
+    opencv_raw = readlines(FP);
+    n = length(opencv_raw);
+    
+    seconds_since_start = zeros(n, 1);
+    values = zeros(n, 1);
+    
+    % Extract reference time from the first line
+    first_line = split(opencv_raw(1), ',');
+    t0 = datetime(char(first_line(1)), 'InputFormat', 'HH:mm:ss.SSSSSS');
+    t = datetime(2000,1,1,12,0,0);
+    
+    for i = 1:n-1
+        line = split(opencv_raw(i), ',');
+        % Parse time and value
+        t(i) = datetime(char(line(1)), 'InputFormat', 'HH:mm:ss.SSSSSS');
+        v = str2double(line(2));
+    
+        % Time since start in seconds
+        seconds_since_start(i) = seconds(t(i) - t0);
+        values(i) = v;
+    end
+    
+    values = values(1:length(values)-1);
+    j2000_times = GPS_data{j}.J2000_time + GPS_data{j}.J2000_frac_time;
+    stor_secs{j} = j2000_times - j2000_times(1);
+    J2000_epoch = datetime(2000, 1, 1, 12, 0, 0);
+    dt_as_j2000 = seconds(t - J2000_epoch);
+    
+    % cv_secs = 0;
+    % if (j == 1)
+    cv_secs = dt_as_j2000 - dt_as_j2000(1) + test_begin_times(j);
+    % elseif (j == 3)
+    %     cv_secs = dt_as_j2000 - dt_as_j2000(1) + test_begin_times(j);
+    % else
+    %     cv_secs = dt_as_j2000 - dt_as_j2000(1) + test_begin_times(j);
+    % end
+
+    values = values';
+    
+    % Combine into output matrix
+    opencv_data{j} = [cv_secs; values];
+    opencv_data{j} = opencv_data{j}(:,1:length(opencv_data{j})-1);
+    
+    % special handling for different test setups
+    if (j == 1)
+        opencv_data{j}(2,:) = opencv_data{j}(2,:) + 90; %for this test, the +x face was directly at the flashlight at the beginning
+    end
+    
+    if (j == 1)
+        % s_body{j} = [zeros(length(opencv_data{j}(2,:)), 1)'; cosd(opencv_data{j}(2,:)); sind(opencv_data{j}(2,:))];
+        s_body{j} = [zeros(length(opencv_data{j}(2,:)), 1)'; cosd(opencv_data{j}(2,:)); -sind(opencv_data{j}(2,:))];
+    elseif (j == 2)
+        s_body{j} = [cosd(opencv_data{j}(2,:)); zeros(length(opencv_data{j}(2,:)), 1)'; sind(opencv_data{j}(2,:))];
+    else
+        s_body{j} = [cosd(opencv_data{j}(2,:)); -sind(opencv_data{j}(2,:)); zeros(length(opencv_data{j}(2,:)), 1)'];
+    end
+
+    for i = 1:3
+        s_body_interp{j}(i,:) = interp1(opencv_data{j}(1,:), s_body{j}(i,:), stor_secs{j}, 'linear', 'extrap');
+    end
+end
+
+% TEST AXES: 1=X, 2=Y, 3=Z
+for i = 1:length(STOR_folders)
+    figure();
+    hold on;
+    % 
+    % % plot(opencv_data(:,1), opencv_data(:,2));
+
+    % CSS 1
+    if (i ~= 2)
+    plot(stor_secs{i}, CSS_data{i}.ad7991_1, '-k');
+    plot(stor_secs{i}, CSS_data{i}.ads7924_1, '-k');
+    end
+
+    % CSS 2
+    if (i ~= 1)
+    plot(stor_secs{i}, CSS_data{i}.ad7991_2, '-r');
+    plot(stor_secs{i}, CSS_data{i}.ads7924_2, '-r');
+    end
+
+    % CSS 3
+    if (i ~= 2)
+    plot(stor_secs{i}, CSS_data{i}.ad7991_3, '-c');
+    % plot(stor_secs{i}, CSS_data{i}.ads7924_3, '-c');
+    end
+
+    if (i ~= 3)
+    % CSS 4
+    plot(stor_secs{i}, CSS_data{i}.ads7924_4, '-g');
+    % CSS 5
+    plot(stor_secs{i}, CSS_data{i}.ad7991_4, '-b');
+    end
+
+    ylim([0, 4095]);
+
+    % % OpenCV data
+    % yyaxis right;
+    % % % plot(opencv_data(1,:), opencv_data(2,:));
+    % plot(opencv_data{i}(1,:), s_body{i}(1,:), '-b');
+    % % % xline(opencv_data(1,(find(s_body(1,:) ==0))), '-k');
+    % plot(opencv_data{i}(1,:), s_body{i}(3,:), '-r');
+    % % % xline(opencv_data(1,(find(s_body(2,:) ==0))), '-k');
+    % yline(0);
+    % % legend('CV angle', '0','sun_x','sun_z');
+end
+
+figure();
+hold on;
+for i = 1:length(CV_folders)
+    subplot(length(CV_folders), 1, i);
+    hold on;
+    plot(opencv_data{i}(1,:), s_body{i}(1,:))
+    plot(opencv_data{i}(1,:), s_body{i}(2,:))
+    plot(opencv_data{i}(1,:), s_body{i}(3,:))
+    legend("X","Y","Z");
+    title("Test:" + CV_folders(i));
+end
+
+
+
+% for i = 1:length(STOR_folders)
+%     figure();
+%     hold on;
+%     plot(stor_secs{i}, CSS_data{i}.ad7991_3);
+%     % plot(stor_secs{i}, CSS_data{i}.ads7924_3, '-b'); % DATA IS BAD
+%     title("Board 3 data for test:" + i);
+% end
+
+% figure();
+% hold on;
+% plot(opencv_data{1}(1,:), s_body{1}(1,:),'-r');
+% plot(opencv_data{1}(1,:), s_body{1}(2,:),'-r');
+% plot(opencv_data{2}(1,:), s_body{2}(1,:),'-r');
+% plot(opencv_data{2}(1,:), s_body{2}(2,:),'-r');
+
+% figure();
+% hold on;
+% plot(stor_secs, ones(length(stor_secs)));
+% plot(opencv_data(1,:), 2.*ones(length(opencv_data(1,:))));
+% ylim([0, 3]);
+% plot() CSS board 2
+
+%% Create sun vector of test (Body frame depends on rot. angle, inertial is constant)
+
+% Angle vector from OpenCV
+% ang_vec = 0:5:360;  % something like that
+
+% Sun Vectors: [phi (x rot), theta (y rot), psi (z rot)]
+% if(X_rot)
+%     Inertial_att = [ang_vec;zeroes(length(ang_vec),1) ; zeroes(length(ang_vec),1)]; % [rot angle, 0, 0]
+% elseif(Y_rot)
+%     Inertial_att = [zeroes(length(ang_vec),1); ang_vec; zeroes(length(ang_vec),1)]; % [0, rot angle, 0]
+% elseif(Z_rot)
+%     Inertial_att = [zeroes(length(ang_vec),1); zeroes(length(ang_vec),1); ang_vec]; % [0, 0, rot angle]
+% end
+
+% Attitude in inertial frame
+% attitude = [0,0,0];
+% Get rotation matrix
+% R = RotationMatrix321(attitude);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Least Squares Formula
+%
+% Variables: 
+% - x: 3xn matrix, photodiode normal vectors
+% - A: mx3 matrix, body frame sun vector data points
+% - b: mxn matrix, voltages from each photodiode corresponding to each body
+%       sun vector
+% - n: number of photodiodes (20), 32 voltage measurements total
+% - m: number of sun vector data points
+%
+% if Ax = b, left multiply by A' on each side to get A as a square matrix,
+% then left multiply both sides by inv(A'A) to get:
+%
+% x = inv(A' * A) * A' * b
+
+% css_valid_indices{3} = [find(stor_secs{3} == time_bounds{3}(1)), find(stor_secs{3} == time_bounds{3}(2))];
+% cv_valid_indices{3} = [find(cv_secs{3} == time_bounds{3}(1)), find(cv_secs{3} == time_bounds{3}(2))];
+test_time = [160, 525; 50, 200; 150, 500];
+
+start = cell(3);
+end_index = cell(3);
+for i = 1:3
+    start{i} = find(stor_secs{i} >= test_time(i,1), 1);
+    end_index{i} = find(stor_secs{i} >= test_time(i,2), 1);
+end
+
+temp_data = cell(4, 2);
+b = cell(4, 2);
+A = cell(4, 2);
+x = cell(4, 2);
+n_unit = cell(4, 2);
+for k = 1:2 % iterating over AD, ADS (1 = AD, 2, = ADS)
+    for i = 1:4 % iterating over CSS boards (5 boards, but 4 for each ADC)
+
+        % Constructing b matrix
+        for j = 1:4 % iterating over photodiodes
+            if k == 1
+                temp_data{j, k} = [(ad7991_data{PD_testaxes(i,1),j}( j, start{PD_testaxes(i,1)}:end_index{PD_testaxes(i,1)} ))';...
+                                (ad7991_data{PD_testaxes(i,2),j}( j, start{PD_testaxes(i,2)}:end_index{PD_testaxes(i,2)} ))'];
+            elseif k == 2
+                temp_data{j, k} = [(ads7924_data{PD_testaxes(i,1),j}( j, start{PD_testaxes(i,1)}:end_index{PD_testaxes(i,1)} ))';...
+                                (ads7924_data{PD_testaxes(i,2),j}( j, start{PD_testaxes(i,2)}:end_index{PD_testaxes(i,2)} ))'];
+            end
+        end
+        b{i, k} = [temp_data{1, k}, temp_data{2, k}, temp_data{3, k}, temp_data{4, k}];
+    
+        % Constructing A matrix
+        A1 = [s_body_interp{PD_testaxes(i,1)}(1, start{PD_testaxes(i,1)}:end_index{PD_testaxes(i,1)});
+              s_body_interp{PD_testaxes(i,1)}(2, start{PD_testaxes(i,1)}:end_index{PD_testaxes(i,1)});
+              s_body_interp{PD_testaxes(i,1)}(3, start{PD_testaxes(i,1)}:end_index{PD_testaxes(i,1)})]';  % N1 x 3
+    
+        A2 = [s_body_interp{PD_testaxes(i,2)}(1, start{PD_testaxes(i,2)}:end_index{PD_testaxes(i,2)});
+              s_body_interp{PD_testaxes(i,2)}(2, start{PD_testaxes(i,2)}:end_index{PD_testaxes(i,2)});
+              s_body_interp{PD_testaxes(i,2)}(3, start{PD_testaxes(i,2)}:end_index{PD_testaxes(i,2)})]';  % N2 x 3
+        
+        A{i, k} = [A1; A2];  % (N1 + N2) x 3
+        rank_A = rank(A{i, k});
+        disp("Rank of A{" + i + "} = " + rank_A);
+        x{i, k} = (A{i, k}' * A{i, k}) \ A{i, k}' * b{i, k};
+    
+        % n_unit{i, k}(1,:) = x{i, k}(1,:)/norm(x{i, k}(1,:));
+        % n_unit{i, k}(2,:) = x{i, k}(2,:)/norm(x{i, k}(2,:));
+        % n_unit{i, k}(3,:) = x{i, k}(3,:)/norm(x{i, k}(3,:));
+        n_unit{i, k} = x{i, k} ./ vecnorm(x{i, k});
+    end
+end
+% cond(A{i,k})
+
+
+all_norms{1} = [n_unit{1, 1}, n_unit{2, 1}, n_unit{3, 1}, n_unit{4, 1}];
+all_norms{2} = [n_unit{1, 2}, n_unit{2, 2}, n_unit{3, 2}, n_unit{4, 2}];
+
+all_norms{1}
+all_norms{2}
+% disp("CSS2 AD norms: " + all_norms{1}(:,1:4));
+% disp("CSS2 ADS norms: " + all_norms{2}(:,1:4));
+
+figure();
+for i = 1:16
+    hold on;
+    if i < 5
+        quiver3(0, 0, 0, all_norms{1}(1,i), all_norms{1}(2,i), all_norms{1}(3,i), 0, '-r', 'LineWidth', 2); % CSS 1
+    elseif i < 9
+        quiver3(0, 0, 0, all_norms{1}(1,i), all_norms{1}(2,i), all_norms{1}(3,i), 0, '-b', 'LineWidth', 2); % CSS 2
+    elseif i < 13
+        quiver3(0, 0, 0, all_norms{1}(1,i), all_norms{1}(2,i), all_norms{1}(3,i), 0, '--g', 'LineWidth', 2); % CSS 3
+    else 
+        quiver3(0, 0, 0, all_norms{1}(1,i), all_norms{1}(2,i), all_norms{1}(3,i), 0, '-c', 'LineWidth', 2); % CSS 5
+    end
+end
+for i = 13:16
+    quiver3(0, 0, 0, all_norms{2}(1,i), all_norms{2}(2,i), all_norms{2}(3,i), 0, '--k', 'LineWidth', 2); % CSS 4
+end
+quiver3(0, 0, 0, -1, 0, 0, 0, '-m', 'LineWidth', 1);
+quiver3(0, 0, 0, 0, -1, 0, 0, '-m', 'LineWidth', 1);
+quiver3(0, 0, 0, 0, 1, 0, 0, '-m', 'LineWidth', 1);
+quiver3(0, 0, 0, 0, 0, -1, 0, '-m', 'LineWidth', 1);
+quiver3(0, 0, 0, 0, 0, 1, 0, '-m', 'LineWidth', 1);
+% Dimensions
+Lx = 0.6;  % x length
+Ly = 0.1;  % y length
+Lz = 0.3;  % z length
+
+% Define half-lengths
+hx = Lx / 2;
+hy = Ly / 2;
+hz = Lz / 2;
+
+% Define the 8 corners of the box
+vertices = [...
+    -hx, -hy, -hz;
+     hx, -hy, -hz;
+     hx,  hy, -hz;
+    -hx,  hy, -hz;
+    -hx, -hy,  hz;
+     hx, -hy,  hz;
+     hx,  hy,  hz;
+    -hx,  hy,  hz];
+
+% Define faces by connecting vertices
+faces = [...
+    1 2 3 4;  % bottom
+    5 6 7 8;  % top
+    1 2 6 5;  % front
+    2 3 7 6;  % right
+    3 4 8 7;  % back
+    4 1 5 8]; % left
+patch('Vertices', vertices, 'Faces', faces, ...
+      'FaceColor', [0.8 0.8 1], 'FaceAlpha', 0.5, ...
+      'EdgeColor', 'k', 'LineWidth', 1.5);
+xlabel('X'); ylabel('Y'); zlabel('Z');
+grid on;
+axis equal;
+title('3D Vector');
+view(3);
+
+figure();
+for i = 1:16
+    hold on;
+    if i < 5
+        quiver3(0, 0, 0, all_norms{2}(1,i), all_norms{2}(2,i), all_norms{2}(3,i), 0, '-r', 'LineWidth', 2); % CSS 1
+    elseif i < 9
+        quiver3(0, 0, 0, all_norms{2}(1,i), all_norms{2}(2,i), all_norms{2}(3,i), 0, '-b', 'LineWidth', 2); % CSS 2
+    elseif i < 13
+        quiver3(0, 0, 0, all_norms{2}(1,i), all_norms{2}(2,i), all_norms{2}(3,i), 0, '--g', 'LineWidth', 2); % CSS 3
+    else 
+        quiver3(0, 0, 0, all_norms{1}(1,i), all_norms{1}(2,i), all_norms{1}(3,i), 0, '-c', 'LineWidth', 2); % CSS 5
+    end
+end
+for i = 13:16
+    quiver3(0, 0, 0, all_norms{2}(1,i), all_norms{2}(2,i), all_norms{2}(3,i), 0, '--k', 'LineWidth', 2); % CSS 4
+end
+quiver3(0, 0, 0, -1, 0, 0, 0, '-m', 'LineWidth', 1);
+quiver3(0, 0, 0, 0, -1, 0, 0, '-m', 'LineWidth', 1);
+quiver3(0, 0, 0, 0, 1, 0, 0, '-m', 'LineWidth', 1);
+quiver3(0, 0, 0, 0, 0, -1, 0, '-m', 'LineWidth', 1);
+quiver3(0, 0, 0, 0, 0, 1, 0, '-m', 'LineWidth', 1);
+patch('Vertices', vertices, 'Faces', faces, ...
+      'FaceColor', [0.8 0.8 1], 'FaceAlpha', 0.5, ...
+      'EdgeColor', 'k', 'LineWidth', 1.5);
+xlabel('X'); ylabel('Y'); zlabel('Z');
+grid on;
+axis equal;
+title('3D Vector');
+view(3);
+% n_unit{1}
+
+
+
+% temp_data{1} = movmean((CSS_data{1}.ad7991_2(3,start{1}:end_index{1}))', 5);
+% temp_data{3} = movmean((CSS_data{3}.ad7991_2(3,start{3}:end_index{3}))', 5);
+
+% A1 = [s_body_interp{3}(1, start{3}:end_index{3});
+%       s_body_interp{3}(2, start{3}:end_index{3});
+%       s_body_interp{3}(3, start{3}:end_index{3})]';  % N1 x 3
+% 
+% A2 = [s_body_interp{1}(1, start{1}:end_index{1});
+%       s_body_interp{1}(2, start{1}:end_index{1});
+%       s_body_interp{1}(3, start{1}:end_index{1})]';  % N2 x 3
+% 
+% A{1} = [A1; A2];  % (N1 + N2) x 3
+
+% rank_A = rank(A{1});
+% disp("Rank of A: " + rank_A);
+
+% b{1} = [temp_data{3}, temp_data{1}];  %, (CSS_data{1}.ad7991_2(:,time_bounds{3}(1):time_bounds{3}(2)))', (CSS_data{1}.ad7991_3(:,time_bounds{3}(1):time_bounds{3}(2)))'];
+% b1 = temp_data{3};  % N1 x 1
+% b2 = temp_data{1};  % N2 x 1
+% b{1} = [b1;...
+%         b2];  % (N1 + N2) x 1
+
+% x{1} = (A{1}' * A{1}) \ A{1}' * b{1};
+% 
+% n_unit = x{1}/norm(x{1});
+% 
+% n_unit
+
+% figure()
+% hold on;
+% % plot(stor_secs{2}, CSS_data{2}.ads7924_4(4,:));
+% plot(stor_secs{3}(start{3}:end_index{3}), temp_data{3});
+% plot(stor_secs{1}(start{1}:end_index{1}), temp_data{1});
+% % ylim([0.24,0.26]);
+% yyaxis right;
+% % plot(stor_secs{2}, s_body_interp{2}(1,:));
+% plot(stor_secs{3}(start{3}:end_index{3}), s_body_interp{3}(3,start{3}:end_index{3}));
+% plot(stor_secs{3}(start{3}:end_index{3}), s_body_interp{3}(1,start{3}:end_index{3}));
+% plot(stor_secs{1}(start{1}:end_index{1}), s_body_interp{1}(2,start{1}:end_index{1}));
+% plot(stor_secs{1}(start{1}:end_index{1}), s_body_interp{1}(1,start{1}:end_index{1}));
+
+% A{1} = [(s_body_interp{3}(1,start{3}:end_index{3}))',(s_body_interp{1}(1,start{1}:end_index{1}))',...
+%         (s_body_interp{3}(2,start{3}:end_index{3}))',(s_body_interp{1}(2,start{1}:end_index{1}))',...
+%         (s_body_interp{3}(3,start{3}:end_index{3}))',(s_body_interp{1}(3,start{1}:end_index{1}))'];
+
+%% Helper Functions
+
+

@@ -2,3 +2,6 @@ venv/
 .venv/
 .history/
 .vscode/
+data/
+scripts/OpenCV
+scripts/STOR_folders
