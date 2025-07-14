@@ -46,7 +46,7 @@ Time_range_hours = First_Hour:1:Last_Hour;
 for i = 1:length(Time_range_hours)
     for j = 1:length(File_range)
         
-        hour_path = fullfile(Root_dir,'STOR_folders','STOR_CSS_',num2str(Day),num2str(Time_range_hours(i)));
+        hour_path = fullfile(Root_dir,'STOR_folders','STOR',num2str(Day),num2str(Time_range_hours(i)));
         % hour_path = fullfile(Root_dir, 'STOR_YROT_5-19','LOW/'); % Can plot low res data
         FP = fullfile(hour_path,strcat(num2str(File_range(j))));
         Data_filepaths = dir(FP);
@@ -84,6 +84,10 @@ GPS_data.J2000_time = [];
 GPS_data.J2000_frac_time = [];
 GPS_data.eci_pos = [];
 GPS_data.eci_vel = [];
+
+RW_data.ref_wheel_speeds_drpm = [];
+RW_data.ref_wheel_speeds_drpm_ret = [];
+RW_data.current_wheel_speeds_drpm = [];
 
 %% Concatenate Data for std deviation and mean calculations
 % ========================================================================
@@ -129,6 +133,11 @@ for i = 1:length(adcs_data) % i corresponds to hour
         GPS_data.J2000_frac_time = [GPS_data.J2000_frac_time adcs_data{i}(:,j).GPS.J2000_frac_time];
         GPS_data.eci_pos = [GPS_data.eci_pos adcs_data{i}(:,j).GPS.eci_pos];
         GPS_data.eci_vel = [GPS_data.eci_vel adcs_data{i}(:,j).GPS.eci_vel];
+
+        % RW
+        RW_data.ref_wheel_speeds_drpm = [RW_data.ref_wheel_speeds_drpm adcs_data{i}(:,j).RW.ref_wheel_speeds_drpm];
+        RW_data.ref_wheel_speeds_drpm_ret = [RW_data.ref_wheel_speeds_drpm_ret adcs_data{i}(:,j).RW.ref_wheel_speeds_drpm_ret];
+        RW_data.current_wheel_speeds_drpm = [RW_data.current_wheel_speeds_drpm adcs_data{i}(:,j).RW.current_wheel_speeds_drpm];
     end
 end
 
@@ -221,10 +230,10 @@ A = A(B);
 
 %% Plot Calls
 % Comment out when certain data is not wanted
-% plotSYS(Time_combine,SYS_data)
+plotSYS(Time_combine,SYS_data)
 plotCSS(Time_combine,CSS_data)
-% plotGYRO(Time_combine,GYRO_data)
-% plotMAG(Time_combine,MAG_data)
+plotGYRO(Time_combine,GYRO_data)
+plotMAG(Time_combine,MAG_data)
 plotGPS(Time_combine,GPS_data,Time_line)
 
 %% Plotting Functions
@@ -310,7 +319,7 @@ function plotCSS(Time_combine,CSS_data)
     legend('PD 1','PD 2','PD 3','PD 4')
 
     figure(12)
-    plot(Time_combine,movmean(CSS_data.ads7924_4, 5));
+    plot(Time_combine,movmean(CSS_data.ads7924_4, 10));
     title('ADS7924 - Board 4')
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
@@ -416,5 +425,9 @@ function plotGPS(Time_combine,GPS_data,Time_line)
     xlabel('Time (s)')
     ylabel('Velocity (coordinates / sec??')
     legend('X','Z','Y')
+
+end
+
+function plotRW(Time_combine, RW_data)
 
 end

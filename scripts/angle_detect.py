@@ -110,7 +110,7 @@ def detect_marker(frame, object):
 
     return frame
 
-file = open(f"OpenCV/CSS_6-6-25/test_data{testnum}.csv", "w")
+file = open(f"OpenCV/HW_7-14-25/test_data{testnum}.csv", "w")
 
 while True:
     ret, frame = capture.read()

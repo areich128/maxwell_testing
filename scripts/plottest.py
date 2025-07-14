@@ -20,7 +20,7 @@ testnum = input("Enter test number: ")
 
 time = []
 angleseries = []
-with open (f'OpenCV/CSS_6-6-25/test_data{testnum}.csv', 'r') as csvfile:
+with open (f'OpenCV/HW_7-14-25/test_data{testnum}.csv', 'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
         datetime_data = dt.datetime.strptime(row[0], "%H:%M:%S.%f")
@@ -58,7 +58,7 @@ for i in range(1, len(angleseries)):
     omegaseries.append((angleseries_smooth[i] - angleseries_smooth[i-1]) / diff_secs)
     if i < len(angleseries_smooth)-10 | i > 10:
         omegaseries_avg[i] = sum(omegaseries[i-10:i+10]) / 10
-    omegaseries_lowpass = lowpass(omegaseries, 0.01, order=5)
+    omegaseries_lowpass = lowpass(omegaseries, 0.001, order=5)
 
 time = [(t - time[0]).total_seconds() for t in time]
 time = np.array(time)
@@ -78,57 +78,57 @@ plt.title('Angular Velocity vs Time')
 plt.savefig(f'anglevstime{testnum}.png')
 plt.show()
 
-t_uniform = np.linspace(time.min(), time.max(), len(time))  # new uniform time vector
-interp_func = interp1d(time, omegaseries, kind='linear', fill_value="extrapolate")
-x_uniform = interp_func(t_uniform)
+# t_uniform = np.linspace(time.min(), time.max(), len(time))  # new uniform time vector
+# interp_func = interp1d(time, omegaseries, kind='linear', fill_value="extrapolate")
+# x_uniform = interp_func(t_uniform)
 
-# Number of sample points
-N = len(x_uniform)
-T = t_uniform[1] - t_uniform[0]  # sample spacing
-yf = fft(x_uniform)
-xf = fftfreq(N, T)[:N // 2]  # frequency bins
+# # Number of sample points
+# N = len(x_uniform)
+# T = t_uniform[1] - t_uniform[0]  # sample spacing
+# yf = fft(x_uniform)
+# xf = fftfreq(N, T)[:N // 2]  # frequency bins
 
-# Amplitude spectrum (normalized)
-amplitude = 2.0/N * np.abs(yf[:N//2])
+# # Amplitude spectrum (normalized)
+# amplitude = 2.0/N * np.abs(yf[:N//2])
 
-plt.figure()
-plt.loglog(xf, amplitude)
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude')
-plt.grid(True, which='both')
-plt.title('FFT of Angular Velocity without Lowpass')
-plt.show()
+# plt.figure()
+# plt.loglog(xf, amplitude)
+# plt.xlabel('Frequency (Hz)')
+# plt.ylabel('Magnitude')
+# plt.grid(True, which='both')
+# plt.title('FFT of Angular Velocity without Lowpass')
+# plt.show()
 
-t_uniform = np.linspace(0, 1400, 1400)  # new uniform time vector for test signals
+# t_uniform = np.linspace(0, 1400, 1400)  # new uniform time vector for test signals
 
-x_test100 = np.sin(2*np.pi*t_uniform/100)
-x_test10 = np.sin(2*np.pi*t_uniform/10)
-x_test700 = np.sin(2*np.pi*t_uniform/700)
+# x_test100 = np.sin(2*np.pi*t_uniform/100)
+# x_test10 = np.sin(2*np.pi*t_uniform/10)
+# x_test700 = np.sin(2*np.pi*t_uniform/700)
 
-N = len(x_test700)
-T = t_uniform[1] - t_uniform[0]
-yf700 = fft(x_test700)
-xf700 = fftfreq(N, T)[:N // 2]
-amplitude700 = 2.0/N * np.abs(yf700[:N//2])
+# N = len(x_test700)
+# T = t_uniform[1] - t_uniform[0]
+# yf700 = fft(x_test700)
+# xf700 = fftfreq(N, T)[:N // 2]
+# amplitude700 = 2.0/N * np.abs(yf700[:N//2])
 
-N = len(x_test100)
-yf100 = fft(x_test100)
-xf100 = fftfreq(N, T)[:N // 2]
-amplitude100 = 2.0/N * np.abs(yf100[:N//2])
+# N = len(x_test100)
+# yf100 = fft(x_test100)
+# xf100 = fftfreq(N, T)[:N // 2]
+# amplitude100 = 2.0/N * np.abs(yf100[:N//2])
 
-N = len(x_test10)
-yf10 = fft(x_test10)
-xf10 = fftfreq(N, T)[:N // 2]
-amplitude10 = 2.0/N * np.abs(yf10[:N//2])
+# N = len(x_test10)
+# yf10 = fft(x_test10)
+# xf10 = fftfreq(N, T)[:N // 2]
+# amplitude10 = 2.0/N * np.abs(yf10[:N//2])
 
-plt.figure()
-plt.loglog(xf700, amplitude700)
-plt.loglog(xf100, amplitude100)
-plt.loglog(xf10, amplitude10)
-plt.legend(['700 Hz', '100 Hz', '10 Hz'])
-plt.ylim(1e-6, 1e1)
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude')
-plt.grid(True, which='both')
-plt.title(f'Test FFT over {max(t_uniform)} seconds')
-plt.show()
+# plt.figure()
+# plt.loglog(xf700, amplitude700)
+# plt.loglog(xf100, amplitude100)
+# plt.loglog(xf10, amplitude10)
+# plt.legend(['700 Hz', '100 Hz', '10 Hz'])
+# plt.ylim(1e-6, 1e1)
+# plt.xlabel('Frequency (Hz)')
+# plt.ylabel('Magnitude')
+# plt.grid(True, which='both')
+# plt.title(f'Test FFT over {max(t_uniform)} seconds')
+# plt.show()

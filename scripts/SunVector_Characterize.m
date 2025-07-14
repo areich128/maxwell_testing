@@ -226,6 +226,7 @@ end
 
 ad7991_data = cell(length(STOR_folders), 4);
 ads7924_data = cell(length(STOR_folders), 4);
+CSS_AD_vals = 0;
 
 for i = 1:length(STOR_folders)
     ad7991_data{i, 1} = CSS_data{i}.ad7991_1;
@@ -237,7 +238,9 @@ for i = 1:length(STOR_folders)
     ads7924_data{i, 2} = CSS_data{i}.ads7924_2;
     ads7924_data{i, 3} = CSS_data{i}.ads7924_3;
     ads7924_data{i, 4} = CSS_data{i}.ads7924_4;
+end
 
+for i = 1:length(STOR_folders)
     for j = 1:4
         for k = 1:4
             ad7991_data{i, j}(k,:) = ad7991_data{i, j}(k,:) - min(ad7991_data{i, j}(k,:));
@@ -245,6 +248,18 @@ for i = 1:length(STOR_folders)
         end
     end
 end
+
+CSS_AD_vals = [ad7991_data{1, 1}; ad7991_data{1, 2}; ad7991_data{1, 3}; ad7991_data{1, 4}];
+
+for i = 1:16
+    CSS_AD_vals(i,:) = movmean(CSS_AD_vals(i,:), 20);
+end
+figure();
+hold on;
+for i = 1:16
+    plot(CSS_AD_vals(i,:));
+end
+
 
 hour_path = [];
 
@@ -575,7 +590,7 @@ legend("x", "y", "z");
 all_norms{1} = [n_unit{1, 1}, n_unit{2, 1}, n_unit{3, 1}, n_unit{4, 1}];
 all_norms{2} = [n_unit{1, 2}, n_unit{2, 2}, n_unit{3, 2}, n_unit{4, 2}];
 % 
-% all_norms{1}
+all_norms{1}
 % all_norms{2}
 
 % disp("CSS2 AD norms: " + all_norms{1}(:,1:4));

@@ -46,7 +46,7 @@ Time_range_hours = First_Hour:1:Last_Hour;
 for i = 1:length(Time_range_hours)
     for j = 1:length(File_range)
         
-        hour_path = fullfile(Root_dir,'STOR_folders','STOR_CSS_transient2',num2str(Day),num2str(Time_range_hours(i)));
+        hour_path = fullfile(Root_dir,'STOR_folders','STOR_HW_7-14_Y5',num2str(Day),num2str(Time_range_hours(i)));
         % hour_path = fullfile(Root_dir, 'STOR_YROT_5-19','LOW/'); % Can plot low res data
         FP = fullfile(hour_path,strcat(num2str(File_range(j))));
         Data_filepaths = dir(FP);
@@ -84,6 +84,10 @@ GPS_data.J2000_time = [];
 GPS_data.J2000_frac_time = [];
 GPS_data.eci_pos = [];
 GPS_data.eci_vel = [];
+
+RW_data.ref_wheel_speeds_drpm = [];
+RW_data.ref_wheel_speeds_drpm_ret = [];
+RW_data.current_wheel_speeds_drpm = [];
 
 %% Concatenate Data for std deviation and mean calculations
 % ========================================================================
@@ -129,6 +133,11 @@ for i = 1:length(adcs_data) % i corresponds to hour
         GPS_data.J2000_frac_time = [GPS_data.J2000_frac_time adcs_data{i}(:,j).GPS.J2000_frac_time];
         GPS_data.eci_pos = [GPS_data.eci_pos adcs_data{i}(:,j).GPS.eci_pos];
         GPS_data.eci_vel = [GPS_data.eci_vel adcs_data{i}(:,j).GPS.eci_vel];
+
+        % RW
+        RW_data.ref_wheel_speeds_drpm = [RW_data.ref_wheel_speeds_drpm adcs_data{i}(:,j).RW.ref_wheel_speeds_drpm];
+        RW_data.ref_wheel_speeds_drpm_ret = [RW_data.ref_wheel_speeds_drpm_ret adcs_data{i}(:,j).RW.ref_wheel_speeds_drpm_ret];
+        RW_data.current_wheel_speeds_drpm = [RW_data.current_wheel_speeds_drpm adcs_data{i}(:,j).RW.current_wheel_speeds_drpm];
     end
 end
 
@@ -226,6 +235,7 @@ plotCSS(Time_combine,CSS_data)
 plotGYRO(Time_combine,GYRO_data)
 plotMAG(Time_combine,MAG_data)
 plotGPS(Time_combine,GPS_data,Time_line)
+plotRW(Time_combine, RW_data)
 
 %% Plotting Functions
 function plotSYS(Time_combine,SYS_data)
@@ -258,6 +268,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 1])
     
     figure(5)
     plot(Time_combine,CSS_data.ad7991_2)
@@ -265,6 +276,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 1])
     
     figure(6)
     plot(Time_combine,CSS_data.ad7991_3)
@@ -272,6 +284,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 1])
     
     figure(7)
     plot(Time_combine,CSS_data.ad7991_4)
@@ -279,6 +292,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 1])
     
     % CSS Data ADS7924
     figure(8)
@@ -287,6 +301,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 1])
     
     figure(9)
     plot(Time_combine,CSS_data.ads7924_2)
@@ -294,6 +309,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 1])
     
     figure(10)
     plot(Time_combine,CSS_data.ads7924_3)
@@ -301,6 +317,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 1])
     
     figure(11)
     plot(Time_combine,CSS_data.ads7924_4)
@@ -308,6 +325,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 1])
 
     figure(12)
     plot(Time_combine,movmean(CSS_data.ads7924_4, 10));
@@ -315,6 +333,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 1])
 
 end
 
@@ -417,4 +436,42 @@ function plotGPS(Time_combine,GPS_data,Time_line)
     ylabel('Velocity (coordinates / sec??')
     legend('X','Z','Y')
 
+end
+
+function plotRW(Time_combine, RW_data)
+    figure()
+    hold on;
+    plot(Time_combine,RW_data.ref_wheel_speeds_drpm)
+    title('Ref Wheel Speeds DRPM')
+    xlabel('Time (s)')
+    ylabel('Ref Wheel Speeds (DRPM)')
+    legend('1','2','3', '4')
+    ylim([-100000, 100000]);
+
+    figure()
+    hold on;
+    plot(Time_combine,RW_data.ref_wheel_speeds_drpm)
+    title('Ref Wheel Speeds DRPM')
+    xlabel('Time (s)')
+    ylabel('Ref Wheel Speeds (DRPM)')
+    legend('1','2','3', '4')
+    ylim([-100000, 100000]);
+
+    figure()
+    hold on;
+    plot(Time_combine,RW_data.ref_wheel_speeds_drpm_ret)
+    title('Ref Wheel Speeds DRPM?')
+    xlabel('Time (s)')
+    ylabel('Ref Wheel Speeds (DRPM)')
+    legend('1','2','3', '4')
+    ylim([-100000, 100000]);
+
+    figure()
+    hold on;
+    plot(Time_combine,RW_data.current_wheel_speeds_drpm)
+    title('Current Wheel Speeds DRPM')
+    xlabel('Time (s)')
+    ylabel('Current Wheel Speeds (DRPM)')
+    legend('1','2','3', '4')
+    ylim([-100000, 100000]);
 end
