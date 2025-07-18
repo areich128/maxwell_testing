@@ -36,7 +36,7 @@ phi0 = 0; theta0 = 0; psi0 = 0;
 ptp0 = [phi0;theta0;psi0];
 q0123_0 = EulerAngles2Quaternions(ptp0);  % Convert to quaternion
 
-% Initial angular velocity (I estimated
+% Initial angular velocity (I estimated) (rad/s)
 p0 = 0.05; q0 = -0.05; r0 = 0.05;
 
 % Initial state vector: [position; velocity; quaternion; angular velocity]
@@ -44,7 +44,7 @@ state = [x0;y0;z0;xdot0;ydot0;zdot0;q0123_0;p0;q0;r0];
 
 %% Define simulation time settings
 period = 2*pi/sqrt(mu) * semi_major^(3/2);  % Orbital period
-number_of_orbits = 1;       % Simulate 1 full orbit (can do more or less)
+number_of_orbits = 2;       % Simulate 1 full orbit (can do more or less)
 tfinal = period * number_of_orbits;
 timestep = 0.1;             % Time step for integration (10hz just like flight code)
 tout = 0:timestep:tfinal;   % Time vector
@@ -141,3 +141,22 @@ plot(tout, pqrout, 'LineWidth', 2);
 xlabel('Time (sec)');
 ylabel('Angular Velocity (rad/s)');
 grid on;
+
+% --- Plot Roll, Pitch, Yaw (ptpout) ---
+figure;
+plot(tout, ptpout, 'LineWidth', 2);
+xlabel('Time [sec]');
+ylabel('Angle [rad]');
+title('Attitude: Roll, Pitch, Yaw');
+legend('Roll', 'Pitch', 'Yaw');
+grid on;
+
+% --- Plot Quaternion Components (q0123out) ---
+figure;
+plot(tout, q0123out, 'LineWidth', 2);
+xlabel('Time [sec]');
+ylabel('Quaternion Value');
+title('Quaternion Components');
+legend('q0', 'q1', 'q2', 'q3');
+grid on;
+
