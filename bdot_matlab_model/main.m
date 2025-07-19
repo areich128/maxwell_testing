@@ -11,9 +11,6 @@ global BxBout ByBout BzBout LMN_magtorquers
 %% begin simulation and initialize all variable
 disp('Simulation Started')
 
-% Add IGRF model path for geomagnetic field computations
-addpath 'igrf/'
-
 % load Earth and satellite parameters
 earth_params   % defines R, M, G, mu, m
 inertia        % defines satellite's inertia matrix I and I's inverse
@@ -120,17 +117,17 @@ disp('Simulation Complete')
 xout = stateout(:,1); yout = stateout(:,2); zout = stateout(:,3);
 q0123out = stateout(:,7:10);
 ptpout = Quaternions2EulerAngles(q0123out);
-pqrout = stateout(:,11:13); % angular velocities over time
+pqrout = stateout(:,11:13); % angular velocities over time (p=dx,q=dy,r=dz)
 
 %% --- PLOTTING ---
-% Magnetic Field in Body Frame over time
+% Magnetic Field in Body Frame over time in Gauss
 figure;
 set(gcf,'color','white')
 plot(tout, BxBout, 'b-', 'LineWidth', 2); hold on;
 plot(tout, ByBout, 'y-', 'LineWidth', 2);
 plot(tout, BzBout, 'g-', 'LineWidth', 2);
 xlabel('Time (sec)');
-ylabel('Magnetic Field (G)');
+ylabel('Magnetic Field in Body Frame (G)');
 legend('Bx', 'By', 'Bz');
 grid on;
 
@@ -140,9 +137,10 @@ set(gcf,'color','white')
 plot(tout, pqrout, 'LineWidth', 2);
 xlabel('Time (sec)');
 ylabel('Angular Velocity (rad/s)');
+title('Body Rates vs. Time');
 grid on;
 
-% --- Plot Roll, Pitch, Yaw (ptpout) ---
+% Plot Roll, Pitch, Yaw (ptpout)
 figure;
 plot(tout, ptpout, 'LineWidth', 2);
 xlabel('Time [sec]');
@@ -151,7 +149,7 @@ title('Attitude: Roll, Pitch, Yaw');
 legend('Roll', 'Pitch', 'Yaw');
 grid on;
 
-% --- Plot Quaternion Components (q0123out) ---
+% Plot Quaternion Components (q0123out)
 figure;
 plot(tout, q0123out, 'LineWidth', 2);
 xlabel('Time [sec]');
@@ -160,3 +158,11 @@ title('Quaternion Components');
 legend('q0', 'q1', 'q2', 'q3');
 grid on;
 
+%%%Plot X,Y,Z as a function of time
+fig0 = figure();
+set(fig0,'color','white')
+plot(tout,sqrt(xout.^2+yout.^2+zout.^2)-R,'b-','LineWidth',2)
+grid on
+xlabel('Time (sec)')
+ylabel('Altitude (m)')
+title('Altitude vs. Time')

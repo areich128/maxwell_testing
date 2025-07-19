@@ -30,12 +30,11 @@ if t >= lastMagUpdate
     psiE = atan2(y, x);
     latitude = 90 - thetaE * 180 / pi;
     longitude = psiE * 180 / pi;
-    rhokm = rho / 1000;
 
-    [BN, BE, BD] = igrf('01-Jan-2020', latitude, longitude, rhokm, 'geocentric');
-    BNED = [BN; BE; BD]; %the igrf model gives us field in north east down format
-    BI = TIB(0, thetaE + pi, psiE) * BNED;   % convert igrf in NED to ECI
-    mag_bf = TIBquat(q0123)' * BI;    % Convert ECI to body frame in nT
+    [BNED,H,D,A,F,DXDYDZ,DH,DD,DI,DF] = igrfmagm(rho-R, latitude, longitude, decyear(2026,3,4));
+    %BNED=mag field in NED frame in nT
+    BI = TIB(0, thetaE + pi, psiE) * BNED';   % convert igrf in NED to ECI
+    mag_bf = TIBquat(q0123)' * BI;    % Convert ECI to body frame
     mag_bf = mag_bf * 1e-5;            % Convert nT to Gauss
 end
 
