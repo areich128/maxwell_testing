@@ -42,7 +42,7 @@ void Test2_Outputs_wrapper(const uint8_T *u0,
 			real32_T *y0)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
- 
+void create_desRN(u0, u1, y0);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

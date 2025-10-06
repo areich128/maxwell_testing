@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Mon Oct 06 17:42:26 2025
+ * Created: Mon Oct 06 17:44:54 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -102,7 +102,7 @@
 #define NUM_CONT_STATES                0
 #define CONT_STATES_IC                 [0]
 #define SFUNWIZ_GENERATE_TLC           1
-#define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight__SFB__SRC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\drivers__SFB__SRC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\tasks__SFB__INC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\include__SFB__INC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\include\test__SFB__INC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\fatfs\src__SFB__INC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\drivers__SFB__"
+#define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight__SFB__SRC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\drivers__SFB__SRC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\tasks__SFB__INC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\include__SFB__INC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\include\test__SFB__INC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\fatfs\src__SFB__INC_PATH C:\Users\AdamY\workspace\University - CU Boulder\MAXWELL\maxwell_adcs\flight\drivers"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
 #define SHOW_COMPILE_STEPS             1
