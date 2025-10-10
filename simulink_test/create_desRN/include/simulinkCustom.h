@@ -1,6 +1,13 @@
 #include <stdint.h>
+#include <stdio.h>
+#include "mex.h"
+//#define PRINT(fmt,arg...)
 
-#define PRINT(fmt,arg...)
+#define PRINT(fmt,args...) {			\
+		char dbgstr[360];				\
+		sprintf(dbgstr, fmt, ##args); 	\
+		mexPrintf(dbgstr); 				\
+		}
 
 
 extern uint64_t g_err; ///< Global error flag
