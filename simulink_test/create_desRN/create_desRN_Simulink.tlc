@@ -1,5 +1,5 @@
 %% File : create_desRN_Simulink.tlc
-%% Created : Fri Oct 10 17:47:16 2025
+%% Created : Fri Oct 17 16:56:23 2025
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -24,7 +24,6 @@
 %function BlockTypeSetup(block, system) void
     %assign uint8Type = LibGetDataTypeNameFromId(::CompiledModel.tSS_UINT8)
     %assign singleType = LibGetDataTypeNameFromId(::CompiledModel.tSS_SINGLE)
-    %assign doubleType = LibGetDataTypeNameFromId(::CompiledModel.tSS_DOUBLE)
 
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
     %assign hFileName = "create_desRN_Simulink_accel_wrapper"
@@ -46,7 +45,7 @@
     #endif
     SFB_EXTERN_C void create_desRN_Simulink_Outputs_wrapper_accel(const %<uint8Type> *opmode,
 			const %<singleType> *des_vec,
-			%<doubleType> *des_RN);
+			%<singleType> *des_RN);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -75,11 +74,11 @@
     SFB_EXTERN_C void create_desRN_Simulink_Start_wrapper(void);
     SFB_EXTERN_C void create_desRN_Simulink_Outputs_wrapper(const %<uint8Type> *opmode,
 			const %<singleType> *des_vec,
-			%<doubleType> *des_RN);
+			%<singleType> *des_RN);
     SFB_EXTERN_C void create_desRN_Simulink_Terminate_wrapper(void);
     void create_desRN_Simulink_Outputs_wrapper_accel(const %<uint8Type> *opmode,
 			const %<singleType> *des_vec,
-			%<doubleType> *des_RN){
+			%<singleType> *des_RN){
     create_desRN_Simulink_Outputs_wrapper(opmode,
 			des_vec,
 			des_RN);
@@ -103,7 +102,7 @@
 
     SFB_EXTERN_C void create_desRN_Simulink_Outputs_wrapper(const %<uint8Type> *opmode,
 			const %<singleType> *des_vec,
-			%<doubleType> *des_RN);
+			%<singleType> *des_RN);
 
     SFB_EXTERN_C void create_desRN_Simulink_Terminate_wrapper(void);
 

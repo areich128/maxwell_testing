@@ -1041,7 +1041,6 @@ void create_gnd_stn_des_q(uint8_t op_mode, struct mtx_matrix* q_BN_vecmtx,
 /*Pranith -> Algorithm to compute desired quaternion*/
 void create_desRN(uint8_t opmode, float *des_vec, float *des_RN){ //des_vec is in ECI frame, DCM expressed in ECI
 uint8_t i,b;
-PRINT("test\r\n")
 struct mtx_matrix dcm_NR, dcm_RN, quat_des;
 float unitx[3] = {1.0f,0.0f,0.0f};
 float unity[3] = {0.0f,1.0f,0.0f};
@@ -1093,7 +1092,6 @@ for(i = 0; i<4; i++){
 if(des_RN[0]<0) min=1;
 q_norm=normq(des_RN);             //normalize
 if(q_norm==0) PRINT("ERR->qnorm is 0\r\n");
-
 for(i=0; i<4; i++){
     des_RN[i]/= (min ? -1*q_norm : q_norm);
 }

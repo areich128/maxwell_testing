@@ -15,11 +15,12 @@
 
 
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
- 
+#include "mex.h"
+#include <stdio.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 1
 #define u_1_width 3
-#define y_width 9
+#define y_width 4
 
 /*
  * Create external references here.  
@@ -35,14 +36,14 @@
  */
 extern void create_desRN_Simulink_Outputs_wrapper(const uint8_T *opmode,
 			const real32_T *des_vec,
-			real_T *des_RN);
+			real32_T *des_RN);
 
 void create_desRN_Simulink_Outputs_wrapper(const uint8_T *opmode,
 			const real32_T *des_vec,
-			real_T *des_RN)
+			real32_T *des_RN)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-create_desRN(opmode, des_vec, des_RN);
+    create_desRN(*opmode, des_vec, des_RN);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

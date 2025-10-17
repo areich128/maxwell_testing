@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Fri Oct 10 17:47:16 2025
+ * Created: Fri Oct 17 16:56:23 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -79,11 +79,11 @@
 
 /* Output Port  0 */
 #define OUT_PORT_0_NAME                des_RN
-#define OUTPUT_0_DIMS_ND               {3,3}
-#define OUTPUT_0_NUM_ELEMS             9
-#define OUTPUT_0_WIDTH                 3
-#define OUTPUT_DIMS_0_COL              3
-#define OUTPUT_0_DTYPE                 real_T
+#define OUTPUT_0_DIMS_ND               {4,1}
+#define OUTPUT_0_NUM_ELEMS             4
+#define OUTPUT_0_WIDTH                 4
+#define OUTPUT_DIMS_0_COL              1
+#define OUTPUT_0_DTYPE                 real32_T
 #define OUTPUT_0_COMPLEX               COMPLEX_NO
 #define OUTPUT_0_UNIT                  ""
 #define OUT_0_BUS_BASED                0
@@ -96,13 +96,13 @@
 #define OUT_0_BIAS                     0
 #define OUT_0_SLOPE                    0.125
 #define NPARAMS                        0
-#define SAMPLE_TIME_0                  0
+#define SAMPLE_TIME_0                  1
 #define NUM_DISC_STATES                0
 #define DISC_STATES_IC                 [0]
 #define NUM_CONT_STATES                0
 #define CONT_STATES_IC                 [0]
 #define SFUNWIZ_GENERATE_TLC           1
-#define SOURCEFILES                    "__SFB__SRC_PATH ..\create_desRN\src__SFB__INC_PATH ..\create_desRN\include__SFB__att_det.c__SFB__mtx.c__SFB__conversions.c__SFB__ref_rotation.c__SFB__simulinkCustom.c__SFB__"
+#define SOURCEFILES                    "__SFB__SRC_PATH ..\create_desRN\src__SFB__INC_PATH ..\create_desRN\include__SFB__att_det.c__SFB__mtx.c__SFB__conversions.c__SFB__ref_rotation.c__SFB__simulinkCustom.c"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
 #define SHOW_COMPILE_STEPS             1
@@ -116,7 +116,7 @@
 
 extern void create_desRN_Simulink_Outputs_wrapper(const uint8_T *opmode,
   const real32_T *des_vec,
-  real_T *des_RN);
+  real32_T *des_RN);
 
 /*=============================*
  * Data Transposition Routines *
@@ -297,7 +297,7 @@ static void mdlInitializeSizes(SimStruct *S)
   int_T out0Dims[] = OUTPUT_0_DIMS_ND;
   outputDimsInfo.dims = out0Dims;
   ssSetOutputPortDimensionInfo(S, 0, &outputDimsInfo);
-  ssSetOutputPortDataType(S, 0, SS_DOUBLE);
+  ssSetOutputPortDataType(S, 0, SS_SINGLE);
   ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
 
   /*
@@ -475,14 +475,14 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 {
   const uint8_T *opmode = (uint8_T *) ssGetInputPortRealSignal(S, 0);
   const real32_T *des_vec = (real32_T *) ssGetInputPortRealSignal(S, 1);
-  real_T *des_RN = (real_T *) ssGetOutputPortRealSignal(S, 0);
+  real32_T *des_RN = (real32_T *) ssGetOutputPortRealSignal(S, 0);
 
   /* S-Function Builder Row Major Support has been enabled for custom
    * code, a transposed copy will be created for any array signals.
    */
   uint8_T *opmode_t = (uint8_T *)ssGetDWork(S, 0);
   real32_T *des_vec_t = (real32_T *)ssGetDWork(S, 1);
-  real_T *des_RN_t = (real_T *)ssGetDWork(S, 2);
+  real32_T *des_RN_t = (real32_T *)ssGetDWork(S, 2);
   NDTransposeBySrcSpecs((void*)opmode_t, (const void*)opmode,
                         ssGetInputPortDimensions(S, 0),
                         ssGetInputPortNumDimensions(S, 0), sizeof(uint8_T));
@@ -492,7 +492,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   create_desRN_Simulink_Outputs_wrapper(opmode_t, des_vec_t, des_RN_t);
   NDTransposeByDstSpecs((void*)des_RN, (const void*)des_RN_t,
                         ssGetOutputPortDimensions(S, 0),
-                        ssGetOutputPortNumDimensions(S, 0), sizeof(real_T));
+                        ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));
 }
 
 /* Function: mdlTerminate =====================================================
