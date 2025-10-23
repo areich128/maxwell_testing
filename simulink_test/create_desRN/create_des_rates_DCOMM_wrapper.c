@@ -15,12 +15,14 @@
 
 
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
-#include "mex.h"
-#include <stdio.h>
+#include <math.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 1
-#define u_1_width 3
-#define y_width 4
+#define u_1_width 1
+#define u_2_width 1
+#define u_3_width 1
+#define y_width 1
+#define y_1_width 1
 
 /*
  * Create external references here.  
@@ -34,16 +36,28 @@
  * Output function
  *
  */
-extern void create_desRN_Simulink_Outputs_wrapper(const uint8_T *opmode,
-			const real32_T *des_vec,
-			real32_T *des_RN);
+extern void create_des_rates_DCOMM_Outputs_wrapper(const uint8_T *opmode,
+			const real32_T *pos_ecef,
+			const uint8_T *leapsec,
+			const real32_T *q_BN,
+			real32_T *gnd_ecef,
+			real32_T *des_rates_bf);
 
-void create_desRN_Simulink_Outputs_wrapper(const uint8_T *opmode,
-			const real32_T *des_vec,
-			real32_T *des_RN)
+void create_des_rates_DCOMM_Outputs_wrapper(const uint8_T *opmode,
+			const real32_T *pos_ecef,
+			const uint8_T *leapsec,
+			const real32_T *q_BN,
+			real32_T *gnd_ecef,
+			real32_T *des_rates_bf)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-create_desRN(*opmode, des_vec, des_RN);
+/* This sample sets the output equal to the input
+      y0[0] = u0[0]; 
+ For complex signals use: y0[0].re = u0[0].re; 
+      y0[0].im = u0[0].im;
+      y1[0].re = u1[0].re;
+      y1[0].im = u1[0].im;
+ */
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 
