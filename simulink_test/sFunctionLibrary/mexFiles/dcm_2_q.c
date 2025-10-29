@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Mon Oct 27 14:34:75 2025
+ * Created: Wed Oct 29 13:49:95 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -85,8 +85,8 @@
 #define SOURCEFILES                    "__SFB__SRC_PATH ..\..\..\maxwell_adcs\flight__SFB__INC_PATH ..\..\..\maxwell_adcs\flight\include__SFB__..\..\..\maxwell_adcs\flight\drivers\mtx.c__SFB__..\..\..\maxwell_adcs\flight\tasks\conversions.c__SFB__..\..\..\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__..\..\..\maxwell_adcs\flight\tasks\att_det.c__SFB__..\..\..\maxwell_adcs\flight\drivers\global.c"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
-#define SHOW_COMPILE_STEPS             0
-#define CREATE_DEBUG_MEXFILE           0
+#define SHOW_COMPILE_STEPS             1
+#define CREATE_DEBUG_MEXFILE           1
 #define SAVE_CODE_ONLY                 0
 #define SFUNWIZ_REVISION               3.0
 
@@ -314,7 +314,9 @@ static void mdlInitializeSizes(SimStruct *S)
 
   /* Take care when specifying exception free code - see sfuntmpl_doc.c */
   ssSetRuntimeThreadSafetyCompliance(S, RUNTIME_THREAD_SAFETY_COMPLIANCE_FALSE);
-  ssSetOptions(S, SS_OPTION_EXCEPTION_FREE_CODE);
+  ssSetOptions(S, (SS_OPTION_EXCEPTION_FREE_CODE |
+                   SS_OPTION_WORKS_WITH_CODE_REUSE));
+  ssSupportsMultipleExecInstances(S, true);
 }
 
 #if defined(MATLAB_MEX_FILE)

@@ -14,12 +14,12 @@ function testResults = dcm2quat_Test()
     data = single(zeros(nTestCases,3,3));
 
     % Populate
-    data(1,:,:) = [0 0 1; 0 1 0; -1 0 0];
+    data(1,:,:) = [1 0 0; 0 1 0; 0 0 1];
     inData = timetable(time,data);
 
     %% Expected Outputs
     outputs = zeros(4,nTestCases);
-    outputs(:,1) = [0; 1/sqrt(2); 0; 1/sqrt(2)];
+    outputs(:,1) = [1; 0; 0; 0];
 
     %% Update Model
     % Set Inputs
