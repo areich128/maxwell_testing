@@ -1,6 +1,6 @@
 classdef TestSupport
-    % TESTHELPER Summary of this class goes here
-    %   Detailed explanation goes here
+    % TestSupport: This class has a bunch of comparison functions to check 
+    % outputs of a test harness against expected values.
 
     properties
         ABS_TOL;

@@ -1,3 +1,7 @@
+%{
+    This script executes all unit tests in the testFunctions directory.
+%}
+
 %% Setup Paths
 currentPath = matlab.desktop.editor.getActiveFilename;
 currentPath = strsplit(currentPath,'\');
