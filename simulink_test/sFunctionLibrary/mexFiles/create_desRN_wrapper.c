@@ -15,11 +15,12 @@
 
 
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
-#include <math.h>
-#include "mtx.h"
+#include "mex.h"
+#include <stdio.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
-#define u_width 4
-#define y_width 9
+#define u_width 1
+#define u_1_width 3
+#define y_width 4
 
 /*
  * Create external references here.  
@@ -33,33 +34,16 @@
  * Output function
  *
  */
-extern void q_2_dcm_Outputs_wrapper(const real32_T *q,
-			real32_T *dcm);
+extern void create_desRN_Outputs_wrapper(const uint8_T *opmode,
+			const real32_T *des_vec,
+			real32_T *des_RN);
 
-void q_2_dcm_Outputs_wrapper(const real32_T *q,
-			real32_T *dcm)
+void create_desRN_Outputs_wrapper(const uint8_T *opmode,
+			const real32_T *des_vec,
+			real32_T *des_RN)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-// Inputs
-struct mtx_matrix dcmMtx;
-mtx_create_ones(3,3,&dcmMtx);
-
-// Outputs
-struct mtx_matrix qMtx;
-mtx_create(4,1,q,&qMtx);
-
-q_2_dcm(&qMtx,&dcmMtx);
-
-// Set Outputs
-dcm[0] = mtx_get(1,1,&dcmMtx);
-dcm[1] = mtx_get(1,2,&dcmMtx);
-dcm[2] = mtx_get(1,3,&dcmMtx);
-dcm[3] = mtx_get(2,1,&dcmMtx);
-dcm[4] = mtx_get(2,2,&dcmMtx);
-dcm[5] = mtx_get(2,3,&dcmMtx);
-dcm[6] = mtx_get(3,1,&dcmMtx);
-dcm[7] = mtx_get(3,2,&dcmMtx);
-dcm[8] = mtx_get(3,3,&dcmMtx);
+create_desRN(*opmode, des_vec, des_RN);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 
