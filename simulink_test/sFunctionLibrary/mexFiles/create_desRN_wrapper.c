@@ -43,7 +43,7 @@ void create_desRN_Outputs_wrapper(const uint8_T *opmode,
 			real32_T *des_RN)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-create_desRN(opmode, des_vec, des_RN);
+create_desRN(*opmode, des_vec, des_RN);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

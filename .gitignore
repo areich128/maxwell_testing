@@ -5,3 +5,4 @@ venv/
 data/
 scripts/OpenCV
 scripts/STOR_folders
+*.autosave

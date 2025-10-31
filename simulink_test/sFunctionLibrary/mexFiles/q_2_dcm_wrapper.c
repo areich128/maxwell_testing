@@ -43,19 +43,25 @@ void q_2_dcm_Outputs_wrapper(const real32_T *q,
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
 // Inputs
-struct mtx_matrix qMtx;
-mtx_create_ones(4,1,&qMtx);
+struct mtx_matrix dcmMtx;
+mtx_create_ones(3,3,&dcmMtx);
 
 // Outputs
-struct mtx_matrix dcmMtx;
-mtx_create(3,3,dcm,&dcmMtx);
+struct mtx_matrix qMtx;
+mtx_create(4,1,q,&qMtx);
 
-q_2_dcm(&qMtx, &dcmMtx);
-// This is a test....
-// dcm[0] = mtx_get(1,1,&dcmMtx);
-// dcm[1] = mtx_get(2,1,&dcmMtx);
-// dcm[2] = mtx_get(3,1,&dcmMtx);
-// dcm[3] = mtx_get(4,1,&dcmMtx);
+q_2_dcm(&qMtx,&dcmMtx);
+
+// Set Outputs
+dcm[0] = mtx_get(1,1,&dcmMtx);
+dcm[1] = mtx_get(1,2,&dcmMtx);
+dcm[2] = mtx_get(1,3,&dcmMtx);
+dcm[3] = mtx_get(2,1,&dcmMtx);
+dcm[4] = mtx_get(2,2,&dcmMtx);
+dcm[5] = mtx_get(2,3,&dcmMtx);
+dcm[6] = mtx_get(3,1,&dcmMtx);
+dcm[7] = mtx_get(3,2,&dcmMtx);
+dcm[8] = mtx_get(3,3,&dcmMtx);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 
