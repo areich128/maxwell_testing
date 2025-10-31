@@ -58,6 +58,8 @@ void create_phicone_des_q_Outputs_wrapper(const uint8_T *op_mode,
       y1[0].re = u1[0].re;
       y1[0].im = u1[0].im;
  */
+
+   create_phicone_des_q(op_mode,pos_vec, sun_vec, des_RN_q, phi_cone_angle, phi_vec_normlzd);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

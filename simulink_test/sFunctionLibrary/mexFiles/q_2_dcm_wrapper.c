@@ -16,6 +16,9 @@
 
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
 #include <math.h>
+#include "mtx.h"
+#include "mex.h"
+#include "uart_dbg.h"
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 4
 #define y_width 9
@@ -39,13 +42,20 @@ void q_2_dcm_Outputs_wrapper(const real32_T *q,
 			real32_T *dcm)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-/* This sample sets the output equal to the input
-      y0[0] = u0[0]; 
- For complex signals use: y0[0].re = u0[0].re; 
-      y0[0].im = u0[0].im;
-      y1[0].re = u1[0].re;
-      y1[0].im = u1[0].im;
- */
+// Inputs
+struct mtx_matrix qMtx;
+mtx_create_ones(4,1,&qMtx);
+
+// Outputs
+struct mtx_matrix dcmMtx;
+mtx_create(3,3,dcm,&dcmMtx);
+
+q_2_dcm(&qMtx, &dcmMtx);
+// This is a test....
+// dcm[0] = mtx_get(1,1,&dcmMtx);
+// dcm[1] = mtx_get(2,1,&dcmMtx);
+// dcm[2] = mtx_get(3,1,&dcmMtx);
+// dcm[3] = mtx_get(4,1,&dcmMtx);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

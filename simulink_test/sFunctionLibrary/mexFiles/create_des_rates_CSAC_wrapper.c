@@ -52,6 +52,7 @@ void create_des_rates_CSAC_Outputs_wrapper(const uint8_T *opmode,
       y1[0].re = u1[0].re;
       y1[0].im = u1[0].im;
  */
+   create_des_rates_CSAC_Outputs_wrapper(opmode, q_BN, phi_cone, des_rates_bf);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

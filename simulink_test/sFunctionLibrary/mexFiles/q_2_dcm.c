@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Thu Oct 23 17:49:72 2025
+ * Created: Fri Oct 31 12:11:78 2025
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -82,7 +82,7 @@
 #define NUM_CONT_STATES                0
 #define CONT_STATES_IC                 [0]
 #define SFUNWIZ_GENERATE_TLC           1
-#define SOURCEFILES                    "__SFB__SRC_PATH ..\..\..\maxwell_adcs\flight__SFB__INC_PATH ..\..\..\maxwell_adcs\flight\include__SFB__..\..\..\maxwell_adcs\flight\drivers\mtx.c__SFB__..\..\..\maxwell_adcs\flight\tasks\conversions.c__SFB__..\..\..\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__..\..\..\maxwell_adcs\flight\tasks\att_det.c__SFB__..\..\..\maxwell_adcs\flight\drivers\global.c__SFB__"
+#define SOURCEFILES                    "__SFB__SRC_PATH ..\..\..\maxwell_adcs\flight__SFB__INC_PATH ..\..\..\maxwell_adcs\flight\include__SFB__..\..\..\maxwell_adcs\flight\drivers\mtx.c__SFB__..\..\..\maxwell_adcs\flight\tasks\conversions.c__SFB__..\..\..\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__..\..\..\maxwell_adcs\flight\tasks\att_det.c__SFB__..\..\..\maxwell_adcs\flight\drivers\global.c"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
 #define SHOW_COMPILE_STEPS             0
