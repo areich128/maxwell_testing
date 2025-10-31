@@ -6,7 +6,7 @@
     <P Name="CreatedBy">AdamY</P>
     <P Name="CreatedOn">Mon Oct 27 14:35:08 2025</P>
     <P Name="ModifiedBy">AdamY</P>
-    <P Name="LastSaved">Fri Oct 31 13:35:03 2025</P>
+    <P Name="LastSaved">Fri Oct 31 15:06:55 2025</P>
     <P Name="Owner">1</P>
     <P Name="OwnerType">UDF_HARNESS</P>
     <P Name="OwnerPath">dcm_2_q</P>
@@ -40,12 +40,53 @@
     <P Name="SysArchSUTModel"/>
   </Harness>
   <Harness>
+    <P Name="Name">sFunctionLibrary_create_desRN_Harness</P>
+    <P Name="Description"/>
+    <P Name="CreatedBy">AdamY</P>
+    <P Name="CreatedOn">Fri Oct 31 15:30:05 2025</P>
+    <P Name="ModifiedBy">AdamY</P>
+    <P Name="LastSaved">Fri Oct 31 15:55:32 2025</P>
+    <P Name="Owner">13</P>
+    <P Name="OwnerType">UDF_HARNESS</P>
+    <P Name="OwnerPath">create_desRN</P>
+    <P Name="Directory"/>
+    <P Name="FileName">sFunctionLibrary_create_desRN_Harness.slx</P>
+    <P Name="SavedVersion">25.2</P>
+    <P Name="HarnessUUID">1be66c8f-eae0-4532-9f5f-e6f7c7103612</P>
+    <P Name="HarnessConnectionsMap">0,1|0|0,0,0,0||</P>
+    <P Name="VerificationMode">0</P>
+    <P Name="HarnessOwnerCheckSum">0,0,0,0</P>
+    <P Name="RebuildOnOpen">false</P>
+    <P Name="RebuildModelData">false</P>
+    <P Name="Graphical">true</P>
+    <P Name="DriveFcnCallWithTS">true</P>
+    <P Name="ScheduleInitTermReset">false</P>
+    <P Name="AutoShapeInputs">false</P>
+    <P Name="SLDVCompatible">no</P>
+    <P Name="SynchronizationMode">0</P>
+    <P Name="IsImported">false</P>
+    <P Name="PostRebuildCB"/>
+    <P Name="IsCodeContext">false</P>
+    <P Name="SchedulerBlock">1</P>
+    <P Name="SourceTypeString">Inport</P>
+    <P Name="SinkTypeString">Outport</P>
+    <P Name="CustomSourcePath"/>
+    <P Name="CustomSinkPath"/>
+    <P Name="BlockSIDs">5|13|0|0|0|0|0</P>
+    <P Name="OpenGraphs">||sFunctionLibrary_create_desRN_Harness/Input
+Conversion
+Subsystem</P>
+    <P Name="ExistingBuildFolder"/>
+    <P Name="FunctionInterfaceName"/>
+    <P Name="SysArchSUTModel"/>
+  </Harness>
+  <Harness>
     <P Name="Name">sFunctionLibrary_q2dcm_Harness</P>
     <P Name="Description"/>
     <P Name="CreatedBy">AdamY</P>
     <P Name="CreatedOn">Fri Oct 31 12:45:59 2025</P>
     <P Name="ModifiedBy">AdamY</P>
-    <P Name="LastSaved">Fri Oct 31 13:35:03 2025</P>
+    <P Name="LastSaved">Fri Oct 31 15:07:21 2025</P>
     <P Name="Owner">2</P>
     <P Name="OwnerType">UDF_HARNESS</P>
     <P Name="OwnerPath">q_2_dcm</P>

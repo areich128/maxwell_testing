@@ -56,11 +56,6 @@ function testResults = q2dcm_Test()
     testResults = struct();
     testResults.passed = NaN(nTestCases,1);
 
-
-%% TODO - work out why getting the opposite transpose, is this a MATLAB definitions issue?
-% HOW COME THIS DIDNT FAIL FOR THE dcm to quat?
-
-
     for iTest = 1:nTestCases
         testResults.passed(iTest) = tester.IS_EQUAL_ABS(outputs(:,:,iTest),outPort1(:,:,iTest));
     end   
