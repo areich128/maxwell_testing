@@ -4,9 +4,9 @@ function testResults = dcm2quat_Test()
     load_system(modelName);
     
     % Setup
-    nTestCases = 1;    
+    nTestCases = 15;    
     setupSolver(nTestCases,modelName);
-    tester = TestSupport(1E-7,1E-7);
+    tester = TestSupport(1E-7,1E-7); % ABS and Rel tol of 1E-7 to be close to single precision
 
     %% Inputs
     % Preallocate
@@ -14,12 +14,34 @@ function testResults = dcm2quat_Test()
     data = single(zeros(nTestCases,3,3));
 
     % Populate
-    data(1,:,:) = [1 0 0; 0 1 0; 0 0 1];
+    anglesToTest = [0,0,0;
+                    pi/6,0,0;
+                    -pi/6,0,0;
+                    pi/6,pi/3,pi/4;
+                    pi/6,-pi/3,pi/4;
+                    -pi/6,pi/3,pi/4;
+                    -pi/6,-pi/3,pi/4;
+                    pi/6,pi/3,-pi/4;
+                    pi/6,-pi/3,-pi/4;
+                    -pi/6,pi/3,-pi/4;
+                    -pi/6,-pi/3,-pi/4;
+                    0,pi/2,0;
+                    0,-pi/2,0;
+                    0,0,pi/2;
+                    0,0,-pi/2];
+
+    for iTest = 1:nTestCases
+        data(iTest,:,:) = angle2dcm(anglesToTest(iTest,1),...
+            anglesToTest(iTest,2),anglesToTest(iTest,3),'ZYX');
+    end
     inData = timetable(time,data);
 
     %% Expected Outputs
     outputs = zeros(4,nTestCases);
-    outputs(:,1) = [1; 0; 0; 0];
+    for iTest = 1:nTestCases
+        outputs(:,iTest) = angle2quat(anglesToTest(iTest,1),...
+            anglesToTest(iTest,2),anglesToTest(iTest,3),'ZYX');
+    end
 
     %% Update Model
     % Set Inputs
@@ -31,9 +53,10 @@ function testResults = dcm2quat_Test()
     outPort1 = out.yout{1}.Values.Data;
 
     %% Test Results
-    testResults = NaN(nTestCases,1);
+    testResults = struct();
+    testResults.passed = NaN(nTestCases,1);
     for iTest = 1:nTestCases
-        testResults(iTest) = tester.IS_EQUAL_ABS(outputs(:,iTest),outPort1(:,iTest));
+        testResults.passed(iTest) = tester.IS_EQUAL_ABS(outputs(:,iTest),outPort1(:,iTest));
     end   
 
     close_system(modelName);
