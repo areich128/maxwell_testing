@@ -9,6 +9,33 @@ import csv
 
 from scipy.signal import butter, sosfilt
 
+def remove_outliers_iqr(data, k=1.5):
+    """
+    Removes outliers from a 1D NumPy array using the Interquartile Range (IQR) method.
+
+    Args:
+        data (np.ndarray): The 1D NumPy array from which to remove outliers.
+        k (float): The multiplier for the IQR to define the outlier bounds.
+                   A common value is 1.5.
+
+    Returns:
+        np.ndarray: A new NumPy array with outliers removed.
+    """
+    if not isinstance(data, np.ndarray) or data.ndim != 1:
+        raise ValueError("Input 'data' must be a 1D NumPy array.")
+
+    q1 = np.percentile(data, 25)
+    q3 = np.percentile(data, 75)
+    iqr = q3 - q1
+
+    lower_bound = q1 - (k * iqr)
+    upper_bound = q3 + (k * iqr)
+
+    # Filter out values outside the bounds
+    filtered_data = data[(data >= lower_bound) & (data <= upper_bound)]
+
+    return filtered_data
+
 def kf():
     return
 
@@ -39,6 +66,7 @@ for i in range(1, len(angleseries)):
         print("DECREASING OFFSET")
     angleseries_smooth[i:] = angleseries[i:] + offset
 
+# angleseries_smooth = remove_outliers_iqr(angleseries_smooth)
 # angleseries = lowpass(angleseries, 0.05, order=5)
 
 # plt.plot(time, angleseries)
@@ -56,12 +84,14 @@ for i in range(1, len(angleseries)):
     # if angleseries[i] - angleseries[i-1] > 355:
     #     omegaseries.append((angleseries[i] - angleseries[i-1] - 360) / diff_secs)
     omegaseries.append((angleseries_smooth[i] - angleseries_smooth[i-1]) / diff_secs)
-    if i < len(angleseries_smooth)-10 | i > 10:
-        omegaseries_avg[i] = sum(omegaseries[i-10:i+10]) / 10
-    omegaseries_lowpass = lowpass(omegaseries, 0.001, order=5)
+    # if i < len(angleseries_smooth)-10 | i > 10:
+    #     omegaseries_avg[i] = sum(omegaseries[i-10:i+10]) / 10
+    omegaseries_lowpass = lowpass(omegaseries, 0.01, order=5)
 
 time = [(t - time[0]).total_seconds() for t in time]
 time = np.array(time)
+
+# omegaseries_lowpass = remove_outliers_iqr(omegaseries_lowpass)
 
 # plt.plot(time, omegaseries)
 plt.plot(time, omegaseries_lowpass)
