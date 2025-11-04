@@ -41,7 +41,7 @@ try:
             if first2 == 1:
                 f2.write(f"T_start = {datetime.now()}")
                 first2 = 0
-            line = ser.readline().decode('utf-8').strip()
+            line = ser2.readline().decode('utf-8').strip()
             f2.write(line)
             f2.write("\n")
             print(f"Received: {line}")
