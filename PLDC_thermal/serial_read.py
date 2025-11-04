@@ -39,13 +39,14 @@ try:
             print(f"Received: {line}")
         if ser2.in_waiting > 0:
             if first1 == 1:
-                f.write(f"T_start = {datetime.now()}")
+                f2.write(f"T_start = {datetime.now()}")
                 first1 = 0
             line = ser.readline().decode('utf-8').strip()
             f2.write(line)
-            f.write("\n")
+            f2.write("\n")
             print(f"Received: {line}")
 except KeyboardInterrupt:
     print("Exiting serial read.")
 finally:
     ser.close()
+    ser2.close()
