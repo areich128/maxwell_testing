@@ -13,6 +13,15 @@ classdef TestSupport
             obj.REL_TOL = relTol;
         end
 
+        function res = IS_NAN(obj,meas)
+            nMeas = numel(meas);
+            res = true;
+            for i = 1:nMeas
+                compRes = isnan(meas(i));
+                res = res& compRes;
+            end
+        end
+
         function res = IS_EQUAL_ABS(obj,truth,meas)
             nx = numel(truth);
             ny = numel(meas);

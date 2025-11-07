@@ -1,6 +1,10 @@
 %{
     This script executes all unit tests in the testFunctions directory.
 %}
+%% Options
+% Exclude Tests
+exclude = {}; % put names of tests in here you want to exclude from running, 
+% e.g. 'create_desRN_Test'
 
 %% Setup Paths
 currentPath = matlab.desktop.editor.getActiveFilename;
@@ -25,19 +29,22 @@ for iTest = 1:numel(allTests)
     testName = strsplit(allTests(iTest).name,'.');
     testName = testName{1};
 
-    % Display output
-    disp(repelem('#',1,75));
-    fprintf('Running Test: %s\n', testName);    
-
-    % Run Test 
-    testResults.(testName) = feval(testName);
+    % Only run test if not in the exclude path
+    if all(~strcmp(exclude,testName))
+        % Display output
+        disp(repelem('#',1,75));
+        fprintf('Running Test: %s\n', testName);    
     
-    % Report Results
-    testResultText = 'FAILED';
-    if all(testResults.(testName).passed)
-        testResultText = 'PASSED';
+        % Run Test 
+        testResults.(testName) = feval(testName);
+        
+        % Report Results
+        testResultText = 'FAILED';
+        if all(testResults.(testName).passed)
+            testResultText = 'PASSED';
+        end
+        fprintf('%s\n',testResultText);
+        disp(repelem('#',1,75));
     end
-    fprintf('%s\n',testResultText);
-    disp(repelem('#',1,75));
 end
 
