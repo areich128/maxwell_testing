@@ -10,7 +10,7 @@ function testResults = create_desRN_Test()
 
     %% Inputs
     % Preallocate
-    time = seconds(1:1:nTestCases)';
+    time = 1:1:nTestCases;
     opMode = uint8(zeros(nTestCases,1));
     desVector = single(zeros(nTestCases,3));
 
@@ -18,10 +18,10 @@ function testResults = create_desRN_Test()
     %     data(iTest,:) = angle2quat(anglesToTest(iTest,1),...
     %         anglesToTest(iTest,2),anglesToTest(iTest,3),'ZYX');
     % end
-    https://www.mathworks.com/matlabcentral/answers/458511-setexternalinput-the-number-of-external-inputs-must-be-equal-to-the-number-of-root-level-input-port
+   % https://www.mathworks.com/matlabcentral/answers/458511-setexternalinput-the-number-of-external-inputs-must-be-equal-to-the-number-of-root-level-input-port
     inports=createInputDataset(modelName);
-    inports{1} = timetable(time,opMode,'Name',inports{1}.Name);
-    inports{2} = timetable(time,desVector,'Name',inports{2}.Name);
+    inports{1} = timeseries(opMode, time, 'Name',inports{1}.Name);
+    inports{2} = timeseries(desVector, time, 'Name',inports{2}.Name);
     
     %% Expected Outputs
     outputs =  single(zeros(3,nTestCases));
@@ -45,6 +45,8 @@ function testResults = create_desRN_Test()
     for iTest = 1:nTestCases
         testResults.passed(iTest) = tester.IS_EQUAL_ABS(outputs(:,iTest),outPort1(:,iTest));
     end   
+    
+    testResults.passed = false;
 
     close_system(modelName);
 end
