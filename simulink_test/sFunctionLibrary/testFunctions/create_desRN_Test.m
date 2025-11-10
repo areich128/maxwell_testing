@@ -58,3 +58,28 @@ function testResults = create_desRN_Test()
 
     close_system(modelName);
 end
+
+function q_RN = buildExpectedQuaternion(des_vec)
+    xECI = [1; 0; 0];
+    yECI = [0; 1; 0];
+    
+    dotXdes = dot(des_vec,xECI);
+
+    if abs(dotXdes) < 0.99
+        yAxis = cross(des_vec,xECI);
+    else
+        yAxis = cross(des_vec,yECI);
+    end
+
+    zAxis = cross(des_vec,yAxis);
+
+    DCM_NR = [des_vec/norm(des_vec); yAxis/norm(yAxis); zAxis/norm(zAxis)];
+    DCM_RN = DCM_NR';
+    q_RN = dcm2quat(DCM_RN);
+
+    if norm(q_RN) < 0
+        q_RN = -q_RN;
+    end
+
+
+end
