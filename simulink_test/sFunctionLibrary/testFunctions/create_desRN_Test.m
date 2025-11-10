@@ -4,7 +4,7 @@ function testResults = create_desRN_Test()
     load_system(modelName);
     
     % Setup
-    nTestCases = 2;    
+    nTestCases = 11;    
     setupSolver(nTestCases,modelName);
     tester = TestSupport(1E-7,1E-7); % ABS and Rel tol of 1E-7 to be close to single precision
 
@@ -19,8 +19,13 @@ function testResults = create_desRN_Test()
     desVector(:,1) = [0,0,0]';
 
     % SubSet 1 - CTRL_SUN mode
-    opMode(2) = 0x1;
-    desVector(:,2) = [1,0,0]';
+    opMode(2) = 0x2;
+    xAngles = 0:2*pi/9:2*pi;
+    for i = 1:10
+        opMode(i+1) = 0x2;
+        desVector(:,i+1) = eul2dcm(xAngles(i),0,0)*[1;0;0];
+    end
+    % desVector(:,2) = [1,0,0]';
    
    % https://www.mathworks.com/matlabcentral/answers/458511-setexternalinput-the-number-of-external-inputs-must-be-equal-to-the-number-of-root-level-input-port
     inports=createInputDataset(modelName,'UpdateDiagram',false);
@@ -30,7 +35,9 @@ function testResults = create_desRN_Test()
     %% Expected Outputs
     outputs =  single(zeros(4,nTestCases));
     outputs(:,1) = NaN(4,1);
-    outputs(:,2) = [1; 0; 0; 0];
+    for i = 1:10
+        outputs(:,i+1) = angle2quat(xAngles(i),0,0);
+    end
     
     %% Update Model
     % Set Inputs
