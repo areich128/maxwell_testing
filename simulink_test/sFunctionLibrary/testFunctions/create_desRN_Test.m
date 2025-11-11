@@ -4,7 +4,7 @@ function testResults = create_desRN_Test()
     load_system(modelName);
     
     % Setup
-    nTestCases = 11;    
+    nTestCases = 101;    
     setupSolver(nTestCases,modelName);
     tester = TestSupport(1E-7,1E-7); % ABS and Rel tol of 1E-7 to be close to single precision
 
@@ -18,15 +18,21 @@ function testResults = create_desRN_Test()
     opMode(1) = 0x0;
     desVector(:,1) = [0,0,0]';
 
-    % SubSet 1 - CTRL_SUN mode
+    % SubSet 2 - CTRL_SUN mode (with random vectors)
     opMode(2) = 0x2;
-    xAngles = 0:2*pi/9:2*pi;
-    for i = 1:10
+    angles = 0 + 2*pi* rand(100,3);
+    for i = 1:100
         opMode(i+1) = 0x2;
-        desVector(:,i+1) = eul2dcm(xAngles(i),0,0)*[1;0;0];
+        desVector(:,i+1) = angle2dcm(angles(i,3),angles(i,2),angles(i,1))*[1;0;0];
     end
-    % desVector(:,2) = [1,0,0]';
    
+    % Subset 3 - CSAC
+
+
+    % Subset 4 - DCOMM
+
+    %% TODO - add antenna modes
+
    % https://www.mathworks.com/matlabcentral/answers/458511-setexternalinput-the-number-of-external-inputs-must-be-equal-to-the-number-of-root-level-input-port
     inports=createInputDataset(modelName,'UpdateDiagram',false);
     inports{1} = timeseries(opMode, time, 'Name',inports{1}.Name);
@@ -35,8 +41,8 @@ function testResults = create_desRN_Test()
     %% Expected Outputs
     outputs =  single(zeros(4,nTestCases));
     outputs(:,1) = NaN(4,1);
-    for i = 1:10
-        outputs(:,i+1) = angle2quat(xAngles(i),0,0);
+    for i = 1:100
+        outputs(:,i+1) = buildExpectedQuaternion(desVector(:,i+1));
     end
     
     %% Update Model
@@ -60,10 +66,35 @@ function testResults = create_desRN_Test()
             testResults.passed(iTest) = tester.IS_EQUAL_ABS(outputs(:,iTest),outPort1(:,:,iTest));
         end
     end   
-
-    testResults.passed = false;
-
     close_system(modelName);
+
+    % figure(); 
+    % subplot(4,1,1);
+    % plot(2:11,zAngles);
+    % title('Z Angles vs Step');
+    % grid on;
+    % 
+    % subplot(4,1,2);
+    % plot(2:11,desVector(:,2:11)');
+    % legend('x','y','z');
+    % title('Des Vector Components ECI');
+    % grid on;
+    % 
+    % subplot(4,1,3);
+    % plot(2:11,outputs(:,2:11)');
+    % legend('w','x','y','z');
+    % title('Expected Quaternion Out - Ref to ECI');
+    % grid on;
+    % 
+    % subplot(4,1,4);
+    % plot(2:11,squeeze(outPort1(:,2:11))');
+    % legend('w','x','y','z');
+    % title('Des Quaternion Out - Ref to ECI');
+    % grid on;
+    % 
+    % figure();
+    % plot(2:11, 2*acos(outPort1(1,2:11)));
+
 end
 
 function q_RN = buildExpectedQuaternion(des_vec)
@@ -73,18 +104,18 @@ function q_RN = buildExpectedQuaternion(des_vec)
     dotXdes = dot(des_vec,xECI);
 
     if abs(dotXdes) < 0.99
-        yAxis = cross(des_vec,xECI);
+         yAxis = cross(des_vec,xECI);
     else
         yAxis = cross(des_vec,yECI);
     end
 
     zAxis = cross(des_vec,yAxis);
 
-    DCM_NR = [des_vec/norm(des_vec); yAxis/norm(yAxis); zAxis/norm(zAxis)];
+    DCM_NR = [des_vec/norm(des_vec), yAxis/norm(yAxis), zAxis/norm(zAxis)];
     DCM_RN = DCM_NR';
     q_RN = dcm2quat(DCM_RN);
 
-    if norm(q_RN) < 0
+    if (q_RN(1) < 0)
         q_RN = -q_RN;
     end
 
