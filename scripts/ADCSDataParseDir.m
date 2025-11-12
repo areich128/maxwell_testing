@@ -29,7 +29,7 @@ EPOCH_START = 693662400; % From ADCS FSW 22.8.1 (defined in global.h)
 %% --------------- File format definitions --------------- %%
 % Total size of one frame of SD card data (Bytes)
 % Should exactly match 'LOOP_STORAGE_LEN' in global.h
-FRAME_SIZE = 200; % [Bytes]
+FRAME_SIZE = 242; % [Bytes]
 
 %% Struct Strings - Should Match Variable Name Assignment Below
 % Allows for looping over variable names to pull data
@@ -217,7 +217,7 @@ while (j <= n_frames)
     % 0xDEADBEEF
 %     if frames(197,j) ~= 222 || frames(198,j) ~= 173 || frames(199,j) ~= 190 || frames(200,j) ~= 239
     % 0xADBEEF
-    if frames(198,j) ~= 173 || frames(199,j) ~= 190 || frames(200,j) ~= 239
+    if frames(240,j) ~= 173 || frames(241,j) ~= 190 || frames(242,j) ~= 239
         frames(:,j) = [];
         j = j - 1;
         n_frames = n_frames - 1;

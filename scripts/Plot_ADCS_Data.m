@@ -46,7 +46,7 @@ Time_range_hours = First_Hour:1:Last_Hour;
 for i = 1:length(Time_range_hours)
     for j = 1:length(File_range)
         
-        hour_path = fullfile(Root_dir,'STOR_folders','STOR_XROT_6-6-25',num2str(Day),num2str(Time_range_hours(i)));
+        hour_path = fullfile(Root_dir,'STOR_folders','STOR_helm_mock',num2str(Day),num2str(Time_range_hours(i)));
         % hour_path = fullfile(Root_dir, 'STOR_YROT_5-19','LOW/'); % Can plot low res data
         FP = fullfile(hour_path,strcat(num2str(File_range(j))));
         Data_filepaths = dir(FP);
