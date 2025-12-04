@@ -166,6 +166,27 @@ MAG_data.lis3mdl_1_mag = MAG_data.lis3mdl_1_mag .* Parameters.MAG_conversion;
 MAG_data.lis3mdl_2_mag = MAG_data.lis3mdl_2_mag .* Parameters.MAG_conversion;
 MAG_data.lis3mdl_3_mag = MAG_data.lis3mdl_3_mag .* Parameters.MAG_conversion;
 
+%% Computing Rate of Change of Magnetic Field (dB/dt)
+% Sampling period (10 Hz = 0.1 seconds)
+dt = 0.1; % seconds
+
+% Pre-allocate for dB/dt (one less frame since we are computing differences)
+MAG_data.lis3mdl_1_dBdt = zeros(3, length(MAG_data.lis3mdl_1_mag)-1);
+MAG_data.lis3mdl_2_dBdt = zeros(3, length(MAG_data.lis3mdl_2_mag)-1);
+MAG_data.lis3mdl_3_dBdt = zeros(3, length(MAG_data.lis3mdl_3_mag)-1);
+
+% Compute dB/dt for each magnetometer
+for frame_idx = 1:(length(MAG_data.lis3mdl_1_mag)-1)
+    % Mag 1: (next - current) / dt
+    MAG_data.lis3mdl_1_dBdt(:,frame_idx) = (MAG_data.lis3mdl_1_mag(:,frame_idx+1) - MAG_data.lis3mdl_1_mag(:,frame_idx)) / dt;
+
+    % Mag 2
+    MAG_data.lis3mdl_2_dBdt(:,frame_idx) = (MAG_data.lis3mdl_2_mag(:,frame_idx+1) - MAG_data.lis3mdl_2_mag(:,frame_idx)) / dt;
+
+    % Mag 3
+    MAG_data.lis3mdl_3_dBdt(:,frame_idx) = (MAG_data.lis3mdl_3_mag(:,frame_idx+1) - MAG_data.lis3mdl_3_mag(:,frame_idx)) / dt;
+end
+
 %% Noise Measurements
 
 % Calculate Std Deviation and Mean
@@ -422,11 +443,34 @@ function plotMAG(Time_combine,MAG_data)
     xlabel('Time (s)')
     ylabel('Temp {\circ}C')
 
+    % MAG dB/dt Data
+    % Using Time_combine(1:end-1) since dB/dt has one less frame
+    figure(21)
+    plot(Time_combine(1:end-1),MAG_data.lis3mdl_1_dBdt)
+    title('lis3mdl Mag 1 dB/dt')
+    xlabel('Time (s)')
+    ylabel('Field Rate of Change dB/dt (Gauss/s)')
+    legend('X','Y','Z')
+
+    figure(22)
+    plot(Time_combine(1:end-1),MAG_data.lis3mdl_2_dBdt)
+    title('lis3mdl Mag 2 dB/dt')
+    xlabel('Time (s)')
+    ylabel('Field Rate of Change dB/dt (Gauss/s)')
+    legend('X','Y','Z')
+
+    figure(23)
+    plot(Time_combine(1:end-1),MAG_data.lis3mdl_3_dBdt)
+    title('lis3mdl Mag 3 dB/dt')
+    xlabel('Time (s)')
+    ylabel('Field Rate of Change dB/dt (Gauss/s)')
+    legend('X','Y','Z')
+
 end
 
 function plotGPS(Time_combine,GPS_data,Time_line)
     % GPS Time
-    figure(21)
+    figure(24)
     plot(Time_line,'LineWidth',1.5,'Color','r','LineStyle','--')
     hold on
     plot(Time_combine,'LineWidth',1.5,'Color','b')
@@ -437,7 +481,7 @@ function plotGPS(Time_combine,GPS_data,Time_line)
     hold off
     
     % GPS ECI Position
-    figure(22)
+    figure(25)
     plot(Time_combine, GPS_data.eci_pos)
     title('ECI Position (GPS)')
     xlabel('Time (s)')
@@ -445,7 +489,7 @@ function plotGPS(Time_combine,GPS_data,Time_line)
     legend('X','Y','Z')
     
     % GPS ECI Velocity
-    figure(23)
+    figure(26)
     plot(Time_combine, GPS_data.eci_vel)
     title('ECI Velocity (GPS)')
     xlabel('Time (s)')
