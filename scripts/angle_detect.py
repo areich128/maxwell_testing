@@ -63,7 +63,7 @@ def detect_circle(frame, lower1, upper1, lower2, upper2):
     # Detect center of white circle
     mask_white = cv2.inRange(frame_hsv, lower2, upper2)
     blurred_white = cv2.GaussianBlur(mask_white, (9, 9), 0)
-    circles_white = cv2.HoughCircles(blurred_white, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=25)
+    circles_white = cv2.HoughCircles(blurred_white, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=15, maxRadius=25)
     if circles_white is not None:
         print("White circle detected")
         circles_white = np.int32(np.around(circles_white))
@@ -110,7 +110,7 @@ def detect_marker(frame, object):
 
     return frame
 
-file = open(f"OpenCV/CSS_6-6-25/test_data{testnum}.csv", "w")
+file = open(f"OpenCV/HW_7-14-25/test_data{testnum}.csv", "w")
 
 while True:
     ret, frame = capture.read()

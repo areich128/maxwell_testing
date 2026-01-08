@@ -46,7 +46,7 @@ Time_range_hours = First_Hour:1:Last_Hour;
 for i = 1:length(Time_range_hours)
     for j = 1:length(File_range)
         
-        hour_path = fullfile(Root_dir,'STOR_folders','STOR_CSS_transient2',num2str(Day),num2str(Time_range_hours(i)));
+        hour_path = fullfile(Root_dir,'STOR_folders','STOR_helm_mock',num2str(Day),num2str(Time_range_hours(i)));
         % hour_path = fullfile(Root_dir, 'STOR_YROT_5-19','LOW/'); % Can plot low res data
         FP = fullfile(hour_path,strcat(num2str(File_range(j))));
         Data_filepaths = dir(FP);
@@ -85,6 +85,10 @@ GPS_data.J2000_frac_time = [];
 GPS_data.eci_pos = [];
 GPS_data.eci_vel = [];
 
+RW_data.ref_wheel_speeds_drpm = [];
+RW_data.ref_wheel_speeds_drpm_ret = [];
+RW_data.current_wheel_speeds_drpm = [];
+
 %% Concatenate Data for std deviation and mean calculations
 % ========================================================================
 % May not need all this data concatenated, only need data that needs to be
@@ -112,10 +116,10 @@ for i = 1:length(adcs_data) % i corresponds to hour
         % NOTE: The l3gd20h gyro is no longer on the board, but the data
         % parse script logs it with that name (was replaced by a second
         % bmg250 gyro)
-        GYRO_data.bmg250_2_gyro = [GYRO_data.bmg250_2_gyro adcs_data{i}(:,j).GYRO.bmg250_gyro];
-        GYRO_data.bmg250_2_temp = [GYRO_data.bmg250_2_temp adcs_data{i}(:,j).GYRO.bmg250_temp];
-        GYRO_data.bmg250_1_gyro = [GYRO_data.bmg250_1_gyro adcs_data{i}(:,j).GYRO.l3gd20h_gyro];
-        GYRO_data.bmg250_1_temp = [GYRO_data.bmg250_1_temp adcs_data{i}(:,j).GYRO.l3gd20h_temp];
+        GYRO_data.bmg250_2_gyro = [GYRO_data.bmg250_2_gyro adcs_data{i}(:,j).GYRO.bmg250_2_gyro];
+        GYRO_data.bmg250_2_temp = [GYRO_data.bmg250_2_temp adcs_data{i}(:,j).GYRO.bmg250_2_temp];
+        GYRO_data.bmg250_1_gyro = [GYRO_data.bmg250_1_gyro adcs_data{i}(:,j).GYRO.bmg250_gyro];
+        GYRO_data.bmg250_1_temp = [GYRO_data.bmg250_1_temp adcs_data{i}(:,j).GYRO.bmg250_temp];
         
         % MAG
         MAG_data.lis3mdl_1_mag = [MAG_data.lis3mdl_1_mag adcs_data{i}(:,j).MAG.lis3mdl_1_mag];
@@ -129,6 +133,11 @@ for i = 1:length(adcs_data) % i corresponds to hour
         GPS_data.J2000_frac_time = [GPS_data.J2000_frac_time adcs_data{i}(:,j).GPS.J2000_frac_time];
         GPS_data.eci_pos = [GPS_data.eci_pos adcs_data{i}(:,j).GPS.eci_pos];
         GPS_data.eci_vel = [GPS_data.eci_vel adcs_data{i}(:,j).GPS.eci_vel];
+
+        % RW
+        RW_data.ref_wheel_speeds_drpm = [RW_data.ref_wheel_speeds_drpm adcs_data{i}(:,j).RW.ref_wheel_speeds_drpm];
+        RW_data.ref_wheel_speeds_drpm_ret = [RW_data.ref_wheel_speeds_drpm_ret adcs_data{i}(:,j).RW.ref_wheel_speeds_drpm_ret];
+        RW_data.current_wheel_speeds_drpm = [RW_data.current_wheel_speeds_drpm adcs_data{i}(:,j).RW.current_wheel_speeds_drpm];
     end
 end
 
@@ -137,15 +146,15 @@ end
 % Volts, ect.
 % See ADCS sensor conversion document on how values were obtained
 
-CSS_data.ad7991_1 = CSS_data.ad7991_1 .* Parameters.CSS_conversion; % Currently in volts
-CSS_data.ad7991_2 = CSS_data.ad7991_2 .* Parameters.CSS_conversion; % Can normalize based on max int12 value
-CSS_data.ad7991_3 = CSS_data.ad7991_3 .* Parameters.CSS_conversion; 
-CSS_data.ad7991_4 = CSS_data.ad7991_4 .* Parameters.CSS_conversion;
-
-CSS_data.ads7924_1 = CSS_data.ads7924_1 .* Parameters.CSS_conversion;
-CSS_data.ads7924_2 = CSS_data.ads7924_2 .* Parameters.CSS_conversion;
-CSS_data.ads7924_3 = CSS_data.ads7924_3 .* Parameters.CSS_conversion;
-CSS_data.ads7924_4 = CSS_data.ads7924_4 .* Parameters.CSS_conversion;
+% CSS_data.ad7991_1 = CSS_data.ad7991_1 .* Parameters.CSS_conversion; % Currently in volts
+% CSS_data.ad7991_2 = CSS_data.ad7991_2 .* Parameters.CSS_conversion; % Can normalize based on max int12 value
+% CSS_data.ad7991_3 = CSS_data.ad7991_3 .* Parameters.CSS_conversion; 
+% CSS_data.ad7991_4 = CSS_data.ad7991_4 .* Parameters.CSS_conversion;
+% 
+% CSS_data.ads7924_1 = CSS_data.ads7924_1 .* Parameters.CSS_conversion;
+% CSS_data.ads7924_2 = CSS_data.ads7924_2 .* Parameters.CSS_conversion;
+% CSS_data.ads7924_3 = CSS_data.ads7924_3 .* Parameters.CSS_conversion;
+% CSS_data.ads7924_4 = CSS_data.ads7924_4 .* Parameters.CSS_conversion;
 
 GYRO_data.bmg250_2_gyro = GYRO_data.bmg250_2_gyro .* Parameters.GYRO_conversion;
 GYRO_data.bmg250_2_temp = GYRO_data.bmg250_2_temp .* Parameters.Temp_conversion;
@@ -156,6 +165,27 @@ GYRO_data.bmg250_1_temp = GYRO_data.bmg250_1_temp .* Parameters.Temp_conversion;
 MAG_data.lis3mdl_1_mag = MAG_data.lis3mdl_1_mag .* Parameters.MAG_conversion;
 MAG_data.lis3mdl_2_mag = MAG_data.lis3mdl_2_mag .* Parameters.MAG_conversion;
 MAG_data.lis3mdl_3_mag = MAG_data.lis3mdl_3_mag .* Parameters.MAG_conversion;
+
+%% Computing Rate of Change of Magnetic Field (dB/dt)
+% Sampling period (10 Hz = 0.1 seconds)
+dt = 0.1; % seconds
+
+% Pre-allocate for dB/dt (one less frame since we are computing differences)
+MAG_data.lis3mdl_1_dBdt = zeros(3, length(MAG_data.lis3mdl_1_mag)-1);
+MAG_data.lis3mdl_2_dBdt = zeros(3, length(MAG_data.lis3mdl_2_mag)-1);
+MAG_data.lis3mdl_3_dBdt = zeros(3, length(MAG_data.lis3mdl_3_mag)-1);
+
+% Compute dB/dt for each magnetometer
+for frame_idx = 1:(length(MAG_data.lis3mdl_1_mag)-1)
+    % Mag 1: (next - current) / dt
+    MAG_data.lis3mdl_1_dBdt(:,frame_idx) = (MAG_data.lis3mdl_1_mag(:,frame_idx+1) - MAG_data.lis3mdl_1_mag(:,frame_idx)) / dt;
+
+    % Mag 2
+    MAG_data.lis3mdl_2_dBdt(:,frame_idx) = (MAG_data.lis3mdl_2_mag(:,frame_idx+1) - MAG_data.lis3mdl_2_mag(:,frame_idx)) / dt;
+
+    % Mag 3
+    MAG_data.lis3mdl_3_dBdt(:,frame_idx) = (MAG_data.lis3mdl_3_mag(:,frame_idx+1) - MAG_data.lis3mdl_3_mag(:,frame_idx)) / dt;
+end
 
 %% Noise Measurements
 
@@ -226,6 +256,23 @@ plotCSS(Time_combine,CSS_data)
 plotGYRO(Time_combine,GYRO_data)
 plotMAG(Time_combine,MAG_data)
 plotGPS(Time_combine,GPS_data,Time_line)
+plotRW(Time_combine, RW_data)
+
+deltawheel1 = diff(RW_data.current_wheel_speeds_drpm(2,:));
+deltawheel2 = diff(RW_data.ref_wheel_speeds_drpm(2,:));
+deltat = diff(Time_combine);
+
+dwheeldtime1 = deltawheel1 ./ deltat;
+dwheeldtime2 = deltawheel2 ./ deltat;
+
+dwheeldtime1 = lowpass(dwheeldtime1, 0.1);
+dwheeldtime2 = lowpass(dwheeldtime2, 0.1);
+
+% figure();
+% hold on;
+% plot(Time_combine(1:end-1), dwheeldtime1);
+% plot(Time_combine(1:end-1), dwheeldtime2);
+% legend("Current", "Ref");
 
 %% Plotting Functions
 function plotSYS(Time_combine,SYS_data)
@@ -258,6 +305,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 4095])
     
     figure(5)
     plot(Time_combine,CSS_data.ad7991_2)
@@ -265,6 +313,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 4095])
     
     figure(6)
     plot(Time_combine,CSS_data.ad7991_3)
@@ -272,6 +321,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 4095])
     
     figure(7)
     plot(Time_combine,CSS_data.ad7991_4)
@@ -279,6 +329,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 4095])
     
     % CSS Data ADS7924
     figure(8)
@@ -287,6 +338,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 4095])
     
     figure(9)
     plot(Time_combine,CSS_data.ads7924_2)
@@ -294,6 +346,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 4095])
     
     figure(10)
     plot(Time_combine,CSS_data.ads7924_3)
@@ -301,6 +354,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 4095])
     
     figure(11)
     plot(Time_combine,CSS_data.ads7924_4)
@@ -308,6 +362,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 4095])
 
     figure(12)
     plot(Time_combine,movmean(CSS_data.ads7924_4, 10));
@@ -315,6 +370,7 @@ function plotCSS(Time_combine,CSS_data)
     xlabel('Time(s)')
     ylabel('ADC output (Normalized)')
     legend('PD 1','PD 2','PD 3','PD 4')
+    ylim([0, 4095])
 
 end
 
@@ -387,11 +443,34 @@ function plotMAG(Time_combine,MAG_data)
     xlabel('Time (s)')
     ylabel('Temp {\circ}C')
 
+    % MAG dB/dt Data
+    % Using Time_combine(1:end-1) since dB/dt has one less frame
+    figure(21)
+    plot(Time_combine(1:end-1),MAG_data.lis3mdl_1_dBdt)
+    title('lis3mdl Mag 1 dB/dt')
+    xlabel('Time (s)')
+    ylabel('Field Rate of Change dB/dt (Gauss/s)')
+    legend('X','Y','Z')
+
+    figure(22)
+    plot(Time_combine(1:end-1),MAG_data.lis3mdl_2_dBdt)
+    title('lis3mdl Mag 2 dB/dt')
+    xlabel('Time (s)')
+    ylabel('Field Rate of Change dB/dt (Gauss/s)')
+    legend('X','Y','Z')
+
+    figure(23)
+    plot(Time_combine(1:end-1),MAG_data.lis3mdl_3_dBdt)
+    title('lis3mdl Mag 3 dB/dt')
+    xlabel('Time (s)')
+    ylabel('Field Rate of Change dB/dt (Gauss/s)')
+    legend('X','Y','Z')
+
 end
 
 function plotGPS(Time_combine,GPS_data,Time_line)
     % GPS Time
-    figure(21)
+    figure(24)
     plot(Time_line,'LineWidth',1.5,'Color','r','LineStyle','--')
     hold on
     plot(Time_combine,'LineWidth',1.5,'Color','b')
@@ -402,7 +481,7 @@ function plotGPS(Time_combine,GPS_data,Time_line)
     hold off
     
     % GPS ECI Position
-    figure(22)
+    figure(25)
     plot(Time_combine, GPS_data.eci_pos)
     title('ECI Position (GPS)')
     xlabel('Time (s)')
@@ -410,11 +489,40 @@ function plotGPS(Time_combine,GPS_data,Time_line)
     legend('X','Y','Z')
     
     % GPS ECI Velocity
-    figure(23)
+    figure(26)
     plot(Time_combine, GPS_data.eci_vel)
     title('ECI Velocity (GPS)')
     xlabel('Time (s)')
     ylabel('Velocity (coordinates / sec??')
     legend('X','Z','Y')
 
+end
+
+function plotRW(Time_combine, RW_data)
+    figure()
+    hold on;
+    plot(Time_combine,RW_data.ref_wheel_speeds_drpm)
+    title('Ref Wheel Speeds DRPM')
+    xlabel('Time (s)')
+    ylabel('Ref Wheel Speeds (DRPM)')
+    legend('1','2','3', '4')
+    ylim([-100000, 100000]);
+
+    figure()
+    hold on;
+    plot(Time_combine,RW_data.ref_wheel_speeds_drpm_ret)
+    title('Ref Wheel Speeds DRPM?')
+    xlabel('Time (s)')
+    ylabel('Ref Wheel Speeds (DRPM)')
+    legend('1','2','3', '4')
+    ylim([-100000, 100000]);
+
+    figure()
+    hold on;
+    plot(Time_combine,RW_data.current_wheel_speeds_drpm)
+    title('Current Wheel Speeds DRPM')
+    xlabel('Time (s)')
+    ylabel('Current Wheel Speeds (DRPM)')
+    legend('1','2','3', '4')
+    ylim([-100000, 100000]);
 end

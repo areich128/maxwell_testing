@@ -9,6 +9,33 @@ import csv
 
 from scipy.signal import butter, sosfilt
 
+def remove_outliers_iqr(data, k=1.5):
+    """
+    Removes outliers from a 1D NumPy array using the Interquartile Range (IQR) method.
+
+    Args:
+        data (np.ndarray): The 1D NumPy array from which to remove outliers.
+        k (float): The multiplier for the IQR to define the outlier bounds.
+                   A common value is 1.5.
+
+    Returns:
+        np.ndarray: A new NumPy array with outliers removed.
+    """
+    if not isinstance(data, np.ndarray) or data.ndim != 1:
+        raise ValueError("Input 'data' must be a 1D NumPy array.")
+
+    q1 = np.percentile(data, 25)
+    q3 = np.percentile(data, 75)
+    iqr = q3 - q1
+
+    lower_bound = q1 - (k * iqr)
+    upper_bound = q3 + (k * iqr)
+
+    # Filter out values outside the bounds
+    filtered_data = data[(data >= lower_bound) & (data <= upper_bound)]
+
+    return filtered_data
+
 def kf():
     return
 
@@ -20,7 +47,7 @@ testnum = input("Enter test number: ")
 
 time = []
 angleseries = []
-with open (f'OpenCV/CSS_6-6-25/test_data{testnum}.csv', 'r') as csvfile:
+with open (f'OpenCV/HW_7-14-25/test_data{testnum}.csv', 'r') as csvfile:
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
         datetime_data = dt.datetime.strptime(row[0], "%H:%M:%S.%f")
@@ -39,6 +66,7 @@ for i in range(1, len(angleseries)):
         print("DECREASING OFFSET")
     angleseries_smooth[i:] = angleseries[i:] + offset
 
+# angleseries_smooth = remove_outliers_iqr(angleseries_smooth)
 # angleseries = lowpass(angleseries, 0.05, order=5)
 
 # plt.plot(time, angleseries)
@@ -56,12 +84,14 @@ for i in range(1, len(angleseries)):
     # if angleseries[i] - angleseries[i-1] > 355:
     #     omegaseries.append((angleseries[i] - angleseries[i-1] - 360) / diff_secs)
     omegaseries.append((angleseries_smooth[i] - angleseries_smooth[i-1]) / diff_secs)
-    if i < len(angleseries_smooth)-10 | i > 10:
-        omegaseries_avg[i] = sum(omegaseries[i-10:i+10]) / 10
+    # if i < len(angleseries_smooth)-10 | i > 10:
+    #     omegaseries_avg[i] = sum(omegaseries[i-10:i+10]) / 10
     omegaseries_lowpass = lowpass(omegaseries, 0.01, order=5)
 
 time = [(t - time[0]).total_seconds() for t in time]
 time = np.array(time)
+
+# omegaseries_lowpass = remove_outliers_iqr(omegaseries_lowpass)
 
 # plt.plot(time, omegaseries)
 plt.plot(time, omegaseries_lowpass)
@@ -78,57 +108,57 @@ plt.title('Angular Velocity vs Time')
 plt.savefig(f'anglevstime{testnum}.png')
 plt.show()
 
-t_uniform = np.linspace(time.min(), time.max(), len(time))  # new uniform time vector
-interp_func = interp1d(time, omegaseries, kind='linear', fill_value="extrapolate")
-x_uniform = interp_func(t_uniform)
+# t_uniform = np.linspace(time.min(), time.max(), len(time))  # new uniform time vector
+# interp_func = interp1d(time, omegaseries, kind='linear', fill_value="extrapolate")
+# x_uniform = interp_func(t_uniform)
 
-# Number of sample points
-N = len(x_uniform)
-T = t_uniform[1] - t_uniform[0]  # sample spacing
-yf = fft(x_uniform)
-xf = fftfreq(N, T)[:N // 2]  # frequency bins
+# # Number of sample points
+# N = len(x_uniform)
+# T = t_uniform[1] - t_uniform[0]  # sample spacing
+# yf = fft(x_uniform)
+# xf = fftfreq(N, T)[:N // 2]  # frequency bins
 
-# Amplitude spectrum (normalized)
-amplitude = 2.0/N * np.abs(yf[:N//2])
+# # Amplitude spectrum (normalized)
+# amplitude = 2.0/N * np.abs(yf[:N//2])
 
-plt.figure()
-plt.loglog(xf, amplitude)
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude')
-plt.grid(True, which='both')
-plt.title('FFT of Angular Velocity without Lowpass')
-plt.show()
+# plt.figure()
+# plt.loglog(xf, amplitude)
+# plt.xlabel('Frequency (Hz)')
+# plt.ylabel('Magnitude')
+# plt.grid(True, which='both')
+# plt.title('FFT of Angular Velocity without Lowpass')
+# plt.show()
 
-t_uniform = np.linspace(0, 1400, 1400)  # new uniform time vector for test signals
+# t_uniform = np.linspace(0, 1400, 1400)  # new uniform time vector for test signals
 
-x_test100 = np.sin(2*np.pi*t_uniform/100)
-x_test10 = np.sin(2*np.pi*t_uniform/10)
-x_test700 = np.sin(2*np.pi*t_uniform/700)
+# x_test100 = np.sin(2*np.pi*t_uniform/100)
+# x_test10 = np.sin(2*np.pi*t_uniform/10)
+# x_test700 = np.sin(2*np.pi*t_uniform/700)
 
-N = len(x_test700)
-T = t_uniform[1] - t_uniform[0]
-yf700 = fft(x_test700)
-xf700 = fftfreq(N, T)[:N // 2]
-amplitude700 = 2.0/N * np.abs(yf700[:N//2])
+# N = len(x_test700)
+# T = t_uniform[1] - t_uniform[0]
+# yf700 = fft(x_test700)
+# xf700 = fftfreq(N, T)[:N // 2]
+# amplitude700 = 2.0/N * np.abs(yf700[:N//2])
 
-N = len(x_test100)
-yf100 = fft(x_test100)
-xf100 = fftfreq(N, T)[:N // 2]
-amplitude100 = 2.0/N * np.abs(yf100[:N//2])
+# N = len(x_test100)
+# yf100 = fft(x_test100)
+# xf100 = fftfreq(N, T)[:N // 2]
+# amplitude100 = 2.0/N * np.abs(yf100[:N//2])
 
-N = len(x_test10)
-yf10 = fft(x_test10)
-xf10 = fftfreq(N, T)[:N // 2]
-amplitude10 = 2.0/N * np.abs(yf10[:N//2])
+# N = len(x_test10)
+# yf10 = fft(x_test10)
+# xf10 = fftfreq(N, T)[:N // 2]
+# amplitude10 = 2.0/N * np.abs(yf10[:N//2])
 
-plt.figure()
-plt.loglog(xf700, amplitude700)
-plt.loglog(xf100, amplitude100)
-plt.loglog(xf10, amplitude10)
-plt.legend(['700 Hz', '100 Hz', '10 Hz'])
-plt.ylim(1e-6, 1e1)
-plt.xlabel('Frequency (Hz)')
-plt.ylabel('Magnitude')
-plt.grid(True, which='both')
-plt.title(f'Test FFT over {max(t_uniform)} seconds')
-plt.show()
+# plt.figure()
+# plt.loglog(xf700, amplitude700)
+# plt.loglog(xf100, amplitude100)
+# plt.loglog(xf10, amplitude10)
+# plt.legend(['700 Hz', '100 Hz', '10 Hz'])
+# plt.ylim(1e-6, 1e1)
+# plt.xlabel('Frequency (Hz)')
+# plt.ylabel('Magnitude')
+# plt.grid(True, which='both')
+# plt.title(f'Test FFT over {max(t_uniform)} seconds')
+# plt.show()

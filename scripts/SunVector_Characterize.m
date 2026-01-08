@@ -226,6 +226,7 @@ end
 
 ad7991_data = cell(length(STOR_folders), 4);
 ads7924_data = cell(length(STOR_folders), 4);
+CSS_AD_vals = 0;
 
 for i = 1:length(STOR_folders)
     ad7991_data{i, 1} = CSS_data{i}.ad7991_1;
@@ -237,7 +238,9 @@ for i = 1:length(STOR_folders)
     ads7924_data{i, 2} = CSS_data{i}.ads7924_2;
     ads7924_data{i, 3} = CSS_data{i}.ads7924_3;
     ads7924_data{i, 4} = CSS_data{i}.ads7924_4;
+end
 
+for i = 1:length(STOR_folders)
     for j = 1:4
         for k = 1:4
             ad7991_data{i, j}(k,:) = ad7991_data{i, j}(k,:) - min(ad7991_data{i, j}(k,:));
@@ -245,6 +248,18 @@ for i = 1:length(STOR_folders)
         end
     end
 end
+
+CSS_AD_vals = [ad7991_data{1, 1}; ad7991_data{1, 2}; ad7991_data{1, 3}; ad7991_data{1, 4}];
+
+for i = 1:16
+    CSS_AD_vals(i,:) = movmean(CSS_AD_vals(i,:), 20);
+end
+figure();
+hold on;
+for i = 1:16
+    plot(CSS_AD_vals(i,:));
+end
+
 
 hour_path = [];
 
@@ -575,7 +590,7 @@ legend("x", "y", "z");
 all_norms{1} = [n_unit{1, 1}, n_unit{2, 1}, n_unit{3, 1}, n_unit{4, 1}];
 all_norms{2} = [n_unit{1, 2}, n_unit{2, 2}, n_unit{3, 2}, n_unit{4, 2}];
 % 
-% all_norms{1}
+all_norms{1}
 % all_norms{2}
 
 % disp("CSS2 AD norms: " + all_norms{1}(:,1:4));
@@ -640,7 +655,7 @@ patch('Vertices', vertices, 'Faces', faces, ...
 xlabel('X'); ylabel('Y'); zlabel('Z');
 grid on;
 axis equal;
-title('3D Vector');
+title('Photodiode Normal Vector Visualization');
 view(3);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -724,6 +739,113 @@ view(3);
 %         (s_body_interp{3}(2,start{3}:end_index{3}))',(s_body_interp{1}(2,start{1}:end_index{1}))',...
 %         (s_body_interp{3}(3,start{3}:end_index{3}))',(s_body_interp{1}(3,start{1}:end_index{1}))'];
 
-%% Helper Functions
+%% STUFF FOR SIMULINK SCENARIO
+
+Day = 0;
+First_Hour = 0;
+Last_Hour = 16;
+First_File = 0;
+Last_File = 302;
+
+File_range = First_File:1:Last_File;
+Time_range_hours = First_Hour:1:Last_Hour;
+
+for k = 1:length(STOR_folders)
+    for i = 1:length(Time_range_hours)
+        for j = 1:length(File_range)
+            
+            hour_path = fullfile(Root_dir,'STOR_folders','STOR_4',num2str(Day),num2str(Time_range_hours(i)));
+            % hour_path = fullfile(Root_dir, 'STOR_YROT_5-19','LOW/'); % Can plot low res data
+            FP = fullfile(hour_path,strcat(num2str(File_range(j))));
+            Data_filepaths = dir(FP);
+            
+            adcs_data{k,i}(:,j) = ADCSDataParseDir(Data_filepaths);
+        end
+    end
+end
+
+SYS_data = cell(length(STOR_folders), 1);
+PD_data = cell(length(STOR_folders), 1);
+GYRO_data = cell(length(STOR_folders), 1);
+MAG_data = cell(length(STOR_folders), 1);
+GPS_data = cell(length(STOR_folders), 1);
+
+for k = 1:length(STOR_folders)
+
+    PD_data{k}.ad7991_1 = [];
+    PD_data{k}.ad7991_2 = [];
+    PD_data{k}.ad7991_3 = [];
+    PD_data{k}.ad7991_4 = [];
+    PD_data{k}.ads7924_1 = [];
+    PD_data{k}.ads7924_2 = [];
+    PD_data{k}.ads7924_3 = [];
+    PD_data{k}.ads7924_4 = [];
+
+    for i = 1:length(adcs_data) % hour
+        for j = 1:length(adcs_data{k,i}) % minute
+            % CSS
+            PD_data{k}.ad7991_1 = [PD_data{k}.ad7991_1 adcs_data{k,i}(:,j).CSS.css_ad7991_1];
+            PD_data{k}.ad7991_2 = [PD_data{k}.ad7991_2 adcs_data{k,i}(:,j).CSS.css_ad7991_2];
+            PD_data{k}.ad7991_3 = [PD_data{k}.ad7991_3 adcs_data{k,i}(:,j).CSS.css_ad7991_3];
+            PD_data{k}.ad7991_4 = [PD_data{k}.ad7991_4 adcs_data{k,i}(:,j).CSS.css_ad7991_4];
+            PD_data{k}.ads7924_1 = [PD_data{k}.ads7924_1  adcs_data{k,i}(:,j).CSS.css_ads7924_1];
+            PD_data{k}.ads7924_2 = [PD_data{k}.ads7924_2  adcs_data{k,i}(:,j).CSS.css_ads7924_2];
+            PD_data{k}.ads7924_3 = [PD_data{k}.ads7924_3  adcs_data{k,i}(:,j).CSS.css_ads7924_3];
+            PD_data{k}.ads7924_4 = [PD_data{k}.ads7924_4  adcs_data{k,i}(:,j).CSS.css_ads7924_4];
+        end
+    end
+
+    for i = 1:4
+        PD_data{k}.ad7991_1(i,:) = movmean(PD_data{k}.ad7991_1(i,:), 1);
+        PD_data{k}.ad7991_2(i,:) = movmean(PD_data{k}.ad7991_2(i,:), 1);
+        PD_data{k}.ad7991_3(i,:) = movmean(PD_data{k}.ad7991_3(i,:), 1);
+        PD_data{k}.ad7991_4(i,:) = movmean(PD_data{k}.ad7991_4(i,:), 1);
+        PD_data{k}.ads7924_1(i,:) = movmean(PD_data{k}.ads7924_1(i,:), 1);
+        PD_data{k}.ads7924_2(i,:) = movmean(PD_data{k}.ads7924_2(i,:), 1);
+        PD_data{k}.ads7924_3(i,:) = movmean(PD_data{k}.ads7924_3(i,:), 1);
+        PD_data{k}.ads7924_4(i,:) = movmean(PD_data{k}.ads7924_4(i,:), 1);
+    end
+end
+
+for i = 1:length(STOR_folders)
+    PD_data{i}.ad7991_1 = PD_data{i}.ad7991_1; % Currently in volts
+    PD_data{i}.ad7991_2 = PD_data{i}.ad7991_2; % Can normalize based on max int12 value
+    PD_data{i}.ad7991_3 = PD_data{i}.ad7991_3; 
+    PD_data{i}.ad7991_4 = PD_data{i}.ad7991_4;
+    
+    PD_data{i}.ads7924_1 = PD_data{i}.ads7924_1;
+    PD_data{i}.ads7924_2 = PD_data{i}.ads7924_2;
+    PD_data{i}.ads7924_3 = PD_data{i}.ads7924_3;
+    PD_data{i}.ads7924_4 = PD_data{i}.ads7924_4;
+end
+
+ad7991_data2 = cell(length(STOR_folders), 4);
+ads7924_data2 = cell(length(STOR_folders), 4);
+PD_vals = 0;
+
+for i = 1:length(STOR_folders)
+    ad7991_data2{i, 1} = PD_data{i}.ad7991_1;
+    ad7991_data2{i, 2} = PD_data{i}.ad7991_2;
+    ad7991_data2{i, 3} = PD_data{i}.ad7991_3;
+    ad7991_data2{i, 4} = PD_data{i}.ad7991_4;
+
+    ads7924_data2{i, 1} = PD_data{i}.ads7924_1;
+    ads7924_data2{i, 2} = PD_data{i}.ads7924_2;
+    ads7924_data2{i, 3} = PD_data{i}.ads7924_3;
+    ads7924_data2{i, 4} = PD_data{i}.ads7924_4;
+end
+
+% for i = 1:length(STOR_folders)
+%     for j = 1:4
+%         for k = 1:4
+%             ad7991_data2{i, j}(k,:) = ad7991_data2{i, j}(k,:) - min(ad7991_data2{i, j}(k,:));
+%             ads7924_data2{i, j}(k,:) = ads7924_data2{i, j}(k,:) - min(ads7924_data2{i, j}(k,:));
+%         end
+%     end
+% end
+
+PD_vals = [ad7991_data2{1, 1}; ad7991_data2{1, 2}; ad7991_data2{1, 3}; ad7991_data2{1, 4}];
+
+
 
 
