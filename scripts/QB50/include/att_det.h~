@@ -1,0 +1,64 @@
+/* ***********************************************************************
+ * file:    att_det.h
+ * author:	? (No header edit by Andre L Antunes de Sa)
+ * created on:	?
+ *
+ * att dependencies?
+ *
+ * ***********************************************************************
+ */
+
+#ifndef __ATT_DET_H_
+#define __ATT_DET_H_
+
+#include "types.h"
+#include "mtx.h"
+
+#define SS_MAX 3.0f
+//#define SS_V_CUTOFF	.259f * SS_MAX //cos(75)*SS_MAX
+#define SS_V_CUTOFF	.42f * SS_MAX //cos(65)*SS_MAX
+//#define SS_V_CUTOFF	.5f * SS_MAX //cos(60)*SS_MAX
+#define SS_COUNT	15
+#define UPDATE_RATE	10 //Hz
+#define THETA_RP .25f
+#define MAX_ROTS 3
+#define ROT_ANGLE .5f
+#define MIN_MINV_DET .00001f
+#define AVG_WIN 8 /*Must be Even*/
+
+/* ------------------------ CODE FOR EKF --------------------------*/
+#define EKF_ON_AFTER 100
+#define SNC_FLAG 1
+#define SIGMA_SNC (1e1f)
+#define TSTEP (0.1f)
+#define CSS_SCALE_FACTOR (3.0f)
+#define CSS_HALF_ANGLE (1.22173f)
+
+//#define PRINT(fmt,args...) mexPrintf(fmt, ##args)
+#define PRINT(...) do {} while(0)
+
+
+struct est_state{
+	struct mtx_matrix att_quaternion; //4x1
+	struct mtx_matrix att_err; //3x3
+	struct mtx_matrix sat_body_rates; //3x1
+	struct mtx_matrix gyro_bias; //3x1
+}; 
+
+void q_2_dcm(struct mtx_matrix* q, struct mtx_matrix* dcm);
+void dcm_2_q(struct mtx_matrix* dcm, struct mtx_matrix* q);
+void q_from_2uvecs(float *v1, float *v2, float *q_v1v2);
+void body_rate_dcm_rot(struct mtx_matrix* body_rates, struct mtx_matrix* prior_dcm, struct mtx_matrix* rot_dcm);
+void calc_q_err(float *q_bn, float *q_rn, float *q_br);
+int32_t est_sun_vec_ls(struct mtx_matrix* sun_sens_volt, struct mtx_matrix* sun_sens_norm, struct mtx_matrix* sun_vec, float ss_v_cutoff);
+int32_t est_quest_rp(struct mtx_matrix* b_k, struct mtx_matrix* eci_k, struct est_state* state, struct mtx_matrix* dcm_out);
+int32_t est_quest(struct mtx_matrix* b_k, struct mtx_matrix* eci_k, struct est_state* state, struct mtx_matrix* dcm_out);
+int32_t est_simp(struct mtx_matrix* sun_sens_volt, struct mtx_matrix* sun_sens_norm, struct mtx_matrix* mag_sens, struct mtx_matrix* sun_eci, struct mtx_matrix* mag_eci, struct est_state* state, struct mtx_matrix* dcm_out, float ss_v_cutoff);
+int32_t est_ekf(struct mtx_matrix* sun_sens_volt, struct mtx_matrix* sun_sens_norm, struct mtx_matrix* mag_sens, struct mtx_matrix* sun_eci, struct mtx_matrix* mag_eci, struct est_state* state, struct mtx_matrix* dcm_out, float ss_v_cutoff);
+void create_att_state(struct est_state* state);
+void create_sun_des_q(uint8_t op_mode, float *sun_vec, float *des_BR_q);
+void create_ram_des_Rframe(uint8_t op_mode, struct mtx_matrix* q_BN_vecmtx, float *vel_vec, float *sun_vec, float *pos_vec, float *des_RN_q, float *des_rates);
+void smooth_mag(float *mag_in, float *mag_out);
+void median_css(float *css_in, float *css_out);
+
+#endif

@@ -29,7 +29,7 @@ EPOCH_START = 693662400; % From ADCS FSW 22.8.1 (defined in global.h)
 %% --------------- File format definitions --------------- %%
 % Total size of one frame of SD card data (Bytes)
 % Should exactly match 'LOOP_STORAGE_LEN' in global.h
-FRAME_SIZE = 200; % [Bytes]
+FRAME_SIZE = 242; % [Bytes]
 
 %% Struct Strings - Should Match Variable Name Assignment Below
 % Allows for looping over variable names to pull data
@@ -40,7 +40,7 @@ CSS.varnames = {'css_ad7991_1','css_ad7991_2','css_ad7991_3','css_ad7991_4',...
 
 % Rate Gyros
 GYRO.varnames = {'bmg250_gyro','bmg250_temp',...
-               'l3gd20h_gyro','l3gd20h_temp'}; % Can change to bmg250_2
+               'bmg250_2_gyro','bmg250_2_temp'}; % Can change to bmg250_2
 
 % Magnetometers
 MAG.varnames = {'lis3mdl_1_mag','lis3mdl_1_temp',...
@@ -77,9 +77,9 @@ OFFSET.css_ads7924_4 = 58;
 OFFSET.bmg250_gyro = 66;    % rate gyro 1
 OFFSET.bmg250_temp = 72;
 
-% l3gd20h rate gyro (to be replaced with another bmg250, same structure)
-OFFSET.l3gd20h_gyro = 74;   % rate gyro 2
-OFFSET.l3gd20h_temp = 80;
+% bmg250_2 rate gyro (to be replaced with another bmg250, same structure)
+OFFSET.bmg250_2_gyro = 74;   % rate gyro 2
+OFFSET.bmg250_2_temp = 80;
 
 % lis3mdl magnetometers
 OFFSET.lis3mdl_1_mag = 82;
@@ -116,9 +116,9 @@ TYPE.css_all = 'int16';
 TYPE.bmg250_gyro = 'int16';
 TYPE.bmg250_temp = 'int16';
 
-% l3gd20h rate gyro (to be replaced with another bmg250, same structure)
-TYPE.l3gd20h_gyro = 'int16';
-TYPE.l3gd20h_temp = 'int16';
+% bmg250_2 rate gyro (to be replaced with another bmg250, same structure)
+TYPE.bmg250_2_gyro = 'int16';
+TYPE.bmg250_2_temp = 'int16';
 
 % lis3mdl magnetometers
 TYPE.lis3mdl_1_mag = 'int16';
@@ -151,9 +151,9 @@ N_OBJ.css_all = 4;
 N_OBJ.bmg250_gyro = 3; % [x, y, z]
 N_OBJ.bmg250_temp = 1;
 
-% l3gd20h rate gyro (to be replaced with another bmg250, same structure)
-N_OBJ.l3gd20h_gyro = 3;
-N_OBJ.l3gd20h_temp = 1;
+% bmg250_2 rate gyro (to be replaced with another bmg250, same structure)
+N_OBJ.bmg250_2_gyro = 3;
+N_OBJ.bmg250_2_temp = 1;
 
 % lis3mdl magnetometers
 N_OBJ.lis3mdl_1_mag = 3; % [x, y, z]
@@ -217,7 +217,7 @@ while (j <= n_frames)
     % 0xDEADBEEF
 %     if frames(197,j) ~= 222 || frames(198,j) ~= 173 || frames(199,j) ~= 190 || frames(200,j) ~= 239
     % 0xADBEEF
-    if frames(198,j) ~= 173 || frames(199,j) ~= 190 || frames(200,j) ~= 239
+    if frames(240,j) ~= 173 || frames(241,j) ~= 190 || frames(242,j) ~= 239
         frames(:,j) = [];
         j = j - 1;
         n_frames = n_frames - 1;
