@@ -1,5 +1,5 @@
 %% File : control_fdbk.tlc
-%% Created : Fri Jan 23 11:32:13 2026
+%% Created : Fri Jan 23 16:50:95 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -46,11 +46,11 @@
     SFB_EXTERN_C void control_fdbk_Outputs_wrapper_accel(const %<uint8Type> *op_mode,
 			const %<singleType> *q_BN,
 			const %<singleType> *q_des_RN,
-			const %<singleType> *q_BR,
 			const %<singleType> *gyro_rates,
 			const %<singleType> *mag_bf,
 			const %<singleType> *ctl_gain,
-			%<singleType> *out_u);
+			%<singleType> *out_u,
+			%<singleType> *q_BR);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -80,28 +80,28 @@
     SFB_EXTERN_C void control_fdbk_Outputs_wrapper(const %<uint8Type> *op_mode,
 			const %<singleType> *q_BN,
 			const %<singleType> *q_des_RN,
-			const %<singleType> *q_BR,
 			const %<singleType> *gyro_rates,
 			const %<singleType> *mag_bf,
 			const %<singleType> *ctl_gain,
-			%<singleType> *out_u);
+			%<singleType> *out_u,
+			%<singleType> *q_BR);
     SFB_EXTERN_C void control_fdbk_Terminate_wrapper(void);
     void control_fdbk_Outputs_wrapper_accel(const %<uint8Type> *op_mode,
 			const %<singleType> *q_BN,
 			const %<singleType> *q_des_RN,
-			const %<singleType> *q_BR,
 			const %<singleType> *gyro_rates,
 			const %<singleType> *mag_bf,
 			const %<singleType> *ctl_gain,
-			%<singleType> *out_u){
+			%<singleType> *out_u,
+			%<singleType> *q_BR){
     control_fdbk_Outputs_wrapper(op_mode,
 			q_BN,
 			q_des_RN,
-			q_BR,
 			gyro_rates,
 			mag_bf,
 			ctl_gain,
-			out_u);
+			out_u,
+			q_BR);
     }
 #undef SFB_EXTERN_C
 
@@ -123,11 +123,11 @@
     SFB_EXTERN_C void control_fdbk_Outputs_wrapper(const %<uint8Type> *op_mode,
 			const %<singleType> *q_BN,
 			const %<singleType> *q_des_RN,
-			const %<singleType> *q_BR,
 			const %<singleType> *gyro_rates,
 			const %<singleType> *mag_bf,
 			const %<singleType> *ctl_gain,
-			%<singleType> *out_u);
+			%<singleType> *out_u,
+			%<singleType> *q_BR);
 
     SFB_EXTERN_C void control_fdbk_Terminate_wrapper(void);
 
@@ -153,13 +153,13 @@
   %assign pu3 = LibBlockInputSignalAddr(3, "", "", 0)
   %assign pu4 = LibBlockInputSignalAddr(4, "", "", 0)
   %assign pu5 = LibBlockInputSignalAddr(5, "", "", 0)
-  %assign pu6 = LibBlockInputSignalAddr(6, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
+  %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    control_fdbk_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<py0>);
+    control_fdbk_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<py0>, %<py1>);
   %else
-    control_fdbk_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<py0>);
+    control_fdbk_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<py0>, %<py1>);
   %endif
 
   %%

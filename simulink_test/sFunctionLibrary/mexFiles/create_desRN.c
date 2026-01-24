@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Fri Nov 07 13:45:31 2025
+ * Created: Fri Jan 23 15:57:80 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     2
+#define NUM_INPUTS                     3
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 opmode
@@ -75,6 +75,26 @@
 #define IN_1_FRACTIONLENGTH            3
 #define IN_1_BIAS                      0
 #define IN_1_SLOPE                     0.125
+
+/* Input Port  2 */
+#define IN_PORT_2_NAME                 antenna
+#define INPUT_2_DIMS_ND                {1,1}
+#define INPUT_2_NUM_ELEMS              1
+#define INPUT_2_WIDTH                  1
+#define INPUT_DIMS_2_COL               1
+#define INPUT_2_DTYPE                  uint8_T
+#define INPUT_2_COMPLEX                COMPLEX_NO
+#define INPUT_2_UNIT                   ""
+#define IN_2_BUS_BASED                 0
+#define IN_2_BUS_NAME
+#define IN_2_DIMS                      1-D
+#define INPUT_2_FEEDTHROUGH            1
+#define IN_2_ISSIGNED                  1
+#define IN_2_WORDLENGTH                8
+#define IN_2_FIXPOINTSCALING           1
+#define IN_2_FRACTIONLENGTH            3
+#define IN_2_BIAS                      0
+#define IN_2_SLOPE                     0.125
 #define NUM_OUTPUTS                    1
 
 /* Output Port  0 */
@@ -116,6 +136,7 @@
 
 extern void create_desRN_Outputs_wrapper(const uint8_T *opmode,
   const real32_T *des_vec,
+  const uint8_T *antenna,
   real32_T *des_RN);
 
 /*=============================*
@@ -258,6 +279,13 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortDirectFeedThrough(S, 1, INPUT_1_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 1, 1);/*direct input signal access*/
 
+  /* Input Port 2 */
+  ssSetInputPortWidth(S, 2, INPUT_2_NUM_ELEMS);
+  ssSetInputPortDataType(S, 2, SS_UINT8);
+  ssSetInputPortComplexSignal(S, 2, INPUT_2_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 2, INPUT_2_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 2, 1);/*direct input signal access*/
+
   /*
    * Configure the Units for Input Ports
    */
@@ -281,6 +309,15 @@ static void mdlInitializeSizes(SimStruct *S)
     } else {
       ssSetLocalErrorStatus(S,
                             "Invalid Unit provided for input port des_vec of S-Function create_desRN");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, INPUT_2_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 2, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port antenna of S-Function create_desRN");
       return;
     }
 
@@ -321,7 +358,7 @@ static void mdlInitializeSizes(SimStruct *S)
 
   }
 
-  if (!ssSetNumDWork(S, 3))
+  if (!ssSetNumDWork(S, 4))
     return;
 
   /*
@@ -343,13 +380,22 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 1, COMPLEX_NO);
 
   /*
-   * Configure the dwork 2 (des_RN_t)
+   * Configure the dwork 2 (antenna_t)
    */
-  ssSetDWorkDataType(S, 2, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkDataType(S, 2, ssGetInputPortDataType(S, 2));
   ssSetDWorkUsageType(S, 2, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 2, "des_RN_t");
-  ssSetDWorkWidth(S, 2, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkName(S, 2, "antenna_t");
+  ssSetDWorkWidth(S, 2, ssGetInputPortWidth(S, 2));
   ssSetDWorkComplexSignal(S, 2, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 3 (des_RN_t)
+   */
+  ssSetDWorkDataType(S, 3, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkUsageType(S, 3, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 3, "des_RN_t");
+  ssSetDWorkWidth(S, 3, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkComplexSignal(S, 3, COMPLEX_NO);
   ssSetNumPWork(S, 0);
   ssSetNumSampleTimes(S, 1);
   ssSetNumRWork(S, 0);
@@ -475,6 +521,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 {
   const uint8_T *opmode = (uint8_T *) ssGetInputPortRealSignal(S, 0);
   const real32_T *des_vec = (real32_T *) ssGetInputPortRealSignal(S, 1);
+  const uint8_T *antenna = (uint8_T *) ssGetInputPortRealSignal(S, 2);
   real32_T *des_RN = (real32_T *) ssGetOutputPortRealSignal(S, 0);
 
   /* S-Function Builder Row Major Support has been enabled for custom
@@ -482,14 +529,18 @@ static void mdlOutputs(SimStruct *S, int_T tid)
    */
   uint8_T *opmode_t = (uint8_T *)ssGetDWork(S, 0);
   real32_T *des_vec_t = (real32_T *)ssGetDWork(S, 1);
-  real32_T *des_RN_t = (real32_T *)ssGetDWork(S, 2);
+  uint8_T *antenna_t = (uint8_T *)ssGetDWork(S, 2);
+  real32_T *des_RN_t = (real32_T *)ssGetDWork(S, 3);
   NDTransposeBySrcSpecs((void*)opmode_t, (const void*)opmode,
                         ssGetInputPortDimensions(S, 0),
                         ssGetInputPortNumDimensions(S, 0), sizeof(uint8_T));
   NDTransposeBySrcSpecs((void*)des_vec_t, (const void*)des_vec,
                         ssGetInputPortDimensions(S, 1),
                         ssGetInputPortNumDimensions(S, 1), sizeof(real32_T));
-  create_desRN_Outputs_wrapper(opmode_t, des_vec_t, des_RN_t);
+  NDTransposeBySrcSpecs((void*)antenna_t, (const void*)antenna,
+                        ssGetInputPortDimensions(S, 2),
+                        ssGetInputPortNumDimensions(S, 2), sizeof(uint8_T));
+  create_desRN_Outputs_wrapper(opmode_t, des_vec_t, antenna_t, des_RN_t);
   NDTransposeByDstSpecs((void*)des_RN, (const void*)des_RN_t,
                         ssGetOutputPortDimensions(S, 0),
                         ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));

@@ -20,11 +20,11 @@
 #define u_width 1
 #define u_1_width 4
 #define u_2_width 4
-#define u_3_width 4
+#define u_3_width 3
 #define u_4_width 3
 #define u_5_width 3
-#define u_6_width 3
-#define y_width 3
+#define y_width 6
+#define y_1_width 4
 
 /*
  * Create external references here.  
@@ -41,22 +41,23 @@
 extern void control_fdbk_Outputs_wrapper(const uint8_T *op_mode,
 			const real32_T *q_BN,
 			const real32_T *q_des_RN,
-			const real32_T *q_BR,
 			const real32_T *gyro_rates,
 			const real32_T *mag_bf,
 			const real32_T *ctl_gain,
-			real32_T *out_u);
+			real32_T *out_u,
+			real32_T *q_BR);
 
 void control_fdbk_Outputs_wrapper(const uint8_T *op_mode,
 			const real32_T *q_BN,
 			const real32_T *q_des_RN,
-			const real32_T *q_BR,
 			const real32_T *gyro_rates,
 			const real32_T *mag_bf,
 			const real32_T *ctl_gain,
-			real32_T *out_u)
+			real32_T *out_u,
+			real32_T *q_BR)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
+    // Unitialised memory - please fix me
 float * pos_eci;
 float * pos_vel;
 float * I_RW_values;
