@@ -57,7 +57,7 @@ void control_fdbk_Outputs_wrapper(const uint8_T *op_mode,
 			real32_T *q_BR)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-    // Unitialised memory - please fix me
+// Unitialised memory - please fix me
 float * pos_eci;
 float * pos_vel;
 float * I_RW_values;
