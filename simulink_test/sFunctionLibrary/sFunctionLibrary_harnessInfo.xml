@@ -14,7 +14,7 @@
     <P Name="FileName">sFunctionLibrary_create_desRN_Harness.slx</P>
     <P Name="SavedVersion">25.2</P>
     <P Name="HarnessUUID">1be66c8f-eae0-4532-9f5f-e6f7c7103612</P>
-    <P Name="HarnessConnectionsMap">0,1|0|0,0,0,0||</P>
+    <P Name="HarnessConnectionsMap">0,1,2|0|0,0,0,0||</P>
     <P Name="VerificationMode">0</P>
     <P Name="HarnessOwnerCheckSum">0,0,0,0</P>
     <P Name="RebuildOnOpen">false</P>
@@ -34,7 +34,7 @@
     <P Name="CustomSourcePath"/>
     <P Name="CustomSinkPath"/>
     <P Name="BlockSIDs">5|13|0|0|0|0|0</P>
-    <P Name="OpenGraphs">||||sFunctionLibrary_create_desRN_Harness</P>
+    <P Name="OpenGraphs">||sFunctionLibrary_create_desRN_Harness</P>
     <P Name="ExistingBuildFolder"/>
     <P Name="FunctionInterfaceName"/>
     <P Name="SysArchSUTModel"/>

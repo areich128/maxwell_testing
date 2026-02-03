@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Mon Feb 02 18:29:58 2026
+ * Created: Mon Feb 02 23:42:36 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -134,7 +134,7 @@
 #define OUT_2_BIAS                     0
 #define OUT_2_SLOPE                    0.125
 #define NPARAMS                        0
-#define SAMPLE_TIME_0                  INHERITED_SAMPLE_TIME
+#define SAMPLE_TIME_0                  0.1
 #define NUM_DISC_STATES                0
 #define DISC_STATES_IC                 [0]
 #define NUM_CONT_STATES                0
