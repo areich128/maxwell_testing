@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Mon Feb 02 18:30:36 2026
+ * Created: Wed Feb 04 12:13:75 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     6
+#define NUM_INPUTS                     8
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 op_mode
@@ -155,6 +155,46 @@
 #define IN_5_FRACTIONLENGTH            3
 #define IN_5_BIAS                      0
 #define IN_5_SLOPE                     0.125
+
+/* Input Port  6 */
+#define IN_PORT_6_NAME                 gps_result_override
+#define INPUT_6_DIMS_ND                {1,1}
+#define INPUT_6_NUM_ELEMS              1
+#define INPUT_6_WIDTH                  1
+#define INPUT_DIMS_6_COL               1
+#define INPUT_6_DTYPE                  boolean_T
+#define INPUT_6_COMPLEX                COMPLEX_NO
+#define INPUT_6_UNIT                   ""
+#define IN_6_BUS_BASED                 0
+#define IN_6_BUS_NAME
+#define IN_6_DIMS                      1-D
+#define INPUT_6_FEEDTHROUGH            1
+#define IN_6_ISSIGNED                  1
+#define IN_6_WORDLENGTH                8
+#define IN_6_FIXPOINTSCALING           1
+#define IN_6_FRACTIONLENGTH            3
+#define IN_6_BIAS                      0
+#define IN_6_SLOPE                     0.125
+
+/* Input Port  7 */
+#define IN_PORT_7_NAME                 q_BR_noGPS
+#define INPUT_7_DIMS_ND                {4,1}
+#define INPUT_7_NUM_ELEMS              4
+#define INPUT_7_WIDTH                  4
+#define INPUT_DIMS_7_COL               1
+#define INPUT_7_DTYPE                  real32_T
+#define INPUT_7_COMPLEX                COMPLEX_NO
+#define INPUT_7_UNIT                   ""
+#define IN_7_BUS_BASED                 0
+#define IN_7_BUS_NAME
+#define IN_7_DIMS                      2-D
+#define INPUT_7_FEEDTHROUGH            1
+#define IN_7_ISSIGNED                  1
+#define IN_7_WORDLENGTH                8
+#define IN_7_FIXPOINTSCALING           1
+#define IN_7_FRACTIONLENGTH            3
+#define IN_7_BIAS                      0
+#define IN_7_SLOPE                     0.125
 #define NUM_OUTPUTS                    2
 
 /* Output Port  0 */
@@ -219,6 +259,8 @@ extern void control_fdbk_Outputs_wrapper(const uint8_T *op_mode,
   const real32_T *gyro_rates,
   const real32_T *mag_bf,
   const real32_T *ctl_gain,
+  const boolean_T *gps_result_override,
+  const real32_T *q_BR_noGPS,
   real32_T *out_u,
   real32_T *q_BR);
 
@@ -406,6 +448,24 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortDirectFeedThrough(S, 5, INPUT_5_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 5, 1);/*direct input signal access*/
 
+  /* Input Port 6 */
+  ssSetInputPortWidth(S, 6, INPUT_6_NUM_ELEMS);
+  ssSetInputPortDataType(S, 6, SS_BOOLEAN);
+  ssSetInputPortComplexSignal(S, 6, INPUT_6_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 6, INPUT_6_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 6, 1);/*direct input signal access*/
+
+  /* Input Port 7 */
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_7_NUM_ELEMS;
+  int_T in7Dims[] = INPUT_7_DIMS_ND;
+  inputDimsInfo.dims = in7Dims;
+  ssSetInputPortDimensionInfo(S, 7, &inputDimsInfo);
+  ssSetInputPortDataType(S, 7, SS_SINGLE);
+  ssSetInputPortComplexSignal(S, 7, INPUT_7_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 7, INPUT_7_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 7, 1);/*direct input signal access*/
+
   /*
    * Configure the Units for Input Ports
    */
@@ -468,6 +528,24 @@ static void mdlInitializeSizes(SimStruct *S)
       return;
     }
 
+    ssRegisterUnitFromExpr(S, INPUT_6_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 6, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port gps_result_override of S-Function control_fdbk");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, INPUT_7_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 7, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port q_BR_noGPS of S-Function control_fdbk");
+      return;
+    }
+
 #endif
 
   }
@@ -523,7 +601,7 @@ static void mdlInitializeSizes(SimStruct *S)
 
   }
 
-  if (!ssSetNumDWork(S, 8))
+  if (!ssSetNumDWork(S, 10))
     return;
 
   /*
@@ -581,22 +659,40 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 5, COMPLEX_NO);
 
   /*
-   * Configure the dwork 6 (out_u_t)
+   * Configure the dwork 6 (gps_result_override_t)
    */
-  ssSetDWorkDataType(S, 6, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkDataType(S, 6, ssGetInputPortDataType(S, 6));
   ssSetDWorkUsageType(S, 6, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 6, "out_u_t");
-  ssSetDWorkWidth(S, 6, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkName(S, 6, "gps_result_override_t");
+  ssSetDWorkWidth(S, 6, ssGetInputPortWidth(S, 6));
   ssSetDWorkComplexSignal(S, 6, COMPLEX_NO);
 
   /*
-   * Configure the dwork 7 (q_BR_t)
+   * Configure the dwork 7 (q_BR_noGPS_t)
    */
-  ssSetDWorkDataType(S, 7, ssGetOutputPortDataType(S, 1));
+  ssSetDWorkDataType(S, 7, ssGetInputPortDataType(S, 7));
   ssSetDWorkUsageType(S, 7, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 7, "q_BR_t");
-  ssSetDWorkWidth(S, 7, ssGetOutputPortWidth(S, 1));
+  ssSetDWorkName(S, 7, "q_BR_noGPS_t");
+  ssSetDWorkWidth(S, 7, ssGetInputPortWidth(S, 7));
   ssSetDWorkComplexSignal(S, 7, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 8 (out_u_t)
+   */
+  ssSetDWorkDataType(S, 8, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkUsageType(S, 8, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 8, "out_u_t");
+  ssSetDWorkWidth(S, 8, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkComplexSignal(S, 8, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 9 (q_BR_t)
+   */
+  ssSetDWorkDataType(S, 9, ssGetOutputPortDataType(S, 1));
+  ssSetDWorkUsageType(S, 9, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 9, "q_BR_t");
+  ssSetDWorkWidth(S, 9, ssGetOutputPortWidth(S, 1));
+  ssSetDWorkComplexSignal(S, 9, COMPLEX_NO);
   ssSetNumPWork(S, 0);
   ssSetNumSampleTimes(S, 1);
   ssSetNumRWork(S, 0);
@@ -695,6 +791,16 @@ static void mdlSetDefaultPortDimensionInfo(SimStruct *S)
     ssSetInputPortMatrixDimensions(S, 5, 1 , 1);
   }
 
+  /* Setting default dimensions for input port 7 */
+  portDimsInfo.width = INPUT_7_NUM_ELEMS;
+  dims[0] = INPUT_7_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 7) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 7, 1 , 1);
+  }
+
   /* Setting default dimensions for output port 0 */
   portDimsInfo.width = OUTPUT_0_NUM_ELEMS;
   dims[0] = OUTPUT_0_NUM_ELEMS;
@@ -775,6 +881,9 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   const real32_T *gyro_rates = (real32_T *) ssGetInputPortRealSignal(S, 3);
   const real32_T *mag_bf = (real32_T *) ssGetInputPortRealSignal(S, 4);
   const real32_T *ctl_gain = (real32_T *) ssGetInputPortRealSignal(S, 5);
+  const boolean_T *gps_result_override = (boolean_T *) ssGetInputPortRealSignal
+    (S, 6);
+  const real32_T *q_BR_noGPS = (real32_T *) ssGetInputPortRealSignal(S, 7);
   real32_T *out_u = (real32_T *) ssGetOutputPortRealSignal(S, 0);
   real32_T *q_BR = (real32_T *) ssGetOutputPortRealSignal(S, 1);
 
@@ -787,8 +896,10 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   real32_T *gyro_rates_t = (real32_T *)ssGetDWork(S, 3);
   real32_T *mag_bf_t = (real32_T *)ssGetDWork(S, 4);
   real32_T *ctl_gain_t = (real32_T *)ssGetDWork(S, 5);
-  real32_T *out_u_t = (real32_T *)ssGetDWork(S, 6);
-  real32_T *q_BR_t = (real32_T *)ssGetDWork(S, 7);
+  boolean_T *gps_result_override_t = (boolean_T *)ssGetDWork(S, 6);
+  real32_T *q_BR_noGPS_t = (real32_T *)ssGetDWork(S, 7);
+  real32_T *out_u_t = (real32_T *)ssGetDWork(S, 8);
+  real32_T *q_BR_t = (real32_T *)ssGetDWork(S, 9);
   NDTransposeBySrcSpecs((void*)op_mode_t, (const void*)op_mode,
                         ssGetInputPortDimensions(S, 0),
                         ssGetInputPortNumDimensions(S, 0), sizeof(uint8_T));
@@ -807,8 +918,14 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   NDTransposeBySrcSpecs((void*)ctl_gain_t, (const void*)ctl_gain,
                         ssGetInputPortDimensions(S, 5),
                         ssGetInputPortNumDimensions(S, 5), sizeof(real32_T));
+  NDTransposeBySrcSpecs((void*)gps_result_override_t, (const void*)
+                        gps_result_override, ssGetInputPortDimensions(S, 6),
+                        ssGetInputPortNumDimensions(S, 6), sizeof(boolean_T));
+  NDTransposeBySrcSpecs((void*)q_BR_noGPS_t, (const void*)q_BR_noGPS,
+                        ssGetInputPortDimensions(S, 7),
+                        ssGetInputPortNumDimensions(S, 7), sizeof(real32_T));
   control_fdbk_Outputs_wrapper(op_mode_t, q_BN_t, q_des_RN_t, gyro_rates_t,
-    mag_bf_t, ctl_gain_t, out_u_t, q_BR_t);
+    mag_bf_t, ctl_gain_t, gps_result_override_t, q_BR_noGPS_t, out_u_t, q_BR_t);
   NDTransposeByDstSpecs((void*)out_u, (const void*)out_u_t,
                         ssGetOutputPortDimensions(S, 0),
                         ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));

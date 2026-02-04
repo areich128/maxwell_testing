@@ -1,5 +1,5 @@
 %% File : control_fdbk.tlc
-%% Created : Mon Feb 02 18:30:36 2026
+%% Created : Wed Feb 04 12:13:75 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -22,6 +22,7 @@
 %%      generated code.
 %%
 %function BlockTypeSetup(block, system) void
+    %assign booleanType = LibGetDataTypeNameFromId(::CompiledModel.tSS_BOOLEAN)
     %assign uint8Type = LibGetDataTypeNameFromId(::CompiledModel.tSS_UINT8)
     %assign singleType = LibGetDataTypeNameFromId(::CompiledModel.tSS_SINGLE)
 
@@ -49,6 +50,8 @@
 			const %<singleType> *gyro_rates,
 			const %<singleType> *mag_bf,
 			const %<singleType> *ctl_gain,
+			const %<booleanType> *gps_result_override,
+			const %<singleType> *q_BR_noGPS,
 			%<singleType> *out_u,
 			%<singleType> *q_BR);
     #undef SFB_EXTERN_C
@@ -83,6 +86,8 @@
 			const %<singleType> *gyro_rates,
 			const %<singleType> *mag_bf,
 			const %<singleType> *ctl_gain,
+			const %<booleanType> *gps_result_override,
+			const %<singleType> *q_BR_noGPS,
 			%<singleType> *out_u,
 			%<singleType> *q_BR);
     SFB_EXTERN_C void control_fdbk_Terminate_wrapper(void);
@@ -92,6 +97,8 @@
 			const %<singleType> *gyro_rates,
 			const %<singleType> *mag_bf,
 			const %<singleType> *ctl_gain,
+			const %<booleanType> *gps_result_override,
+			const %<singleType> *q_BR_noGPS,
 			%<singleType> *out_u,
 			%<singleType> *q_BR){
     control_fdbk_Outputs_wrapper(op_mode,
@@ -100,6 +107,8 @@
 			gyro_rates,
 			mag_bf,
 			ctl_gain,
+			gps_result_override,
+			q_BR_noGPS,
 			out_u,
 			q_BR);
     }
@@ -126,6 +135,8 @@
 			const %<singleType> *gyro_rates,
 			const %<singleType> *mag_bf,
 			const %<singleType> *ctl_gain,
+			const %<booleanType> *gps_result_override,
+			const %<singleType> *q_BR_noGPS,
 			%<singleType> *out_u,
 			%<singleType> *q_BR);
 
@@ -153,13 +164,15 @@
   %assign pu3 = LibBlockInputSignalAddr(3, "", "", 0)
   %assign pu4 = LibBlockInputSignalAddr(4, "", "", 0)
   %assign pu5 = LibBlockInputSignalAddr(5, "", "", 0)
+  %assign pu6 = LibBlockInputSignalAddr(6, "", "", 0)
+  %assign pu7 = LibBlockInputSignalAddr(7, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    control_fdbk_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<py0>, %<py1>);
+    control_fdbk_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<py0>, %<py1>);
   %else
-    control_fdbk_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<py0>, %<py1>);
+    control_fdbk_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<py0>, %<py1>);
   %endif
 
   %%

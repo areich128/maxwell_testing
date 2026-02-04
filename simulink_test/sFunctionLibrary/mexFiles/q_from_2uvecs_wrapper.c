@@ -17,9 +17,9 @@
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
 #include <math.h>
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
-#define u_width 1
-#define u_1_width 1
-#define y_width 1
+#define u_width 3
+#define u_1_width 3
+#define y_width 4
 
 /*
  * Create external references here.  
@@ -42,14 +42,7 @@ void q_from_2uvecs_Outputs_wrapper(const real32_T *v1,
 			real32_T *q_v1v2)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-/* This sample sets the output equal to the input
-      y0[0] = u0[0]; 
- For complex signals use: y0[0].re = u0[0].re; 
-      y0[0].im = u0[0].im;
-      y1[0].re = u1[0].re;
-      y1[0].im = u1[0].im;
- */
- q_from_2uvecs(v1, v2, q_v1v2);
+    q_from_2uvecs(v1,v2,q_v1v2);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 
