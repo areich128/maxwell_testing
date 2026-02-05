@@ -54,27 +54,27 @@ void est_quest_rp_Outputs_wrapper(const real32_T *b_k,
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
 // Inputs
 
-    mexPrintf("Test\n");
+    //mexPrintf("Test\n");
     struct mtx_matrix b_k_mtx;
     mtx_create(3,2,b_k,&b_k_mtx);
 
     struct mtx_matrix eci_k_mtx;
     mtx_create(3,2,eci_k,&eci_k_mtx);  
 
-    mexPrintf("Post Initialisation\n");
-    mexPrintf("Input eci_k\n");
-    mexPrintf("%f,%f,%f; %f,%f,%f\n",
-              eci_k[0],eci_k[1],eci_k[2],eci_k[3],eci_k[4],eci_k[5]);
-
-    mexPrintf("eci_k_mtx\n");
-    mexPrintf("Col 1: %f,%f,%f; Col 2: %f,%f,%f\n",
-              mtx_get(1,1,&eci_k_mtx),
-              mtx_get(2,1,&eci_k_mtx),
-              mtx_get(3,1,&eci_k_mtx),
-              mtx_get(1,2,&eci_k_mtx),
-              mtx_get(2,2,&eci_k_mtx),
-              mtx_get(3,2,&eci_k_mtx));
-    mexPrintf("\n");
+    // mexPrintf("Post Initialisation\n");
+    // mexPrintf("Input eci_k\n");
+    // mexPrintf("%f,%f,%f; %f,%f,%f\n",
+    //           eci_k[0],eci_k[1],eci_k[2],eci_k[3],eci_k[4],eci_k[5]);
+    // 
+    // mexPrintf("eci_k_mtx\n");
+    // mexPrintf("Col 1: %f,%f,%f; Col 2: %f,%f,%f\n",
+    //           mtx_get(1,1,&eci_k_mtx),
+    //           mtx_get(2,1,&eci_k_mtx),
+    //           mtx_get(3,1,&eci_k_mtx),
+    //           mtx_get(1,2,&eci_k_mtx),
+    //           mtx_get(2,2,&eci_k_mtx),
+    //           mtx_get(3,2,&eci_k_mtx));
+    // mexPrintf("\n");
     
     // Outputs
     struct mtx_matrix dcm_out_mtx;
@@ -84,8 +84,8 @@ void est_quest_rp_Outputs_wrapper(const real32_T *b_k,
     mtx_create_ones(4,1,&(state_mtx.att_quaternion));
     mtx_create_ones(3,1,&(state_mtx.sat_body_rates));
 
-    mexPrintf("Made it passed output generation\n");
-    mexPrintf("\n");
+    // mexPrintf("Made it passed output generation\n");
+    // mexPrintf("\n");
 
     // Run Function
     int32_t statusFlag = 0;
@@ -93,7 +93,7 @@ void est_quest_rp_Outputs_wrapper(const real32_T *b_k,
                           &state_mtx, &dcm_out_mtx);
     *status = statusFlag;
 
-    mexPrintf("Passed Running Phase\n");
+    //mexPrintf("Passed Running Phase\n");
 
     // Assign Outputs
     state_quaternion[0] = mtx_get(1,1,&(state_mtx.att_quaternion)); // IDK if this is the correct syntax
@@ -101,14 +101,14 @@ void est_quest_rp_Outputs_wrapper(const real32_T *b_k,
     state_quaternion[2] = mtx_get(3,1,&(state_mtx.att_quaternion));
     state_quaternion[3] = mtx_get(4,1,&(state_mtx.att_quaternion));
     
-    mexPrintf("Quaternion Allocation\n");
-    mexPrintf("Quat Out\n");
-    mexPrintf("%f,%f,%f,%f\n",
-              state_quaternion[0],
-              state_quaternion[1],
-              state_quaternion[2],
-              state_quaternion[3]);
-    mexPrintf("\n");
+    // mexPrintf("Quaternion Allocation\n");
+    // mexPrintf("Quat Out\n");
+    // mexPrintf("%f,%f,%f,%f\n",
+    //           state_quaternion[0],
+    //           state_quaternion[1],
+    //           state_quaternion[2],
+    //           state_quaternion[3]);
+    // mexPrintf("\n");
     
     dcm_out[0] = mtx_get(1,1,&(dcm_out_mtx));
     dcm_out[1] = mtx_get(1,2,&(dcm_out_mtx));
