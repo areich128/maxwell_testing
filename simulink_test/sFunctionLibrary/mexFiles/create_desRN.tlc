@@ -1,5 +1,5 @@
 %% File : create_desRN.tlc
-%% Created : Fri Feb 20 13:55:84 2026
+%% Created : Fri Feb 20 14:27:63 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -46,6 +46,7 @@
     SFB_EXTERN_C void create_desRN_Outputs_wrapper_accel(const %<uint8Type> *opmode,
 			const %<singleType> *des_vec,
 			const %<uint8Type> *antenna,
+			const %<singleType> *b_eci,
 			%<singleType> *des_RN);
     #undef SFB_EXTERN_C
     #endif
@@ -76,15 +77,18 @@
     SFB_EXTERN_C void create_desRN_Outputs_wrapper(const %<uint8Type> *opmode,
 			const %<singleType> *des_vec,
 			const %<uint8Type> *antenna,
+			const %<singleType> *b_eci,
 			%<singleType> *des_RN);
     SFB_EXTERN_C void create_desRN_Terminate_wrapper(void);
     void create_desRN_Outputs_wrapper_accel(const %<uint8Type> *opmode,
 			const %<singleType> *des_vec,
 			const %<uint8Type> *antenna,
+			const %<singleType> *b_eci,
 			%<singleType> *des_RN){
     create_desRN_Outputs_wrapper(opmode,
 			des_vec,
 			antenna,
+			b_eci,
 			des_RN);
     }
 #undef SFB_EXTERN_C
@@ -107,6 +111,7 @@
     SFB_EXTERN_C void create_desRN_Outputs_wrapper(const %<uint8Type> *opmode,
 			const %<singleType> *des_vec,
 			const %<uint8Type> *antenna,
+			const %<singleType> *b_eci,
 			%<singleType> *des_RN);
 
     SFB_EXTERN_C void create_desRN_Terminate_wrapper(void);
@@ -130,12 +135,13 @@
   %assign pu0 = LibBlockInputSignalAddr(0, "", "", 0)
   %assign pu1 = LibBlockInputSignalAddr(1, "", "", 0)
   %assign pu2 = LibBlockInputSignalAddr(2, "", "", 0)
+  %assign pu3 = LibBlockInputSignalAddr(3, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    create_desRN_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<py0>);
+    create_desRN_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>);
   %else
-    create_desRN_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<py0>);
+    create_desRN_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>);
   %endif
 
   %%

@@ -21,6 +21,7 @@
 #define u_width 1
 #define u_1_width 3
 #define u_2_width 1
+#define u_3_width 3
 #define y_width 4
 
 /*
@@ -38,15 +39,17 @@
 extern void create_desRN_Outputs_wrapper(const uint8_T *opmode,
 			const real32_T *des_vec,
 			const uint8_T *antenna,
+			const real32_T *b_eci,
 			real32_T *des_RN);
 
 void create_desRN_Outputs_wrapper(const uint8_T *opmode,
 			const real32_T *des_vec,
 			const uint8_T *antenna,
+			const real32_T *b_eci,
 			real32_T *des_RN)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-create_desRN(*opmode, des_vec, des_RN, *antenna);
+create_desRN(*opmode, des_vec, des_RN, b_eci, *antenna);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 
