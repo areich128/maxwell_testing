@@ -3,3 +3,5 @@
 
 dT_Control = 1/10; % 10Hz control rate
 warning('If changing control rate need to ensure its an integer multiple of the sim rate');
+
+fNoiseOn = 0;

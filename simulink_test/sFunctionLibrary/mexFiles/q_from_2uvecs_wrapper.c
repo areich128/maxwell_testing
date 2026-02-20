@@ -42,7 +42,7 @@ void q_from_2uvecs_Outputs_wrapper(const real32_T *v1,
 			real32_T *q_v1v2)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-    q_from_2uvecs(v1,v2,q_v1v2);
+q_from_2uvecs(v1,v2,q_v1v2);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 
