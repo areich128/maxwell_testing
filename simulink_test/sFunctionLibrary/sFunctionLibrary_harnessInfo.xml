@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <HarnessInformation>
   <Harness>
-    <P Name="Name">sFunctionLibrary_create_desRN_Harness</P>
+    <P Name="Name">sFunctionLibrary_WheelTorque_Command_Harness</P>
     <P Name="Description"/>
-    <P Name="CreatedBy">AdamY</P>
-    <P Name="CreatedOn">Fri Oct 31 15:30:05 2025</P>
-    <P Name="ModifiedBy">AdamY</P>
-    <P Name="LastSaved">Mon Nov 10 23:13:43 2025</P>
-    <P Name="Owner">13</P>
+    <P Name="CreatedBy">palla</P>
+    <P Name="CreatedOn">Wed Apr 15 16:04:06 2026</P>
+    <P Name="ModifiedBy">palla</P>
+    <P Name="LastSaved">Mon May 18 01:02:15 2026</P>
+    <P Name="Owner">65</P>
     <P Name="OwnerType">UDF_HARNESS</P>
-    <P Name="OwnerPath">createDes_RN/create_desRN</P>
+    <P Name="OwnerPath">WheelTorque_Command/S-Function Builder</P>
     <P Name="Directory"/>
-    <P Name="FileName">sFunctionLibrary_create_desRN_Harness.slx</P>
+    <P Name="FileName">sFunctionLibrary_WheelTorque_Command_Harness.slx</P>
     <P Name="SavedVersion">25.2</P>
-    <P Name="HarnessUUID">1be66c8f-eae0-4532-9f5f-e6f7c7103612</P>
-    <P Name="HarnessConnectionsMap">0,1,2|0|0,0,0,0||</P>
+    <P Name="HarnessUUID">d3a56590-90e2-47d2-b72c-48c69d14ef27</P>
+    <P Name="HarnessConnectionsMap">0,1,2,3,4|0,1|0,0,0,0||</P>
     <P Name="VerificationMode">0</P>
     <P Name="HarnessOwnerCheckSum">0,0,0,0</P>
     <P Name="RebuildOnOpen">false</P>
@@ -33,14 +33,14 @@
     <P Name="SinkTypeString">Outport</P>
     <P Name="CustomSourcePath"/>
     <P Name="CustomSinkPath"/>
-    <P Name="BlockSIDs">5|13|0|0|0|0|0</P>
-    <P Name="OpenGraphs">||sFunctionLibrary_create_desRN_Harness</P>
+    <P Name="BlockSIDs">9|26|0|0|0|0|0</P>
+    <P Name="OpenGraphs">||||sFunctionLibrary_WheelTorque_Command_Harness</P>
     <P Name="ExistingBuildFolder"/>
     <P Name="FunctionInterfaceName"/>
     <P Name="SysArchSUTModel"/>
   </Harness>
   <ModelMetadata>
-    <P Name="ModelUUID">08004b5c-21e9-4b87-9dc3-26ccb27889c2</P>
+    <P Name="ModelUUID">d7c1d03a-fc99-49a4-b31f-b49c9579b1a4</P>
     <P Name="OwnerBDName">sFunctionLibrary</P>
   </ModelMetadata>
 </HarnessInformation>

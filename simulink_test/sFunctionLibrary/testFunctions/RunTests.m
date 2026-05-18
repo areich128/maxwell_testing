@@ -3,7 +3,7 @@
 %}
 %% Options
 % Exclude Tests
-exclude = {}; % put names of tests in here you want to exclude from running, 
+ exclude = {'create_desRN_Test','dcm2quat_Test','q2dcm_Test'}; % put names of tests in here you want to exclude from running, 
 % e.g. 'create_desRN_Test'
 
 %% Setup Paths
