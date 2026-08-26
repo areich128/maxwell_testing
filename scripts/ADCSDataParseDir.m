@@ -1,6 +1,7 @@
 function [adcs_data,Filenames] = ADCSDataParseDir(files)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ----------------- Created by Anthony Zara on 10/1/22 ------------------ %
+% ----------------- Edited by Ingrid Paska 3/26 ------------------ %
 % Parses binary ADCS data file inside STOR folder
 % Input:
 %       DirName = Root directory for binary files
@@ -14,23 +15,57 @@ function [adcs_data,Filenames] = ADCSDataParseDir(files)
 % should be able to accomplish all edits by editing the fields before line
 % 165.  The structure below this line is adaptable to the fields above it,
 % and most changes may be accomplished by simply editing those fields.
+
+%Ingrid Notes
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Used depending on how file is input -- dir function in Plot_ADCS_Data
 % will create a '.' and '..' files if a folder is input rather than a file
-if ~isempty(files)
-    if files(1).bytes == 0
-        files = files(3:end);
-    end
-end
 
-EPOCH_START = 693662400; % From ADCS FSW 22.8.1 (defined in global.h)
+%Ingrid Edits
+adcs_data = [];
+Filenames = [];
 
 %% --------------- File format definitions --------------- %%
 % Total size of one frame of SD card data (Bytes)
 % Should exactly match 'LOOP_STORAGE_LEN' in global.h
 FRAME_SIZE = 242; % [Bytes]
 
+
+%{
+    if ~isempty(files)
+    if files(1).bytes == 0
+        files = files(3:end);
+    end 
+end
+%}
+%didn't need/ caused issues
+
+%Paska file reader
+n_files = length(files);
+alldata_uint8 = [];
+
+for file_idx = 1:n_files
+    file_str = strcat(files(file_idx).folder,filesep,files(file_idx).name);
+    fileID = fopen(file_str,'rb');
+
+    %my version of not opening
+    if fileID == -1
+        error('Could not open file');
+    end
+
+    file_in_uint8 = fread(fileID,'uint8'); 
+    fclose(fileID);
+
+    alldata_uint8 = [alldata_uint8; file_in_uint8];
+end
+
+
+%EPOCH_START = 693662400; % From ADCS FSW 22.8.1 (defined in global.h)
+%Paska - didn't use
+
+%{
 %% Struct Strings - Should Match Variable Name Assignment Below
 % Allows for looping over variable names to pull data
 
@@ -57,7 +92,10 @@ SYS.varnames = {'sensor_use','global_err','op_mode'};
 RW.varnames = {'ref_wheel_speeds_drpm',...
               'ref_wheel_speeds_drpm_ret',...
               'current_wheel_speeds_drpm'};
+%}
 
+
+%{
 %% OFFSETs - corresond to the first byte of each sensor's data
 OFFSET.sensor_use = 1; % Sensors being used
 
@@ -173,6 +211,7 @@ N_OBJ.eci_vel = 3;
 N_OBJ.ref_wheel_speeds_drpm = 4; % [wheel 1, wheel 2, wheel 3, wheel 4]
 N_OBJ.ref_wheel_speeds_drpm_ret = 4;
 N_OBJ.current_wheel_speeds_drpm = 4;
+%}
 
 % ---------------------------- CAUTION ---------------------------- %%
 % DO NOT EDIT CODE BELOW THIS LINE UNLESS YOU KNOW WHAT YOU'RE DOING!
@@ -180,6 +219,8 @@ N_OBJ.current_wheel_speeds_drpm = 4;
 % files = dir(DirName); 
 % files = files(3:end); % Old code when input was directory not files
 
+%Paska- have the same thing further up
+%{
 n_files = length(files); % The number of files to parse
 alldata_uint8 = [];
 for file_idx = 1:n_files
@@ -200,15 +241,29 @@ for file_idx = 1:n_files
     % Appending data
     alldata_uint8 = [alldata_uint8; file_in_uint8];
 end
+%}
 
 %% Segmenting data into frames
-n_frames = length(alldata_uint8)/FRAME_SIZE;
+n_frames =floor(length(alldata_uint8)/FRAME_SIZE);
+
+%{
 if round(n_frames) ~= n_frames
     fprintf('ERROR: STOR File data is not a multiple of the frame size.\n')
 end
+%}
+
+if n_frames == 0
+    error('No valid frames found — file format may be incorrect');
+end
+
+alldata_uint8 = alldata_uint8(1:n_frames*FRAME_SIZE);
 
 % Frame array with each column corresponding to one frame in the SD data
 frames = reshape(alldata_uint8,FRAME_SIZE,n_frames);
+
+disp(['Number of frames: ', num2str(n_frames)]);
+
+%{
 
 %% Removing bad Data
 % Ensures 0xDEADBEEF are the last 4 bytes of data
@@ -224,7 +279,10 @@ while (j <= n_frames)
     end
     j = j + 1;
 end
+%}
 
+%Paska -  something here was causing me a crash, rewrote
+%{
 %% Pre-allocating sensor data objects for speed
 for i = 1:length(SYS.varnames)
     name = cell2mat(SYS.varnames(i));
@@ -250,7 +308,24 @@ for i = 1:length(RW.varnames)
     name = cell2mat(RW.varnames(i));
     RW.(name) = zeros(N_OBJ.(name),n_frames);
 end
+%}
+%Paska -Preallocate redo
+gyro = zeros(3,n_frames);
+mag  = zeros(3,n_frames);
+rw   = zeros(4,n_frames);
 
+for k = 1:n_frames
+    frame = frames(:,k);
+    try
+        gyro(:,k) = double(typecast(uint8(frame(66:71)),'int16'));
+        mag(:,k) =double(typecast(uint8(frame(82:87)),'int16'));
+        rw(:,k) =double(typecast(uint8(frame(179:186)),'int16'));
+    catch
+    end
+end
+
+
+%{
 %% Looping through each frame and extracting data
 % All modules are exactly the same with the exception of the struct name,
 % CSS module is different as all objects have the same size/type
@@ -355,4 +430,25 @@ function S = sizeof(V)
         warning('Jan:sizeof:BadClass', 'Class "%s" is not supported.', V);
         S = NaN;
     end
+end
+%}
+
+
+SYS = struct();   % empty (not used yet)
+CSS = struct();   % empty
+
+GYRO.bmg250_gyro = gyro;
+MAG.lis3mdl_1_mag = mag;
+RW.current_wheel_speeds_drpm = rw;
+
+%Paska - causes crashes
+%GPS = struct(); 
+GPS.J2000_time = zeros(1,n_frames);
+GPS.J2000_frac_time = zeros(1,n_frames);
+GPS.eci_pos = zeros(3,n_frames);
+GPS.eci_vel = zeros(3,n_frames);
+
+adcs_data = struct('SYS',SYS,'CSS',CSS,'GYRO',GYRO,...
+                   'MAG',MAG,'GPS',GPS,'RW',RW);
+
 end

@@ -43,15 +43,23 @@ Last_File = 302;
 File_range = First_File:1:Last_File;
 Time_range_hours = First_Hour:1:Last_Hour;
 
+adcs_data = {}; %need array
 for i = 1:length(Time_range_hours)
     for j = 1:length(File_range)
         
         hour_path = fullfile(Root_dir,'STOR_folders','STOR_helm_mock',num2str(Day),num2str(Time_range_hours(i)));
         % hour_path = fullfile(Root_dir, 'STOR_YROT_5-19','LOW/'); % Can plot low res data
         FP = fullfile(hour_path,strcat(num2str(File_range(j))));
+        %Paska - this casued issues
         Data_filepaths = dir(FP);
+
+        %add to fix  if to small
+        if isempty(Data_filepaths) || Data_filepaths.bytes < 242
+            continue
+        end
         
         adcs_data{i}(:,j) = ADCSDataParseDir(Data_filepaths);
+        
     end
 end
 
