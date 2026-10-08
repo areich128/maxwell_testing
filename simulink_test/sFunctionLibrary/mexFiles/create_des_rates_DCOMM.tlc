@@ -1,5 +1,5 @@
 %% File : create_des_rates_DCOMM.tlc
-%% Created : Fri Oct 31 12:31:60 2025
+%% Created : Thu Oct 08 13:21:34 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -22,6 +22,7 @@
 %%      generated code.
 %%
 %function BlockTypeSetup(block, system) void
+    %assign uint32Type = LibGetDataTypeNameFromId(::CompiledModel.tSS_UINT32)
     %assign uint8Type = LibGetDataTypeNameFromId(::CompiledModel.tSS_UINT8)
     %assign singleType = LibGetDataTypeNameFromId(::CompiledModel.tSS_SINGLE)
 
@@ -48,6 +49,8 @@
 			const %<singleType> *gnd_ecef,
 			const %<singleType> *q_BN,
 			const %<uint8Type> *leapsec,
+			const %<uint32Type> *J2000_time,
+			const %<singleType> *J2000_frac_time,
 			%<singleType> *des_rates_bf);
     #undef SFB_EXTERN_C
     #endif
@@ -80,6 +83,8 @@
 			const %<singleType> *gnd_ecef,
 			const %<singleType> *q_BN,
 			const %<uint8Type> *leapsec,
+			const %<uint32Type> *J2000_time,
+			const %<singleType> *J2000_frac_time,
 			%<singleType> *des_rates_bf);
     SFB_EXTERN_C void create_des_rates_DCOMM_Terminate_wrapper(void);
     void create_des_rates_DCOMM_Outputs_wrapper_accel(const %<uint8Type> *opmode,
@@ -87,12 +92,16 @@
 			const %<singleType> *gnd_ecef,
 			const %<singleType> *q_BN,
 			const %<uint8Type> *leapsec,
+			const %<uint32Type> *J2000_time,
+			const %<singleType> *J2000_frac_time,
 			%<singleType> *des_rates_bf){
     create_des_rates_DCOMM_Outputs_wrapper(opmode,
 			pos_ecef,
 			gnd_ecef,
 			q_BN,
 			leapsec,
+			J2000_time,
+			J2000_frac_time,
 			des_rates_bf);
     }
 #undef SFB_EXTERN_C
@@ -117,6 +126,8 @@
 			const %<singleType> *gnd_ecef,
 			const %<singleType> *q_BN,
 			const %<uint8Type> *leapsec,
+			const %<uint32Type> *J2000_time,
+			const %<singleType> *J2000_frac_time,
 			%<singleType> *des_rates_bf);
 
     SFB_EXTERN_C void create_des_rates_DCOMM_Terminate_wrapper(void);
@@ -142,12 +153,14 @@
   %assign pu2 = LibBlockInputSignalAddr(2, "", "", 0)
   %assign pu3 = LibBlockInputSignalAddr(3, "", "", 0)
   %assign pu4 = LibBlockInputSignalAddr(4, "", "", 0)
+  %assign pu5 = LibBlockInputSignalAddr(5, "", "", 0)
+  %assign pu6 = LibBlockInputSignalAddr(6, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    create_des_rates_DCOMM_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<py0>);
+    create_des_rates_DCOMM_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<py0>);
   %else
-    create_des_rates_DCOMM_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<py0>);
+    create_des_rates_DCOMM_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<py0>);
   %endif
 
   %%

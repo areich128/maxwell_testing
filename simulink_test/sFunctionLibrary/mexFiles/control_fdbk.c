@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Mon May 18 16:19:36 2026
+ * Created: Thu Oct 08 12:46:62 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     8
+#define NUM_INPUTS                     10
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 op_mode
@@ -138,9 +138,9 @@
 
 /* Input Port  5 */
 #define IN_PORT_5_NAME                 ctl_gain
-#define INPUT_5_DIMS_ND                {3,1}
-#define INPUT_5_NUM_ELEMS              3
-#define INPUT_5_WIDTH                  3
+#define INPUT_5_DIMS_ND                {4,1}
+#define INPUT_5_NUM_ELEMS              4
+#define INPUT_5_WIDTH                  4
 #define INPUT_DIMS_5_COL               1
 #define INPUT_5_DTYPE                  real32_T
 #define INPUT_5_COMPLEX                COMPLEX_NO
@@ -195,6 +195,46 @@
 #define IN_7_FRACTIONLENGTH            3
 #define IN_7_BIAS                      0
 #define IN_7_SLOPE                     0.125
+
+/* Input Port  8 */
+#define IN_PORT_8_NAME                 des_rates
+#define INPUT_8_DIMS_ND                {3,1}
+#define INPUT_8_NUM_ELEMS              3
+#define INPUT_8_WIDTH                  3
+#define INPUT_DIMS_8_COL               1
+#define INPUT_8_DTYPE                  real32_T
+#define INPUT_8_COMPLEX                COMPLEX_NO
+#define INPUT_8_UNIT                   ""
+#define IN_8_BUS_BASED                 0
+#define IN_8_BUS_NAME
+#define IN_8_DIMS                      2-D
+#define INPUT_8_FEEDTHROUGH            1
+#define IN_8_ISSIGNED                  1
+#define IN_8_WORDLENGTH                8
+#define IN_8_FIXPOINTSCALING           1
+#define IN_8_FRACTIONLENGTH            3
+#define IN_8_BIAS                      0
+#define IN_8_SLOPE                     0.125
+
+/* Input Port  9 */
+#define IN_PORT_9_NAME                 u1
+#define INPUT_9_DIMS_ND                {1,1}
+#define INPUT_9_NUM_ELEMS              1
+#define INPUT_9_WIDTH                  1
+#define INPUT_DIMS_9_COL               1
+#define INPUT_9_DTYPE                  real_T
+#define INPUT_9_COMPLEX                COMPLEX_NO
+#define INPUT_9_UNIT                   ""
+#define IN_9_BUS_BASED                 0
+#define IN_9_BUS_NAME
+#define IN_9_DIMS                      1-D
+#define INPUT_9_FEEDTHROUGH            1
+#define IN_9_ISSIGNED                  1
+#define IN_9_WORDLENGTH                8
+#define IN_9_FIXPOINTSCALING           1
+#define IN_9_FRACTIONLENGTH            3
+#define IN_9_BIAS                      0
+#define IN_9_SLOPE                     0.125
 #define NUM_OUTPUTS                    2
 
 /* Output Port  0 */
@@ -244,7 +284,7 @@
 #define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight__SFB__INC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\include__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\mtx.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\conversions.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\global.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\ctl_alg.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\att_det.c"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
-#define SHOW_COMPILE_STEPS             1
+#define SHOW_COMPILE_STEPS             0
 #define CREATE_DEBUG_MEXFILE           1
 #define SAVE_CODE_ONLY                 0
 #define SFUNWIZ_REVISION               3.0
@@ -261,6 +301,8 @@ extern void control_fdbk_Outputs_wrapper(const uint8_T *op_mode,
   const real32_T *ctl_gain,
   const boolean_T *gps_result_override,
   const real32_T *q_BR_noGPS,
+  const real32_T *des_rates,
+  const real_T *u1,
   real32_T *out_u,
   real32_T *q_BR);
 
@@ -466,6 +508,24 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortDirectFeedThrough(S, 7, INPUT_7_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 7, 1);/*direct input signal access*/
 
+  /* Input Port 8 */
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_8_NUM_ELEMS;
+  int_T in8Dims[] = INPUT_8_DIMS_ND;
+  inputDimsInfo.dims = in8Dims;
+  ssSetInputPortDimensionInfo(S, 8, &inputDimsInfo);
+  ssSetInputPortDataType(S, 8, SS_SINGLE);
+  ssSetInputPortComplexSignal(S, 8, INPUT_8_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 8, INPUT_8_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 8, 1);/*direct input signal access*/
+
+  /* Input Port 9 */
+  ssSetInputPortWidth(S, 9, INPUT_9_NUM_ELEMS);
+  ssSetInputPortDataType(S, 9, SS_DOUBLE);
+  ssSetInputPortComplexSignal(S, 9, INPUT_9_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 9, INPUT_9_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 9, 1);/*direct input signal access*/
+
   /*
    * Configure the Units for Input Ports
    */
@@ -546,6 +606,24 @@ static void mdlInitializeSizes(SimStruct *S)
       return;
     }
 
+    ssRegisterUnitFromExpr(S, INPUT_8_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 8, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port des_rates of S-Function control_fdbk");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, INPUT_9_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 9, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port u1 of S-Function control_fdbk");
+      return;
+    }
+
 #endif
 
   }
@@ -601,7 +679,7 @@ static void mdlInitializeSizes(SimStruct *S)
 
   }
 
-  if (!ssSetNumDWork(S, 10))
+  if (!ssSetNumDWork(S, 12))
     return;
 
   /*
@@ -677,22 +755,40 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 7, COMPLEX_NO);
 
   /*
-   * Configure the dwork 8 (out_u_t)
+   * Configure the dwork 8 (des_rates_t)
    */
-  ssSetDWorkDataType(S, 8, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkDataType(S, 8, ssGetInputPortDataType(S, 8));
   ssSetDWorkUsageType(S, 8, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 8, "out_u_t");
-  ssSetDWorkWidth(S, 8, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkName(S, 8, "des_rates_t");
+  ssSetDWorkWidth(S, 8, ssGetInputPortWidth(S, 8));
   ssSetDWorkComplexSignal(S, 8, COMPLEX_NO);
 
   /*
-   * Configure the dwork 9 (q_BR_t)
+   * Configure the dwork 9 (u1_t)
    */
-  ssSetDWorkDataType(S, 9, ssGetOutputPortDataType(S, 1));
+  ssSetDWorkDataType(S, 9, ssGetInputPortDataType(S, 9));
   ssSetDWorkUsageType(S, 9, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 9, "q_BR_t");
-  ssSetDWorkWidth(S, 9, ssGetOutputPortWidth(S, 1));
+  ssSetDWorkName(S, 9, "u1_t");
+  ssSetDWorkWidth(S, 9, ssGetInputPortWidth(S, 9));
   ssSetDWorkComplexSignal(S, 9, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 10 (out_u_t)
+   */
+  ssSetDWorkDataType(S, 10, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkUsageType(S, 10, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 10, "out_u_t");
+  ssSetDWorkWidth(S, 10, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkComplexSignal(S, 10, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 11 (q_BR_t)
+   */
+  ssSetDWorkDataType(S, 11, ssGetOutputPortDataType(S, 1));
+  ssSetDWorkUsageType(S, 11, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 11, "q_BR_t");
+  ssSetDWorkWidth(S, 11, ssGetOutputPortWidth(S, 1));
+  ssSetDWorkComplexSignal(S, 11, COMPLEX_NO);
   ssSetNumPWork(S, 0);
   ssSetNumSampleTimes(S, 1);
   ssSetNumRWork(S, 0);
@@ -801,6 +897,16 @@ static void mdlSetDefaultPortDimensionInfo(SimStruct *S)
     ssSetInputPortMatrixDimensions(S, 7, 1 , 1);
   }
 
+  /* Setting default dimensions for input port 8 */
+  portDimsInfo.width = INPUT_8_NUM_ELEMS;
+  dims[0] = INPUT_8_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 8) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 8, 1 , 1);
+  }
+
   /* Setting default dimensions for output port 0 */
   portDimsInfo.width = OUTPUT_0_NUM_ELEMS;
   dims[0] = OUTPUT_0_NUM_ELEMS;
@@ -884,6 +990,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   const boolean_T *gps_result_override = (boolean_T *) ssGetInputPortRealSignal
     (S, 6);
   const real32_T *q_BR_noGPS = (real32_T *) ssGetInputPortRealSignal(S, 7);
+  const real32_T *des_rates = (real32_T *) ssGetInputPortRealSignal(S, 8);
+  const real_T *u1 = (real_T *) ssGetInputPortRealSignal(S, 9);
   real32_T *out_u = (real32_T *) ssGetOutputPortRealSignal(S, 0);
   real32_T *q_BR = (real32_T *) ssGetOutputPortRealSignal(S, 1);
 
@@ -898,8 +1006,10 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   real32_T *ctl_gain_t = (real32_T *)ssGetDWork(S, 5);
   boolean_T *gps_result_override_t = (boolean_T *)ssGetDWork(S, 6);
   real32_T *q_BR_noGPS_t = (real32_T *)ssGetDWork(S, 7);
-  real32_T *out_u_t = (real32_T *)ssGetDWork(S, 8);
-  real32_T *q_BR_t = (real32_T *)ssGetDWork(S, 9);
+  real32_T *des_rates_t = (real32_T *)ssGetDWork(S, 8);
+  real_T *u1_t = (real_T *)ssGetDWork(S, 9);
+  real32_T *out_u_t = (real32_T *)ssGetDWork(S, 10);
+  real32_T *q_BR_t = (real32_T *)ssGetDWork(S, 11);
   NDTransposeBySrcSpecs((void*)op_mode_t, (const void*)op_mode,
                         ssGetInputPortDimensions(S, 0),
                         ssGetInputPortNumDimensions(S, 0), sizeof(uint8_T));
@@ -924,8 +1034,14 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   NDTransposeBySrcSpecs((void*)q_BR_noGPS_t, (const void*)q_BR_noGPS,
                         ssGetInputPortDimensions(S, 7),
                         ssGetInputPortNumDimensions(S, 7), sizeof(real32_T));
+  NDTransposeBySrcSpecs((void*)des_rates_t, (const void*)des_rates,
+                        ssGetInputPortDimensions(S, 8),
+                        ssGetInputPortNumDimensions(S, 8), sizeof(real32_T));
+  NDTransposeBySrcSpecs((void*)u1_t, (const void*)u1, ssGetInputPortDimensions(S,
+    9), ssGetInputPortNumDimensions(S, 9), sizeof(real_T));
   control_fdbk_Outputs_wrapper(op_mode_t, q_BN_t, q_des_RN_t, gyro_rates_t,
-    mag_bf_t, ctl_gain_t, gps_result_override_t, q_BR_noGPS_t, out_u_t, q_BR_t);
+    mag_bf_t, ctl_gain_t, gps_result_override_t, q_BR_noGPS_t, des_rates_t, u1_t,
+    out_u_t, q_BR_t);
   NDTransposeByDstSpecs((void*)out_u, (const void*)out_u_t,
                         ssGetOutputPortDimensions(S, 0),
                         ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));

@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Fri Oct 31 12:31:60 2025
+ * Created: Thu Oct 08 13:21:34 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     5
+#define NUM_INPUTS                     7
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 opmode
@@ -58,16 +58,16 @@
 
 /* Input Port  1 */
 #define IN_PORT_1_NAME                 pos_ecef
-#define INPUT_1_DIMS_ND                {1,1}
-#define INPUT_1_NUM_ELEMS              1
-#define INPUT_1_WIDTH                  1
+#define INPUT_1_DIMS_ND                {3,1}
+#define INPUT_1_NUM_ELEMS              3
+#define INPUT_1_WIDTH                  3
 #define INPUT_DIMS_1_COL               1
 #define INPUT_1_DTYPE                  real32_T
 #define INPUT_1_COMPLEX                COMPLEX_NO
 #define INPUT_1_UNIT                   ""
 #define IN_1_BUS_BASED                 0
 #define IN_1_BUS_NAME
-#define IN_1_DIMS                      1-D
+#define IN_1_DIMS                      2-D
 #define INPUT_1_FEEDTHROUGH            1
 #define IN_1_ISSIGNED                  1
 #define IN_1_WORDLENGTH                8
@@ -78,16 +78,16 @@
 
 /* Input Port  2 */
 #define IN_PORT_2_NAME                 gnd_ecef
-#define INPUT_2_DIMS_ND                {1,1}
-#define INPUT_2_NUM_ELEMS              1
-#define INPUT_2_WIDTH                  1
+#define INPUT_2_DIMS_ND                {3,1}
+#define INPUT_2_NUM_ELEMS              3
+#define INPUT_2_WIDTH                  3
 #define INPUT_DIMS_2_COL               1
 #define INPUT_2_DTYPE                  real32_T
 #define INPUT_2_COMPLEX                COMPLEX_NO
 #define INPUT_2_UNIT                   ""
 #define IN_2_BUS_BASED                 0
 #define IN_2_BUS_NAME
-#define IN_2_DIMS                      1-D
+#define IN_2_DIMS                      2-D
 #define INPUT_2_FEEDTHROUGH            1
 #define IN_2_ISSIGNED                  1
 #define IN_2_WORDLENGTH                8
@@ -98,16 +98,16 @@
 
 /* Input Port  3 */
 #define IN_PORT_3_NAME                 q_BN
-#define INPUT_3_DIMS_ND                {1,1}
-#define INPUT_3_NUM_ELEMS              1
-#define INPUT_3_WIDTH                  1
+#define INPUT_3_DIMS_ND                {4,1}
+#define INPUT_3_NUM_ELEMS              4
+#define INPUT_3_WIDTH                  4
 #define INPUT_DIMS_3_COL               1
 #define INPUT_3_DTYPE                  real32_T
 #define INPUT_3_COMPLEX                COMPLEX_NO
 #define INPUT_3_UNIT                   ""
 #define IN_3_BUS_BASED                 0
 #define IN_3_BUS_NAME
-#define IN_3_DIMS                      1-D
+#define IN_3_DIMS                      2-D
 #define INPUT_3_FEEDTHROUGH            1
 #define IN_3_ISSIGNED                  1
 #define IN_3_WORDLENGTH                8
@@ -135,20 +135,60 @@
 #define IN_4_FRACTIONLENGTH            3
 #define IN_4_BIAS                      0
 #define IN_4_SLOPE                     0.125
+
+/* Input Port  5 */
+#define IN_PORT_5_NAME                 J2000_time
+#define INPUT_5_DIMS_ND                {1,1}
+#define INPUT_5_NUM_ELEMS              1
+#define INPUT_5_WIDTH                  1
+#define INPUT_DIMS_5_COL               1
+#define INPUT_5_DTYPE                  uint32_T
+#define INPUT_5_COMPLEX                COMPLEX_NO
+#define INPUT_5_UNIT                   ""
+#define IN_5_BUS_BASED                 0
+#define IN_5_BUS_NAME
+#define IN_5_DIMS                      1-D
+#define INPUT_5_FEEDTHROUGH            1
+#define IN_5_ISSIGNED                  1
+#define IN_5_WORDLENGTH                8
+#define IN_5_FIXPOINTSCALING           1
+#define IN_5_FRACTIONLENGTH            3
+#define IN_5_BIAS                      0
+#define IN_5_SLOPE                     0.125
+
+/* Input Port  6 */
+#define IN_PORT_6_NAME                 J2000_frac_time
+#define INPUT_6_DIMS_ND                {1,1}
+#define INPUT_6_NUM_ELEMS              1
+#define INPUT_6_WIDTH                  1
+#define INPUT_DIMS_6_COL               1
+#define INPUT_6_DTYPE                  real32_T
+#define INPUT_6_COMPLEX                COMPLEX_NO
+#define INPUT_6_UNIT                   ""
+#define IN_6_BUS_BASED                 0
+#define IN_6_BUS_NAME
+#define IN_6_DIMS                      1-D
+#define INPUT_6_FEEDTHROUGH            1
+#define IN_6_ISSIGNED                  1
+#define IN_6_WORDLENGTH                8
+#define IN_6_FIXPOINTSCALING           1
+#define IN_6_FRACTIONLENGTH            3
+#define IN_6_BIAS                      0
+#define IN_6_SLOPE                     0.125
 #define NUM_OUTPUTS                    1
 
 /* Output Port  0 */
 #define OUT_PORT_0_NAME                des_rates_bf
-#define OUTPUT_0_DIMS_ND               {1,1}
-#define OUTPUT_0_NUM_ELEMS             1
-#define OUTPUT_0_WIDTH                 1
+#define OUTPUT_0_DIMS_ND               {3,1}
+#define OUTPUT_0_NUM_ELEMS             3
+#define OUTPUT_0_WIDTH                 3
 #define OUTPUT_DIMS_0_COL              1
 #define OUTPUT_0_DTYPE                 real32_T
 #define OUTPUT_0_COMPLEX               COMPLEX_NO
 #define OUTPUT_0_UNIT                  ""
 #define OUT_0_BUS_BASED                0
 #define OUT_0_BUS_NAME
-#define OUT_0_DIMS                     1-D
+#define OUT_0_DIMS                     2-D
 #define OUT_0_ISSIGNED                 1
 #define OUT_0_WORDLENGTH               8
 #define OUT_0_FIXPOINTSCALING          1
@@ -162,11 +202,11 @@
 #define NUM_CONT_STATES                0
 #define CONT_STATES_IC                 [0]
 #define SFUNWIZ_GENERATE_TLC           1
-#define SOURCEFILES                    "__SFB__"
+#define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight__SFB__INC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\include__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\mtx.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\att_det.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\global.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\conversions.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
 #define SHOW_COMPILE_STEPS             0
-#define CREATE_DEBUG_MEXFILE           0
+#define CREATE_DEBUG_MEXFILE           1
 #define SAVE_CODE_ONLY                 0
 #define SFUNWIZ_REVISION               3.0
 
@@ -179,6 +219,8 @@ extern void create_des_rates_DCOMM_Outputs_wrapper(const uint8_T *opmode,
   const real32_T *gnd_ecef,
   const real32_T *q_BN,
   const uint8_T *leapsec,
+  const uint32_T *J2000_time,
+  const real32_T *J2000_frac_time,
   real32_T *des_rates_bf);
 
 /*=============================*
@@ -288,6 +330,8 @@ void NDTransposeByDstSpecs(void *dst, const void *src, const int dstdims[],
  */
 static void mdlInitializeSizes(SimStruct *S)
 {
+  DECL_AND_INIT_DIMSINFO(inputDimsInfo);
+  DECL_AND_INIT_DIMSINFO(outputDimsInfo);
   ssSetNumSFcnParams(S, NPARAMS);
   if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
     return;                            /* Parameter mismatch will be reported by Simulink */
@@ -308,21 +352,34 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortRequiredContiguous(S, 0, 1);/*direct input signal access*/
 
   /* Input Port 1 */
-  ssSetInputPortWidth(S, 1, INPUT_1_NUM_ELEMS);
+  ssAllowSignalsWithMoreThan2D(S);
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_1_NUM_ELEMS;
+  int_T in1Dims[] = INPUT_1_DIMS_ND;
+  inputDimsInfo.dims = in1Dims;
+  ssSetInputPortDimensionInfo(S, 1, &inputDimsInfo);
   ssSetInputPortDataType(S, 1, SS_SINGLE);
   ssSetInputPortComplexSignal(S, 1, INPUT_1_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 1, INPUT_1_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 1, 1);/*direct input signal access*/
 
   /* Input Port 2 */
-  ssSetInputPortWidth(S, 2, INPUT_2_NUM_ELEMS);
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_2_NUM_ELEMS;
+  int_T in2Dims[] = INPUT_2_DIMS_ND;
+  inputDimsInfo.dims = in2Dims;
+  ssSetInputPortDimensionInfo(S, 2, &inputDimsInfo);
   ssSetInputPortDataType(S, 2, SS_SINGLE);
   ssSetInputPortComplexSignal(S, 2, INPUT_2_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 2, INPUT_2_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 2, 1);/*direct input signal access*/
 
   /* Input Port 3 */
-  ssSetInputPortWidth(S, 3, INPUT_3_NUM_ELEMS);
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_3_NUM_ELEMS;
+  int_T in3Dims[] = INPUT_3_DIMS_ND;
+  inputDimsInfo.dims = in3Dims;
+  ssSetInputPortDimensionInfo(S, 3, &inputDimsInfo);
   ssSetInputPortDataType(S, 3, SS_SINGLE);
   ssSetInputPortComplexSignal(S, 3, INPUT_3_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 3, INPUT_3_FEEDTHROUGH);
@@ -334,6 +391,20 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortComplexSignal(S, 4, INPUT_4_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 4, INPUT_4_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 4, 1);/*direct input signal access*/
+
+  /* Input Port 5 */
+  ssSetInputPortWidth(S, 5, INPUT_5_NUM_ELEMS);
+  ssSetInputPortDataType(S, 5, SS_UINT32);
+  ssSetInputPortComplexSignal(S, 5, INPUT_5_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 5, INPUT_5_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 5, 1);/*direct input signal access*/
+
+  /* Input Port 6 */
+  ssSetInputPortWidth(S, 6, INPUT_6_NUM_ELEMS);
+  ssSetInputPortDataType(S, 6, SS_SINGLE);
+  ssSetInputPortComplexSignal(S, 6, INPUT_6_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 6, INPUT_6_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 6, 1);/*direct input signal access*/
 
   /*
    * Configure the Units for Input Ports
@@ -388,6 +459,24 @@ static void mdlInitializeSizes(SimStruct *S)
       return;
     }
 
+    ssRegisterUnitFromExpr(S, INPUT_5_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 5, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port J2000_time of S-Function create_des_rates_DCOMM");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, INPUT_6_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 6, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port J2000_frac_time of S-Function create_des_rates_DCOMM");
+      return;
+    }
+
 #endif
 
   }
@@ -396,7 +485,11 @@ static void mdlInitializeSizes(SimStruct *S)
     return;
 
   /* Output Port 0 */
-  ssSetOutputPortWidth(S, 0, OUTPUT_0_NUM_ELEMS);
+  outputDimsInfo.numDims = 2;
+  outputDimsInfo.width = OUTPUT_0_NUM_ELEMS;
+  int_T out0Dims[] = OUTPUT_0_DIMS_ND;
+  outputDimsInfo.dims = out0Dims;
+  ssSetOutputPortDimensionInfo(S, 0, &outputDimsInfo);
   ssSetOutputPortDataType(S, 0, SS_SINGLE);
   ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
 
@@ -421,7 +514,7 @@ static void mdlInitializeSizes(SimStruct *S)
 
   }
 
-  if (!ssSetNumDWork(S, 6))
+  if (!ssSetNumDWork(S, 8))
     return;
 
   /*
@@ -470,13 +563,31 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 4, COMPLEX_NO);
 
   /*
-   * Configure the dwork 5 (des_rates_bf_t)
+   * Configure the dwork 5 (J2000_time_t)
    */
-  ssSetDWorkDataType(S, 5, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkDataType(S, 5, ssGetInputPortDataType(S, 5));
   ssSetDWorkUsageType(S, 5, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 5, "des_rates_bf_t");
-  ssSetDWorkWidth(S, 5, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkName(S, 5, "J2000_time_t");
+  ssSetDWorkWidth(S, 5, ssGetInputPortWidth(S, 5));
   ssSetDWorkComplexSignal(S, 5, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 6 (J2000_frac_time_t)
+   */
+  ssSetDWorkDataType(S, 6, ssGetInputPortDataType(S, 6));
+  ssSetDWorkUsageType(S, 6, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 6, "J2000_frac_time_t");
+  ssSetDWorkWidth(S, 6, ssGetInputPortWidth(S, 6));
+  ssSetDWorkComplexSignal(S, 6, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 7 (des_rates_bf_t)
+   */
+  ssSetDWorkDataType(S, 7, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkUsageType(S, 7, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 7, "des_rates_bf_t");
+  ssSetDWorkWidth(S, 7, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkComplexSignal(S, 7, COMPLEX_NO);
   ssSetNumPWork(S, 0);
   ssSetNumSampleTimes(S, 1);
   ssSetNumRWork(S, 0);
@@ -517,6 +628,55 @@ static void mdlSetOutputPortDimensionInfo(SimStruct *S,
 }
 
 #endif
+
+#define MDL_SET_DEFAULT_PORT_DIMENSION_INFO
+
+static void mdlSetDefaultPortDimensionInfo(SimStruct *S)
+{
+  DECL_AND_INIT_DIMSINFO(portDimsInfo);
+  int_T dims[2];
+
+  /* Setting default dimensions for input port 1 */
+  portDimsInfo.width = INPUT_1_NUM_ELEMS;
+  dims[0] = INPUT_1_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 1) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 1, 1 , 1);
+  }
+
+  /* Setting default dimensions for input port 2 */
+  portDimsInfo.width = INPUT_2_NUM_ELEMS;
+  dims[0] = INPUT_2_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 2) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 2, 1 , 1);
+  }
+
+  /* Setting default dimensions for input port 3 */
+  portDimsInfo.width = INPUT_3_NUM_ELEMS;
+  dims[0] = INPUT_3_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 3) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 3, 1 , 1);
+  }
+
+  /* Setting default dimensions for output port 0 */
+  portDimsInfo.width = OUTPUT_0_NUM_ELEMS;
+  dims[0] = OUTPUT_0_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.numDims = 2;
+  if (ssGetOutputPortNumDimensions(S, 0) == (-1)) {
+    ssSetOutputPortDimensionInfo(S, 0, &portDimsInfo);
+  }
+
+  return;
+}
 
 /* Function: mdlInitializeSampleTimes =========================================
  * Abstract:
@@ -576,6 +736,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   const real32_T *gnd_ecef = (real32_T *) ssGetInputPortRealSignal(S, 2);
   const real32_T *q_BN = (real32_T *) ssGetInputPortRealSignal(S, 3);
   const uint8_T *leapsec = (uint8_T *) ssGetInputPortRealSignal(S, 4);
+  const uint32_T *J2000_time = (uint32_T *) ssGetInputPortRealSignal(S, 5);
+  const real32_T *J2000_frac_time = (real32_T *) ssGetInputPortRealSignal(S, 6);
   real32_T *des_rates_bf = (real32_T *) ssGetOutputPortRealSignal(S, 0);
 
   /* S-Function Builder Row Major Support has been enabled for custom
@@ -586,7 +748,9 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   real32_T *gnd_ecef_t = (real32_T *)ssGetDWork(S, 2);
   real32_T *q_BN_t = (real32_T *)ssGetDWork(S, 3);
   uint8_T *leapsec_t = (uint8_T *)ssGetDWork(S, 4);
-  real32_T *des_rates_bf_t = (real32_T *)ssGetDWork(S, 5);
+  uint32_T *J2000_time_t = (uint32_T *)ssGetDWork(S, 5);
+  real32_T *J2000_frac_time_t = (real32_T *)ssGetDWork(S, 6);
+  real32_T *des_rates_bf_t = (real32_T *)ssGetDWork(S, 7);
   NDTransposeBySrcSpecs((void*)opmode_t, (const void*)opmode,
                         ssGetInputPortDimensions(S, 0),
                         ssGetInputPortNumDimensions(S, 0), sizeof(uint8_T));
@@ -602,8 +766,14 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   NDTransposeBySrcSpecs((void*)leapsec_t, (const void*)leapsec,
                         ssGetInputPortDimensions(S, 4),
                         ssGetInputPortNumDimensions(S, 4), sizeof(uint8_T));
+  NDTransposeBySrcSpecs((void*)J2000_time_t, (const void*)J2000_time,
+                        ssGetInputPortDimensions(S, 5),
+                        ssGetInputPortNumDimensions(S, 5), sizeof(uint32_T));
+  NDTransposeBySrcSpecs((void*)J2000_frac_time_t, (const void*)J2000_frac_time,
+                        ssGetInputPortDimensions(S, 6),
+                        ssGetInputPortNumDimensions(S, 6), sizeof(real32_T));
   create_des_rates_DCOMM_Outputs_wrapper(opmode_t, pos_ecef_t, gnd_ecef_t,
-    q_BN_t, leapsec_t, des_rates_bf_t);
+    q_BN_t, leapsec_t, J2000_time_t, J2000_frac_time_t, des_rates_bf_t);
   NDTransposeByDstSpecs((void*)des_rates_bf, (const void*)des_rates_bf_t,
                         ssGetOutputPortDimensions(S, 0),
                         ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));

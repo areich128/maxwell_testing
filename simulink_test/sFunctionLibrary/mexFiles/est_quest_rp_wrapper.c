@@ -89,8 +89,8 @@ void est_quest_rp_Outputs_wrapper(const real32_T *b_k,
 
     // Run Function
     int32_t statusFlag = 0;
-    statusFlag = est_quest_rp(&b_k_mtx, &eci_k_mtx, 
-                          &state_mtx, &dcm_out_mtx);
+    statusFlag = est_quest_rp(&b_k_mtx, &eci_k_mtx, &state_mtx);
+    q_2_dcm(&(state_mtx.att_quaternion), &dcm_out_mtx);
     *status = statusFlag;
 
     //mexPrintf("Passed Running Phase\n");
