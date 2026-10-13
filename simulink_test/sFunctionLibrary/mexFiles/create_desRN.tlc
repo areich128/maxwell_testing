@@ -1,5 +1,5 @@
 %% File : create_desRN.tlc
-%% Created : Mon May 18 16:38:14 2026
+%% Created : Mon Oct 12 19:27:64 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -47,7 +47,8 @@
 			const %<singleType> *des_vec,
 			const %<uint8Type> *antenna,
 			const %<singleType> *b_eci,
-			%<singleType> *des_RN);
+			%<singleType> *des_RN,
+			%<singleType> *dcm_NR_out);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -78,18 +79,21 @@
 			const %<singleType> *des_vec,
 			const %<uint8Type> *antenna,
 			const %<singleType> *b_eci,
-			%<singleType> *des_RN);
+			%<singleType> *des_RN,
+			%<singleType> *dcm_NR_out);
     SFB_EXTERN_C void create_desRN_Terminate_wrapper(void);
     void create_desRN_Outputs_wrapper_accel(const %<uint8Type> *opmode,
 			const %<singleType> *des_vec,
 			const %<uint8Type> *antenna,
 			const %<singleType> *b_eci,
-			%<singleType> *des_RN){
+			%<singleType> *des_RN,
+			%<singleType> *dcm_NR_out){
     create_desRN_Outputs_wrapper(opmode,
 			des_vec,
 			antenna,
 			b_eci,
-			des_RN);
+			des_RN,
+			dcm_NR_out);
     }
 #undef SFB_EXTERN_C
 
@@ -112,7 +116,8 @@
 			const %<singleType> *des_vec,
 			const %<uint8Type> *antenna,
 			const %<singleType> *b_eci,
-			%<singleType> *des_RN);
+			%<singleType> *des_RN,
+			%<singleType> *dcm_NR_out);
 
     SFB_EXTERN_C void create_desRN_Terminate_wrapper(void);
 
@@ -137,11 +142,12 @@
   %assign pu2 = LibBlockInputSignalAddr(2, "", "", 0)
   %assign pu3 = LibBlockInputSignalAddr(3, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
+  %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    create_desRN_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>);
+    create_desRN_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>, %<py1>);
   %else
-    create_desRN_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>);
+    create_desRN_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>, %<py1>);
   %endif
 
   %%

@@ -23,6 +23,7 @@
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 6
 #define u_1_width 6
+#define u_2_width 2
 #define y_width 4
 #define y_1_width 9
 #define y_2_width 1
@@ -41,12 +42,14 @@
  */
 extern void est_quest_rp_Outputs_wrapper(const real32_T *b_k,
 			const real32_T *eci_k,
+			const real32_T *weights,
 			real32_T *state_quaternion,
 			real32_T *dcm_out,
 			int32_T *status);
 
 void est_quest_rp_Outputs_wrapper(const real32_T *b_k,
 			const real32_T *eci_k,
+			const real32_T *weights,
 			real32_T *state_quaternion,
 			real32_T *dcm_out,
 			int32_T *status)
@@ -89,8 +92,7 @@ void est_quest_rp_Outputs_wrapper(const real32_T *b_k,
 
     // Run Function
     int32_t statusFlag = 0;
-    statusFlag = est_quest_rp(&b_k_mtx, &eci_k_mtx, &state_mtx);
-    q_2_dcm(&(state_mtx.att_quaternion), &dcm_out_mtx);
+    statusFlag = est_quest_rp(&b_k_mtx, &eci_k_mtx, (float*)weights, &state_mtx);
     *status = statusFlag;
 
     //mexPrintf("Passed Running Phase\n");

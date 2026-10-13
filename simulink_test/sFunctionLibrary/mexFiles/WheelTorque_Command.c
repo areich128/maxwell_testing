@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Mon May 18 00:27:14 2026
+ * Created: Mon Oct 12 18:53:23 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     5
+#define NUM_INPUTS                     6
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 wheel_speeds
@@ -135,7 +135,27 @@
 #define IN_4_FRACTIONLENGTH            3
 #define IN_4_BIAS                      0
 #define IN_4_SLOPE                     0.125
-#define NUM_OUTPUTS                    2
+
+/* Input Port  5 */
+#define IN_PORT_5_NAME                 c_desat
+#define INPUT_5_DIMS_ND                {1,1}
+#define INPUT_5_NUM_ELEMS              1
+#define INPUT_5_WIDTH                  1
+#define INPUT_DIMS_5_COL               1
+#define INPUT_5_DTYPE                  real32_T
+#define INPUT_5_COMPLEX                COMPLEX_NO
+#define INPUT_5_UNIT                   ""
+#define IN_5_BUS_BASED                 0
+#define IN_5_BUS_NAME
+#define IN_5_DIMS                      1-D
+#define INPUT_5_FEEDTHROUGH            1
+#define IN_5_ISSIGNED                  1
+#define IN_5_WORDLENGTH                8
+#define IN_5_FIXPOINTSCALING           1
+#define IN_5_FRACTIONLENGTH            3
+#define IN_5_BIAS                      0
+#define IN_5_SLOPE                     0.125
+#define NUM_OUTPUTS                    3
 
 /* Output Port  0 */
 #define OUT_PORT_0_NAME                pwm_dipole
@@ -174,6 +194,25 @@
 #define OUT_1_FRACTIONLENGTH           3
 #define OUT_1_BIAS                     0
 #define OUT_1_SLOPE                    0.125
+
+/* Output Port  2 */
+#define OUT_PORT_2_NAME                status
+#define OUTPUT_2_DIMS_ND               {1,1}
+#define OUTPUT_2_NUM_ELEMS             1
+#define OUTPUT_2_WIDTH                 1
+#define OUTPUT_DIMS_2_COL              1
+#define OUTPUT_2_DTYPE                 int32_T
+#define OUTPUT_2_COMPLEX               COMPLEX_NO
+#define OUTPUT_2_UNIT                  ""
+#define OUT_2_BUS_BASED                0
+#define OUT_2_BUS_NAME
+#define OUT_2_DIMS                     1-D
+#define OUT_2_ISSIGNED                 1
+#define OUT_2_WORDLENGTH               8
+#define OUT_2_FIXPOINTSCALING          1
+#define OUT_2_FRACTIONLENGTH           3
+#define OUT_2_BIAS                     0
+#define OUT_2_SLOPE                    0.125
 #define NPARAMS                        0
 #define SAMPLE_TIME_0                  0
 #define NUM_DISC_STATES                0
@@ -198,8 +237,10 @@ extern void WheelTorque_Command_Outputs_wrapper(const real32_T *wheel_speeds,
   const real32_T *GsValues,
   const int32_T *disabled_wheel,
   const real32_T *out_u,
+  const real32_T *c_desat,
   real32_T *pwm_dipole,
-  real32_T *rw_torque);
+  real32_T *rw_torque,
+  int32_T *status);
 
 /*=============================*
  * Data Transposition Routines *
@@ -374,6 +415,13 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortDirectFeedThrough(S, 4, INPUT_4_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 4, 1);/*direct input signal access*/
 
+  /* Input Port 5 */
+  ssSetInputPortWidth(S, 5, INPUT_5_NUM_ELEMS);
+  ssSetInputPortDataType(S, 5, SS_SINGLE);
+  ssSetInputPortComplexSignal(S, 5, INPUT_5_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 5, INPUT_5_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 5, 1);/*direct input signal access*/
+
   /*
    * Configure the Units for Input Ports
    */
@@ -427,6 +475,15 @@ static void mdlInitializeSizes(SimStruct *S)
       return;
     }
 
+    ssRegisterUnitFromExpr(S, INPUT_5_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 5, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port c_desat of S-Function WheelTorque_Command");
+      return;
+    }
+
 #endif
 
   }
@@ -451,6 +508,11 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetOutputPortDimensionInfo(S, 1, &outputDimsInfo);
   ssSetOutputPortDataType(S, 1, SS_SINGLE);
   ssSetOutputPortComplexSignal(S, 1, OUTPUT_1_COMPLEX);
+
+  /* Output Port 2 */
+  ssSetOutputPortWidth(S, 2, OUTPUT_2_NUM_ELEMS);
+  ssSetOutputPortDataType(S, 2, SS_INT32);
+  ssSetOutputPortComplexSignal(S, 2, OUTPUT_2_COMPLEX);
 
   /*
    * Configure the Units for Output Ports
@@ -478,11 +540,20 @@ static void mdlInitializeSizes(SimStruct *S)
       return;
     }
 
+    ssRegisterUnitFromExpr(S, OUTPUT_2_UNIT, &outUnitIdReg);
+    if (outUnitIdReg != INVALID_UNIT_ID) {
+      ssSetOutputPortUnit(S, 2, outUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for output port status of S-Function WheelTorque_Command");
+      return;
+    }
+
 #endif
 
   }
 
-  if (!ssSetNumDWork(S, 7))
+  if (!ssSetNumDWork(S, 9))
     return;
 
   /*
@@ -531,22 +602,40 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 4, COMPLEX_NO);
 
   /*
-   * Configure the dwork 5 (pwm_dipole_t)
+   * Configure the dwork 5 (c_desat_t)
    */
-  ssSetDWorkDataType(S, 5, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkDataType(S, 5, ssGetInputPortDataType(S, 5));
   ssSetDWorkUsageType(S, 5, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 5, "pwm_dipole_t");
-  ssSetDWorkWidth(S, 5, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkName(S, 5, "c_desat_t");
+  ssSetDWorkWidth(S, 5, ssGetInputPortWidth(S, 5));
   ssSetDWorkComplexSignal(S, 5, COMPLEX_NO);
 
   /*
-   * Configure the dwork 6 (rw_torque_t)
+   * Configure the dwork 6 (pwm_dipole_t)
    */
-  ssSetDWorkDataType(S, 6, ssGetOutputPortDataType(S, 1));
+  ssSetDWorkDataType(S, 6, ssGetOutputPortDataType(S, 0));
   ssSetDWorkUsageType(S, 6, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 6, "rw_torque_t");
-  ssSetDWorkWidth(S, 6, ssGetOutputPortWidth(S, 1));
+  ssSetDWorkName(S, 6, "pwm_dipole_t");
+  ssSetDWorkWidth(S, 6, ssGetOutputPortWidth(S, 0));
   ssSetDWorkComplexSignal(S, 6, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 7 (rw_torque_t)
+   */
+  ssSetDWorkDataType(S, 7, ssGetOutputPortDataType(S, 1));
+  ssSetDWorkUsageType(S, 7, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 7, "rw_torque_t");
+  ssSetDWorkWidth(S, 7, ssGetOutputPortWidth(S, 1));
+  ssSetDWorkComplexSignal(S, 7, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 8 (status_t)
+   */
+  ssSetDWorkDataType(S, 8, ssGetOutputPortDataType(S, 2));
+  ssSetDWorkUsageType(S, 8, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 8, "status_t");
+  ssSetDWorkWidth(S, 8, ssGetOutputPortWidth(S, 2));
+  ssSetDWorkComplexSignal(S, 8, COMPLEX_NO);
   ssSetNumPWork(S, 0);
   ssSetNumSampleTimes(S, 1);
   ssSetNumRWork(S, 0);
@@ -713,8 +802,10 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   const real32_T *GsValues = (real32_T *) ssGetInputPortRealSignal(S, 2);
   const int32_T *disabled_wheel = (int32_T *) ssGetInputPortRealSignal(S, 3);
   const real32_T *out_u = (real32_T *) ssGetInputPortRealSignal(S, 4);
+  const real32_T *c_desat = (real32_T *) ssGetInputPortRealSignal(S, 5);
   real32_T *pwm_dipole = (real32_T *) ssGetOutputPortRealSignal(S, 0);
   real32_T *rw_torque = (real32_T *) ssGetOutputPortRealSignal(S, 1);
+  int32_T *status = (int32_T *) ssGetOutputPortRealSignal(S, 2);
 
   /* S-Function Builder Row Major Support has been enabled for custom
    * code, a transposed copy will be created for any array signals.
@@ -724,8 +815,10 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   real32_T *GsValues_t = (real32_T *)ssGetDWork(S, 2);
   int32_T *disabled_wheel_t = (int32_T *)ssGetDWork(S, 3);
   real32_T *out_u_t = (real32_T *)ssGetDWork(S, 4);
-  real32_T *pwm_dipole_t = (real32_T *)ssGetDWork(S, 5);
-  real32_T *rw_torque_t = (real32_T *)ssGetDWork(S, 6);
+  real32_T *c_desat_t = (real32_T *)ssGetDWork(S, 5);
+  real32_T *pwm_dipole_t = (real32_T *)ssGetDWork(S, 6);
+  real32_T *rw_torque_t = (real32_T *)ssGetDWork(S, 7);
+  int32_T *status_t = (int32_T *)ssGetDWork(S, 8);
   NDTransposeBySrcSpecs((void*)wheel_speeds_t, (const void*)wheel_speeds,
                         ssGetInputPortDimensions(S, 0),
                         ssGetInputPortNumDimensions(S, 0), sizeof(real32_T));
@@ -741,14 +834,20 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   NDTransposeBySrcSpecs((void*)out_u_t, (const void*)out_u,
                         ssGetInputPortDimensions(S, 4),
                         ssGetInputPortNumDimensions(S, 4), sizeof(real32_T));
+  NDTransposeBySrcSpecs((void*)c_desat_t, (const void*)c_desat,
+                        ssGetInputPortDimensions(S, 5),
+                        ssGetInputPortNumDimensions(S, 5), sizeof(real32_T));
   WheelTorque_Command_Outputs_wrapper(wheel_speeds_t, mag_bf_t, GsValues_t,
-    disabled_wheel_t, out_u_t, pwm_dipole_t, rw_torque_t);
+    disabled_wheel_t, out_u_t, c_desat_t, pwm_dipole_t, rw_torque_t, status_t);
   NDTransposeByDstSpecs((void*)pwm_dipole, (const void*)pwm_dipole_t,
                         ssGetOutputPortDimensions(S, 0),
                         ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));
   NDTransposeByDstSpecs((void*)rw_torque, (const void*)rw_torque_t,
                         ssGetOutputPortDimensions(S, 1),
                         ssGetOutputPortNumDimensions(S, 1), sizeof(real32_T));
+  NDTransposeByDstSpecs((void*)status, (const void*)status_t,
+                        ssGetOutputPortDimensions(S, 2),
+                        ssGetOutputPortNumDimensions(S, 2), sizeof(int32_T));
 }
 
 /* Function: mdlTerminate =====================================================

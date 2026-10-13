@@ -31,8 +31,10 @@
 #define u_7_width 4
 #define u_8_width 3
 #define u_9_width 1
+#define u_10_width 1
 #define y_width 6
 #define y_1_width 4
+#define y_2_width 1
 
 /*
  * Create external references here.  
@@ -55,9 +57,11 @@ extern void control_fdbk_Outputs_wrapper(const uint8_T *op_mode,
 			const boolean_T *gps_result_override,
 			const real32_T *q_BR_noGPS,
 			const real32_T *des_rates,
-			const real_T *u1,
+			const int32_T *gyro_rates_valid,
+			const int32_T *mag_vec_valid,
 			real32_T *out_u,
-			real32_T *q_BR);
+			real32_T *q_BR,
+			int8_T *status);
 
 void control_fdbk_Outputs_wrapper(const uint8_T *op_mode,
 			const real32_T *q_BN,
@@ -68,9 +72,11 @@ void control_fdbk_Outputs_wrapper(const uint8_T *op_mode,
 			const boolean_T *gps_result_override,
 			const real32_T *q_BR_noGPS,
 			const real32_T *des_rates,
-			const real_T *u1,
+			const int32_T *gyro_rates_valid,
+			const int32_T *mag_vec_valid,
 			real32_T *out_u,
-			real32_T *q_BR)
+			real32_T *q_BR,
+			int8_T *status)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
 float gyro_loc[3], des_loc[3], mag_loc[3], gain_loc[4];
@@ -103,8 +109,10 @@ q_2_dcm(&q_BN_m, &dcm_BN_m);
 q_2_dcm(&q_RN_m, &dcm_RN_m);
 mtx_trans(&dcm_RN_m, &dcm_NR_m);
 
-control_fdbk(*op_mode, &dcm_BN_m, &dcm_NR_m, q_BR_loc,
-             gyro_loc, des_loc, mag_loc, gain_loc, out_loc);
+int8_t statusFlag = control_fdbk(*op_mode, &dcm_BN_m, &dcm_NR_m, q_BR_loc,
+                gyro_loc, *gyro_rates_valid, *mag_vec_valid,
+                des_loc, mag_loc, gain_loc, out_loc);
+*status = statusFlag;
 
 for (i = 0; i < 6; i++) out_u[i] = out_loc[i];
 for (i = 0; i < 4; i++) q_BR[i]  = q_BR_loc[i];

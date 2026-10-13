@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Thu Oct 08 12:51:01 2026
+ * Created: Mon Oct 12 18:44:58 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     2
+#define NUM_INPUTS                     3
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 b_k
@@ -75,6 +75,26 @@
 #define IN_1_FRACTIONLENGTH            3
 #define IN_1_BIAS                      0
 #define IN_1_SLOPE                     0.125
+
+/* Input Port  2 */
+#define IN_PORT_2_NAME                 weights
+#define INPUT_2_DIMS_ND                {2,1}
+#define INPUT_2_NUM_ELEMS              2
+#define INPUT_2_WIDTH                  2
+#define INPUT_DIMS_2_COL               1
+#define INPUT_2_DTYPE                  real32_T
+#define INPUT_2_COMPLEX                COMPLEX_NO
+#define INPUT_2_UNIT                   ""
+#define IN_2_BUS_BASED                 0
+#define IN_2_BUS_NAME
+#define IN_2_DIMS                      2-D
+#define INPUT_2_FEEDTHROUGH            1
+#define IN_2_ISSIGNED                  1
+#define IN_2_WORDLENGTH                8
+#define IN_2_FIXPOINTSCALING           1
+#define IN_2_FRACTIONLENGTH            3
+#define IN_2_BIAS                      0
+#define IN_2_SLOPE                     0.125
 #define NUM_OUTPUTS                    3
 
 /* Output Port  0 */
@@ -143,7 +163,7 @@
 #define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight__SFB__INC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\include__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\mtx.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\att_det.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\global.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\conversions.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\ref_rotation.c"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
-#define SHOW_COMPILE_STEPS             0
+#define SHOW_COMPILE_STEPS             1
 #define CREATE_DEBUG_MEXFILE           1
 #define SAVE_CODE_ONLY                 0
 #define SFUNWIZ_REVISION               3.0
@@ -154,6 +174,7 @@
 
 extern void est_quest_rp_Outputs_wrapper(const real32_T *b_k,
   const real32_T *eci_k,
+  const real32_T *weights,
   real32_T *state_quaternion,
   real32_T *dcm_out,
   int32_T *status);
@@ -302,6 +323,17 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortDirectFeedThrough(S, 1, INPUT_1_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 1, 1);/*direct input signal access*/
 
+  /* Input Port 2 */
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_2_NUM_ELEMS;
+  int_T in2Dims[] = INPUT_2_DIMS_ND;
+  inputDimsInfo.dims = in2Dims;
+  ssSetInputPortDimensionInfo(S, 2, &inputDimsInfo);
+  ssSetInputPortDataType(S, 2, SS_SINGLE);
+  ssSetInputPortComplexSignal(S, 2, INPUT_2_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 2, INPUT_2_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 2, 1);/*direct input signal access*/
+
   /*
    * Configure the Units for Input Ports
    */
@@ -325,6 +357,15 @@ static void mdlInitializeSizes(SimStruct *S)
     } else {
       ssSetLocalErrorStatus(S,
                             "Invalid Unit provided for input port eci_k of S-Function est_quest_rp");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, INPUT_2_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 2, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port weights of S-Function est_quest_rp");
       return;
     }
 
@@ -397,7 +438,7 @@ static void mdlInitializeSizes(SimStruct *S)
 
   }
 
-  if (!ssSetNumDWork(S, 5))
+  if (!ssSetNumDWork(S, 6))
     return;
 
   /*
@@ -419,31 +460,40 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 1, COMPLEX_NO);
 
   /*
-   * Configure the dwork 2 (state_quaternion_t)
+   * Configure the dwork 2 (weights_t)
    */
-  ssSetDWorkDataType(S, 2, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkDataType(S, 2, ssGetInputPortDataType(S, 2));
   ssSetDWorkUsageType(S, 2, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 2, "state_quaternion_t");
-  ssSetDWorkWidth(S, 2, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkName(S, 2, "weights_t");
+  ssSetDWorkWidth(S, 2, ssGetInputPortWidth(S, 2));
   ssSetDWorkComplexSignal(S, 2, COMPLEX_NO);
 
   /*
-   * Configure the dwork 3 (dcm_out_t)
+   * Configure the dwork 3 (state_quaternion_t)
    */
-  ssSetDWorkDataType(S, 3, ssGetOutputPortDataType(S, 1));
+  ssSetDWorkDataType(S, 3, ssGetOutputPortDataType(S, 0));
   ssSetDWorkUsageType(S, 3, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 3, "dcm_out_t");
-  ssSetDWorkWidth(S, 3, ssGetOutputPortWidth(S, 1));
+  ssSetDWorkName(S, 3, "state_quaternion_t");
+  ssSetDWorkWidth(S, 3, ssGetOutputPortWidth(S, 0));
   ssSetDWorkComplexSignal(S, 3, COMPLEX_NO);
 
   /*
-   * Configure the dwork 4 (status_t)
+   * Configure the dwork 4 (dcm_out_t)
    */
-  ssSetDWorkDataType(S, 4, ssGetOutputPortDataType(S, 2));
+  ssSetDWorkDataType(S, 4, ssGetOutputPortDataType(S, 1));
   ssSetDWorkUsageType(S, 4, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 4, "status_t");
-  ssSetDWorkWidth(S, 4, ssGetOutputPortWidth(S, 2));
+  ssSetDWorkName(S, 4, "dcm_out_t");
+  ssSetDWorkWidth(S, 4, ssGetOutputPortWidth(S, 1));
   ssSetDWorkComplexSignal(S, 4, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 5 (status_t)
+   */
+  ssSetDWorkDataType(S, 5, ssGetOutputPortDataType(S, 2));
+  ssSetDWorkUsageType(S, 5, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 5, "status_t");
+  ssSetDWorkWidth(S, 5, ssGetOutputPortWidth(S, 2));
+  ssSetDWorkComplexSignal(S, 5, COMPLEX_NO);
   ssSetNumPWork(S, 0);
   ssSetNumSampleTimes(S, 1);
   ssSetNumRWork(S, 0);
@@ -510,6 +560,16 @@ static void mdlSetDefaultPortDimensionInfo(SimStruct *S)
   portDimsInfo.numDims = 2;
   if (ssGetInputPortWidth(S, 1) == DYNAMICALLY_SIZED) {
     ssSetInputPortMatrixDimensions(S, 1, 1 , 1);
+  }
+
+  /* Setting default dimensions for input port 2 */
+  portDimsInfo.width = INPUT_2_NUM_ELEMS;
+  dims[0] = INPUT_2_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 2) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 2, 1 , 1);
   }
 
   /* Setting default dimensions for output port 0 */
@@ -588,6 +648,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 {
   const real32_T *b_k = (real32_T *) ssGetInputPortRealSignal(S, 0);
   const real32_T *eci_k = (real32_T *) ssGetInputPortRealSignal(S, 1);
+  const real32_T *weights = (real32_T *) ssGetInputPortRealSignal(S, 2);
   real32_T *state_quaternion = (real32_T *) ssGetOutputPortRealSignal(S, 0);
   real32_T *dcm_out = (real32_T *) ssGetOutputPortRealSignal(S, 1);
   int32_T *status = (int32_T *) ssGetOutputPortRealSignal(S, 2);
@@ -597,17 +658,21 @@ static void mdlOutputs(SimStruct *S, int_T tid)
    */
   real32_T *b_k_t = (real32_T *)ssGetDWork(S, 0);
   real32_T *eci_k_t = (real32_T *)ssGetDWork(S, 1);
-  real32_T *state_quaternion_t = (real32_T *)ssGetDWork(S, 2);
-  real32_T *dcm_out_t = (real32_T *)ssGetDWork(S, 3);
-  int32_T *status_t = (int32_T *)ssGetDWork(S, 4);
+  real32_T *weights_t = (real32_T *)ssGetDWork(S, 2);
+  real32_T *state_quaternion_t = (real32_T *)ssGetDWork(S, 3);
+  real32_T *dcm_out_t = (real32_T *)ssGetDWork(S, 4);
+  int32_T *status_t = (int32_T *)ssGetDWork(S, 5);
   NDTransposeBySrcSpecs((void*)b_k_t, (const void*)b_k, ssGetInputPortDimensions
                         (S, 0), ssGetInputPortNumDimensions(S, 0), sizeof
                         (real32_T));
   NDTransposeBySrcSpecs((void*)eci_k_t, (const void*)eci_k,
                         ssGetInputPortDimensions(S, 1),
                         ssGetInputPortNumDimensions(S, 1), sizeof(real32_T));
-  est_quest_rp_Outputs_wrapper(b_k_t, eci_k_t, state_quaternion_t, dcm_out_t,
-    status_t);
+  NDTransposeBySrcSpecs((void*)weights_t, (const void*)weights,
+                        ssGetInputPortDimensions(S, 2),
+                        ssGetInputPortNumDimensions(S, 2), sizeof(real32_T));
+  est_quest_rp_Outputs_wrapper(b_k_t, eci_k_t, weights_t, state_quaternion_t,
+    dcm_out_t, status_t);
   NDTransposeByDstSpecs((void*)state_quaternion, (const void*)state_quaternion_t,
                         ssGetOutputPortDimensions(S, 0),
                         ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));

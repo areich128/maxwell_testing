@@ -1,5 +1,5 @@
 %% File : WheelTorque_Command.tlc
-%% Created : Mon May 18 00:27:14 2026
+%% Created : Mon Oct 12 18:53:23 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -48,8 +48,10 @@
 			const %<singleType> *GsValues,
 			const %<int32Type> *disabled_wheel,
 			const %<singleType> *out_u,
+			const %<singleType> *c_desat,
 			%<singleType> *pwm_dipole,
-			%<singleType> *rw_torque);
+			%<singleType> *rw_torque,
+			%<int32Type> *status);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -81,23 +83,29 @@
 			const %<singleType> *GsValues,
 			const %<int32Type> *disabled_wheel,
 			const %<singleType> *out_u,
+			const %<singleType> *c_desat,
 			%<singleType> *pwm_dipole,
-			%<singleType> *rw_torque);
+			%<singleType> *rw_torque,
+			%<int32Type> *status);
     SFB_EXTERN_C void WheelTorque_Command_Terminate_wrapper(void);
     void WheelTorque_Command_Outputs_wrapper_accel(const %<singleType> *wheel_speeds,
 			const %<singleType> *mag_bf,
 			const %<singleType> *GsValues,
 			const %<int32Type> *disabled_wheel,
 			const %<singleType> *out_u,
+			const %<singleType> *c_desat,
 			%<singleType> *pwm_dipole,
-			%<singleType> *rw_torque){
+			%<singleType> *rw_torque,
+			%<int32Type> *status){
     WheelTorque_Command_Outputs_wrapper(wheel_speeds,
 			mag_bf,
 			GsValues,
 			disabled_wheel,
 			out_u,
+			c_desat,
 			pwm_dipole,
-			rw_torque);
+			rw_torque,
+			status);
     }
 #undef SFB_EXTERN_C
 
@@ -121,8 +129,10 @@
 			const %<singleType> *GsValues,
 			const %<int32Type> *disabled_wheel,
 			const %<singleType> *out_u,
+			const %<singleType> *c_desat,
 			%<singleType> *pwm_dipole,
-			%<singleType> *rw_torque);
+			%<singleType> *rw_torque,
+			%<int32Type> *status);
 
     SFB_EXTERN_C void WheelTorque_Command_Terminate_wrapper(void);
 
@@ -147,13 +157,15 @@
   %assign pu2 = LibBlockInputSignalAddr(2, "", "", 0)
   %assign pu3 = LibBlockInputSignalAddr(3, "", "", 0)
   %assign pu4 = LibBlockInputSignalAddr(4, "", "", 0)
+  %assign pu5 = LibBlockInputSignalAddr(5, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
+  %assign py2 = LibBlockOutputSignalAddr(2, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    WheelTorque_Command_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<py0>, %<py1>);
+    WheelTorque_Command_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<py0>, %<py1>, %<py2>);
   %else
-    WheelTorque_Command_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<py0>, %<py1>);
+    WheelTorque_Command_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<py0>, %<py1>, %<py2>);
   %endif
 
   %%

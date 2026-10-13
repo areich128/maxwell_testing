@@ -1,5 +1,5 @@
 %% File : control_fdbk.tlc
-%% Created : Thu Oct 08 12:46:62 2026
+%% Created : Mon Oct 12 19:13:76 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -22,10 +22,11 @@
 %%      generated code.
 %%
 %function BlockTypeSetup(block, system) void
+    %assign int32Type = LibGetDataTypeNameFromId(::CompiledModel.tSS_INT32)
     %assign booleanType = LibGetDataTypeNameFromId(::CompiledModel.tSS_BOOLEAN)
+    %assign int8Type = LibGetDataTypeNameFromId(::CompiledModel.tSS_INT8)
     %assign uint8Type = LibGetDataTypeNameFromId(::CompiledModel.tSS_UINT8)
     %assign singleType = LibGetDataTypeNameFromId(::CompiledModel.tSS_SINGLE)
-    %assign doubleType = LibGetDataTypeNameFromId(::CompiledModel.tSS_DOUBLE)
 
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
     %assign hFileName = "control_fdbk_accel_wrapper"
@@ -54,9 +55,11 @@
 			const %<booleanType> *gps_result_override,
 			const %<singleType> *q_BR_noGPS,
 			const %<singleType> *des_rates,
-			const %<doubleType> *u1,
+			const %<int32Type> *gyro_rates_valid,
+			const %<int32Type> *mag_vec_valid,
 			%<singleType> *out_u,
-			%<singleType> *q_BR);
+			%<singleType> *q_BR,
+			%<int8Type> *status);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -92,9 +95,11 @@
 			const %<booleanType> *gps_result_override,
 			const %<singleType> *q_BR_noGPS,
 			const %<singleType> *des_rates,
-			const %<doubleType> *u1,
+			const %<int32Type> *gyro_rates_valid,
+			const %<int32Type> *mag_vec_valid,
 			%<singleType> *out_u,
-			%<singleType> *q_BR);
+			%<singleType> *q_BR,
+			%<int8Type> *status);
     SFB_EXTERN_C void control_fdbk_Terminate_wrapper(void);
     void control_fdbk_Outputs_wrapper_accel(const %<uint8Type> *op_mode,
 			const %<singleType> *q_BN,
@@ -105,9 +110,11 @@
 			const %<booleanType> *gps_result_override,
 			const %<singleType> *q_BR_noGPS,
 			const %<singleType> *des_rates,
-			const %<doubleType> *u1,
+			const %<int32Type> *gyro_rates_valid,
+			const %<int32Type> *mag_vec_valid,
 			%<singleType> *out_u,
-			%<singleType> *q_BR){
+			%<singleType> *q_BR,
+			%<int8Type> *status){
     control_fdbk_Outputs_wrapper(op_mode,
 			q_BN,
 			q_des_RN,
@@ -117,9 +124,11 @@
 			gps_result_override,
 			q_BR_noGPS,
 			des_rates,
-			u1,
+			gyro_rates_valid,
+			mag_vec_valid,
 			out_u,
-			q_BR);
+			q_BR,
+			status);
     }
 #undef SFB_EXTERN_C
 
@@ -147,9 +156,11 @@
 			const %<booleanType> *gps_result_override,
 			const %<singleType> *q_BR_noGPS,
 			const %<singleType> *des_rates,
-			const %<doubleType> *u1,
+			const %<int32Type> *gyro_rates_valid,
+			const %<int32Type> *mag_vec_valid,
 			%<singleType> *out_u,
-			%<singleType> *q_BR);
+			%<singleType> *q_BR,
+			%<int8Type> *status);
 
     SFB_EXTERN_C void control_fdbk_Terminate_wrapper(void);
 
@@ -179,13 +190,15 @@
   %assign pu7 = LibBlockInputSignalAddr(7, "", "", 0)
   %assign pu8 = LibBlockInputSignalAddr(8, "", "", 0)
   %assign pu9 = LibBlockInputSignalAddr(9, "", "", 0)
+  %assign pu10 = LibBlockInputSignalAddr(10, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
+  %assign py2 = LibBlockOutputSignalAddr(2, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    control_fdbk_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<py0>, %<py1>);
+    control_fdbk_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<py0>, %<py1>, %<py2>);
   %else
-    control_fdbk_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<py0>, %<py1>);
+    control_fdbk_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<pu8>, %<pu9>, %<pu10>, %<py0>, %<py1>, %<py2>);
   %endif
 
   %%
