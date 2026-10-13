@@ -1,5 +1,5 @@
 %% File : create_des_rates_DCOMM.tlc
-%% Created : Thu Oct 08 13:21:34 2026
+%% Created : Mon Oct 12 19:49:33 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -51,6 +51,7 @@
 			const %<uint8Type> *leapsec,
 			const %<uint32Type> *J2000_time,
 			const %<singleType> *J2000_frac_time,
+			const %<uint8Type> *new_mode,
 			%<singleType> *des_rates_bf);
     #undef SFB_EXTERN_C
     #endif
@@ -85,6 +86,7 @@
 			const %<uint8Type> *leapsec,
 			const %<uint32Type> *J2000_time,
 			const %<singleType> *J2000_frac_time,
+			const %<uint8Type> *new_mode,
 			%<singleType> *des_rates_bf);
     SFB_EXTERN_C void create_des_rates_DCOMM_Terminate_wrapper(void);
     void create_des_rates_DCOMM_Outputs_wrapper_accel(const %<uint8Type> *opmode,
@@ -94,6 +96,7 @@
 			const %<uint8Type> *leapsec,
 			const %<uint32Type> *J2000_time,
 			const %<singleType> *J2000_frac_time,
+			const %<uint8Type> *new_mode,
 			%<singleType> *des_rates_bf){
     create_des_rates_DCOMM_Outputs_wrapper(opmode,
 			pos_ecef,
@@ -102,6 +105,7 @@
 			leapsec,
 			J2000_time,
 			J2000_frac_time,
+			new_mode,
 			des_rates_bf);
     }
 #undef SFB_EXTERN_C
@@ -128,6 +132,7 @@
 			const %<uint8Type> *leapsec,
 			const %<uint32Type> *J2000_time,
 			const %<singleType> *J2000_frac_time,
+			const %<uint8Type> *new_mode,
 			%<singleType> *des_rates_bf);
 
     SFB_EXTERN_C void create_des_rates_DCOMM_Terminate_wrapper(void);
@@ -155,12 +160,13 @@
   %assign pu4 = LibBlockInputSignalAddr(4, "", "", 0)
   %assign pu5 = LibBlockInputSignalAddr(5, "", "", 0)
   %assign pu6 = LibBlockInputSignalAddr(6, "", "", 0)
+  %assign pu7 = LibBlockInputSignalAddr(7, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    create_des_rates_DCOMM_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<py0>);
+    create_des_rates_DCOMM_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<py0>);
   %else
-    create_des_rates_DCOMM_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<py0>);
+    create_des_rates_DCOMM_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<pu5>, %<pu6>, %<pu7>, %<py0>);
   %endif
 
   %%

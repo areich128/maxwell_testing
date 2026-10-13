@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Mon May 18 16:29:91 2026
+ * Created: Mon Oct 12 20:08:13 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -38,16 +38,16 @@
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 prev_vec
-#define INPUT_0_DIMS_ND                {1,1}
-#define INPUT_0_NUM_ELEMS              1
-#define INPUT_0_WIDTH                  1
+#define INPUT_0_DIMS_ND                {3,1}
+#define INPUT_0_NUM_ELEMS              3
+#define INPUT_0_WIDTH                  3
 #define INPUT_DIMS_0_COL               1
 #define INPUT_0_DTYPE                  real32_T
 #define INPUT_0_COMPLEX                COMPLEX_NO
 #define INPUT_0_UNIT                   ""
 #define IN_0_BUS_BASED                 0
 #define IN_0_BUS_NAME
-#define IN_0_DIMS                      1-D
+#define IN_0_DIMS                      2-D
 #define INPUT_0_FEEDTHROUGH            1
 #define IN_0_ISSIGNED                  1
 #define IN_0_WORDLENGTH                8
@@ -58,16 +58,16 @@
 
 /* Input Port  1 */
 #define IN_PORT_1_NAME                 current_vec
-#define INPUT_1_DIMS_ND                {1,1}
-#define INPUT_1_NUM_ELEMS              1
-#define INPUT_1_WIDTH                  1
+#define INPUT_1_DIMS_ND                {3,1}
+#define INPUT_1_NUM_ELEMS              3
+#define INPUT_1_WIDTH                  3
 #define INPUT_DIMS_1_COL               1
 #define INPUT_1_DTYPE                  real32_T
 #define INPUT_1_COMPLEX                COMPLEX_NO
 #define INPUT_1_UNIT                   ""
 #define IN_1_BUS_BASED                 0
 #define IN_1_BUS_NAME
-#define IN_1_DIMS                      1-D
+#define IN_1_DIMS                      2-D
 #define INPUT_1_FEEDTHROUGH            1
 #define IN_1_ISSIGNED                  1
 #define IN_1_WORDLENGTH                8
@@ -77,17 +77,17 @@
 #define IN_1_SLOPE                     0.125
 
 /* Input Port  2 */
-#define IN_PORT_2_NAME                 des_rates_bf
-#define INPUT_2_DIMS_ND                {1,1}
-#define INPUT_2_NUM_ELEMS              1
-#define INPUT_2_WIDTH                  1
+#define IN_PORT_2_NAME                 q_BN
+#define INPUT_2_DIMS_ND                {4,1}
+#define INPUT_2_NUM_ELEMS              4
+#define INPUT_2_WIDTH                  4
 #define INPUT_DIMS_2_COL               1
 #define INPUT_2_DTYPE                  real32_T
 #define INPUT_2_COMPLEX                COMPLEX_NO
 #define INPUT_2_UNIT                   ""
 #define IN_2_BUS_BASED                 0
 #define IN_2_BUS_NAME
-#define IN_2_DIMS                      1-D
+#define IN_2_DIMS                      2-D
 #define INPUT_2_FEEDTHROUGH            1
 #define IN_2_ISSIGNED                  1
 #define IN_2_WORDLENGTH                8
@@ -98,17 +98,17 @@
 #define NUM_OUTPUTS                    1
 
 /* Output Port  0 */
-#define OUT_PORT_0_NAME                q_BN
-#define OUTPUT_0_DIMS_ND               {1,1}
-#define OUTPUT_0_NUM_ELEMS             1
-#define OUTPUT_0_WIDTH                 1
+#define OUT_PORT_0_NAME                des_rates_bf
+#define OUTPUT_0_DIMS_ND               {3,1}
+#define OUTPUT_0_NUM_ELEMS             3
+#define OUTPUT_0_WIDTH                 3
 #define OUTPUT_DIMS_0_COL              1
 #define OUTPUT_0_DTYPE                 real32_T
 #define OUTPUT_0_COMPLEX               COMPLEX_NO
 #define OUTPUT_0_UNIT                  ""
 #define OUT_0_BUS_BASED                0
 #define OUT_0_BUS_NAME
-#define OUT_0_DIMS                     1-D
+#define OUT_0_DIMS                     2-D
 #define OUT_0_ISSIGNED                 1
 #define OUT_0_WORDLENGTH               8
 #define OUT_0_FIXPOINTSCALING          1
@@ -126,7 +126,7 @@
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
 #define SHOW_COMPILE_STEPS             1
-#define CREATE_DEBUG_MEXFILE           0
+#define CREATE_DEBUG_MEXFILE           1
 #define SAVE_CODE_ONLY                 0
 #define SFUNWIZ_REVISION               3.0
 
@@ -136,8 +136,8 @@
 
 extern void calculateOmega_Outputs_wrapper(const real32_T *prev_vec,
   const real32_T *current_vec,
-  const real32_T *des_rates_bf,
-  real32_T *q_BN);
+  const real32_T *q_BN,
+  real32_T *des_rates_bf);
 
 /*=============================*
  * Data Transposition Routines *
@@ -246,6 +246,8 @@ void NDTransposeByDstSpecs(void *dst, const void *src, const int dstdims[],
  */
 static void mdlInitializeSizes(SimStruct *S)
 {
+  DECL_AND_INIT_DIMSINFO(inputDimsInfo);
+  DECL_AND_INIT_DIMSINFO(outputDimsInfo);
   ssSetNumSFcnParams(S, NPARAMS);
   if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
     return;                            /* Parameter mismatch will be reported by Simulink */
@@ -259,21 +261,34 @@ static void mdlInitializeSizes(SimStruct *S)
     return;
 
   /* Input Port 0 */
-  ssSetInputPortWidth(S, 0, INPUT_0_NUM_ELEMS);
+  ssAllowSignalsWithMoreThan2D(S);
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_0_NUM_ELEMS;
+  int_T in0Dims[] = INPUT_0_DIMS_ND;
+  inputDimsInfo.dims = in0Dims;
+  ssSetInputPortDimensionInfo(S, 0, &inputDimsInfo);
   ssSetInputPortDataType(S, 0, SS_SINGLE);
   ssSetInputPortComplexSignal(S, 0, INPUT_0_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 0, INPUT_0_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 0, 1);/*direct input signal access*/
 
   /* Input Port 1 */
-  ssSetInputPortWidth(S, 1, INPUT_1_NUM_ELEMS);
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_1_NUM_ELEMS;
+  int_T in1Dims[] = INPUT_1_DIMS_ND;
+  inputDimsInfo.dims = in1Dims;
+  ssSetInputPortDimensionInfo(S, 1, &inputDimsInfo);
   ssSetInputPortDataType(S, 1, SS_SINGLE);
   ssSetInputPortComplexSignal(S, 1, INPUT_1_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 1, INPUT_1_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 1, 1);/*direct input signal access*/
 
   /* Input Port 2 */
-  ssSetInputPortWidth(S, 2, INPUT_2_NUM_ELEMS);
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_2_NUM_ELEMS;
+  int_T in2Dims[] = INPUT_2_DIMS_ND;
+  inputDimsInfo.dims = in2Dims;
+  ssSetInputPortDimensionInfo(S, 2, &inputDimsInfo);
   ssSetInputPortDataType(S, 2, SS_SINGLE);
   ssSetInputPortComplexSignal(S, 2, INPUT_2_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 2, INPUT_2_FEEDTHROUGH);
@@ -310,7 +325,7 @@ static void mdlInitializeSizes(SimStruct *S)
       ssSetInputPortUnit(S, 2, inUnitIdReg);
     } else {
       ssSetLocalErrorStatus(S,
-                            "Invalid Unit provided for input port des_rates_bf of S-Function calculateOmega");
+                            "Invalid Unit provided for input port q_BN of S-Function calculateOmega");
       return;
     }
 
@@ -322,7 +337,11 @@ static void mdlInitializeSizes(SimStruct *S)
     return;
 
   /* Output Port 0 */
-  ssSetOutputPortWidth(S, 0, OUTPUT_0_NUM_ELEMS);
+  outputDimsInfo.numDims = 2;
+  outputDimsInfo.width = OUTPUT_0_NUM_ELEMS;
+  int_T out0Dims[] = OUTPUT_0_DIMS_ND;
+  outputDimsInfo.dims = out0Dims;
+  ssSetOutputPortDimensionInfo(S, 0, &outputDimsInfo);
   ssSetOutputPortDataType(S, 0, SS_SINGLE);
   ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
 
@@ -339,7 +358,7 @@ static void mdlInitializeSizes(SimStruct *S)
       ssSetOutputPortUnit(S, 0, outUnitIdReg);
     } else {
       ssSetLocalErrorStatus(S,
-                            "Invalid Unit provided for output port q_BN of S-Function calculateOmega");
+                            "Invalid Unit provided for output port des_rates_bf of S-Function calculateOmega");
       return;
     }
 
@@ -369,20 +388,20 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 1, COMPLEX_NO);
 
   /*
-   * Configure the dwork 2 (des_rates_bf_t)
+   * Configure the dwork 2 (q_BN_t)
    */
   ssSetDWorkDataType(S, 2, ssGetInputPortDataType(S, 2));
   ssSetDWorkUsageType(S, 2, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 2, "des_rates_bf_t");
+  ssSetDWorkName(S, 2, "q_BN_t");
   ssSetDWorkWidth(S, 2, ssGetInputPortWidth(S, 2));
   ssSetDWorkComplexSignal(S, 2, COMPLEX_NO);
 
   /*
-   * Configure the dwork 3 (q_BN_t)
+   * Configure the dwork 3 (des_rates_bf_t)
    */
   ssSetDWorkDataType(S, 3, ssGetOutputPortDataType(S, 0));
   ssSetDWorkUsageType(S, 3, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 3, "q_BN_t");
+  ssSetDWorkName(S, 3, "des_rates_bf_t");
   ssSetDWorkWidth(S, 3, ssGetOutputPortWidth(S, 0));
   ssSetDWorkComplexSignal(S, 3, COMPLEX_NO);
   ssSetNumPWork(S, 0);
@@ -425,6 +444,55 @@ static void mdlSetOutputPortDimensionInfo(SimStruct *S,
 }
 
 #endif
+
+#define MDL_SET_DEFAULT_PORT_DIMENSION_INFO
+
+static void mdlSetDefaultPortDimensionInfo(SimStruct *S)
+{
+  DECL_AND_INIT_DIMSINFO(portDimsInfo);
+  int_T dims[2];
+
+  /* Setting default dimensions for input port 0 */
+  portDimsInfo.width = INPUT_0_NUM_ELEMS;
+  dims[0] = INPUT_0_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 0) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 0, 1 , 1);
+  }
+
+  /* Setting default dimensions for input port 1 */
+  portDimsInfo.width = INPUT_1_NUM_ELEMS;
+  dims[0] = INPUT_1_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 1) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 1, 1 , 1);
+  }
+
+  /* Setting default dimensions for input port 2 */
+  portDimsInfo.width = INPUT_2_NUM_ELEMS;
+  dims[0] = INPUT_2_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 2) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 2, 1 , 1);
+  }
+
+  /* Setting default dimensions for output port 0 */
+  portDimsInfo.width = OUTPUT_0_NUM_ELEMS;
+  dims[0] = OUTPUT_0_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.numDims = 2;
+  if (ssGetOutputPortNumDimensions(S, 0) == (-1)) {
+    ssSetOutputPortDimensionInfo(S, 0, &portDimsInfo);
+  }
+
+  return;
+}
 
 /* Function: mdlInitializeSampleTimes =========================================
  * Abstract:
@@ -481,28 +549,28 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 {
   const real32_T *prev_vec = (real32_T *) ssGetInputPortRealSignal(S, 0);
   const real32_T *current_vec = (real32_T *) ssGetInputPortRealSignal(S, 1);
-  const real32_T *des_rates_bf = (real32_T *) ssGetInputPortRealSignal(S, 2);
-  real32_T *q_BN = (real32_T *) ssGetOutputPortRealSignal(S, 0);
+  const real32_T *q_BN = (real32_T *) ssGetInputPortRealSignal(S, 2);
+  real32_T *des_rates_bf = (real32_T *) ssGetOutputPortRealSignal(S, 0);
 
   /* S-Function Builder Row Major Support has been enabled for custom
    * code, a transposed copy will be created for any array signals.
    */
   real32_T *prev_vec_t = (real32_T *)ssGetDWork(S, 0);
   real32_T *current_vec_t = (real32_T *)ssGetDWork(S, 1);
-  real32_T *des_rates_bf_t = (real32_T *)ssGetDWork(S, 2);
-  real32_T *q_BN_t = (real32_T *)ssGetDWork(S, 3);
+  real32_T *q_BN_t = (real32_T *)ssGetDWork(S, 2);
+  real32_T *des_rates_bf_t = (real32_T *)ssGetDWork(S, 3);
   NDTransposeBySrcSpecs((void*)prev_vec_t, (const void*)prev_vec,
                         ssGetInputPortDimensions(S, 0),
                         ssGetInputPortNumDimensions(S, 0), sizeof(real32_T));
   NDTransposeBySrcSpecs((void*)current_vec_t, (const void*)current_vec,
                         ssGetInputPortDimensions(S, 1),
                         ssGetInputPortNumDimensions(S, 1), sizeof(real32_T));
-  NDTransposeBySrcSpecs((void*)des_rates_bf_t, (const void*)des_rates_bf,
+  NDTransposeBySrcSpecs((void*)q_BN_t, (const void*)q_BN,
                         ssGetInputPortDimensions(S, 2),
                         ssGetInputPortNumDimensions(S, 2), sizeof(real32_T));
-  calculateOmega_Outputs_wrapper(prev_vec_t, current_vec_t, des_rates_bf_t,
-    q_BN_t);
-  NDTransposeByDstSpecs((void*)q_BN, (const void*)q_BN_t,
+  calculateOmega_Outputs_wrapper(prev_vec_t, current_vec_t, q_BN_t,
+    des_rates_bf_t);
+  NDTransposeByDstSpecs((void*)des_rates_bf, (const void*)des_rates_bf_t,
                         ssGetOutputPortDimensions(S, 0),
                         ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));
 }

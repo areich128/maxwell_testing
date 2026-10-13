@@ -16,11 +16,13 @@
 
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
 #include <math.h>
+#include "mtx.h"
+#include "att_det.h"
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
-#define u_width 1
-#define u_1_width 1
-#define u_2_width 1
+#define u_width 3
+#define u_1_width 3
 #define y_width 1
+#define y_1_width 1
 
 /*
  * Create external references here.  
@@ -36,23 +38,16 @@
  */
 extern void gs_angle_distance_Outputs_wrapper(const real32_T *sc_pos_vec_ecef,
 			const real32_T *gnd_stn_pos_vec_ecef,
-			const real32_T *angle,
-			real32_T *distance);
+			real32_T *distance,
+			real32_T *angle);
 
 void gs_angle_distance_Outputs_wrapper(const real32_T *sc_pos_vec_ecef,
 			const real32_T *gnd_stn_pos_vec_ecef,
-			const real32_T *angle,
-			real32_T *distance)
+			real32_T *distance,
+			real32_T *angle)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-/* This sample sets the output equal to the input
-      y0[0] = u0[0]; 
- For complex signals use: y0[0].re = u0[0].re; 
-      y0[0].im = u0[0].im;
-      y1[0].re = u1[0].re;
-      y1[0].im = u1[0].im;
- */
-  gs_angle_distance(sc_pos_vec_ecef, gnd_stn_pos_vec_ecef, angle, distance);
+gs_angle_distance((float *)sc_pos_vec_ecef, (float *)gnd_stn_pos_vec_ecef, angle, distance);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

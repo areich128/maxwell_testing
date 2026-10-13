@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Tue Apr 28 12:58:13 2026
+ * Created: Mon Oct 12 20:03:92 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     3
+#define NUM_INPUTS                     4
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 A
@@ -77,7 +77,7 @@
 #define IN_1_SLOPE                     0.125
 
 /* Input Port  2 */
-#define IN_PORT_2_NAME                 lamb
+#define IN_PORT_2_NAME                 C
 #define INPUT_2_DIMS_ND                {1,1}
 #define INPUT_2_NUM_ELEMS              1
 #define INPUT_2_WIDTH                  1
@@ -95,6 +95,26 @@
 #define IN_2_FRACTIONLENGTH            3
 #define IN_2_BIAS                      0
 #define IN_2_SLOPE                     0.125
+
+/* Input Port  3 */
+#define IN_PORT_3_NAME                 lamb
+#define INPUT_3_DIMS_ND                {1,1}
+#define INPUT_3_NUM_ELEMS              1
+#define INPUT_3_WIDTH                  1
+#define INPUT_DIMS_3_COL               1
+#define INPUT_3_DTYPE                  real32_T
+#define INPUT_3_COMPLEX                COMPLEX_NO
+#define INPUT_3_UNIT                   ""
+#define IN_3_BUS_BASED                 0
+#define IN_3_BUS_NAME
+#define IN_3_DIMS                      1-D
+#define INPUT_3_FEEDTHROUGH            1
+#define IN_3_ISSIGNED                  1
+#define IN_3_WORDLENGTH                8
+#define IN_3_FIXPOINTSCALING           1
+#define IN_3_FRACTIONLENGTH            3
+#define IN_3_BIAS                      0
+#define IN_3_SLOPE                     0.125
 #define NUM_OUTPUTS                    1
 
 /* Output Port  0 */
@@ -122,11 +142,11 @@
 #define NUM_CONT_STATES                0
 #define CONT_STATES_IC                 [0]
 #define SFUNWIZ_GENERATE_TLC           1
-#define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight__SFB__INC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\include__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\mtx.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\conversions.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\att_det.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\global.c__SFB__"
+#define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight__SFB__INC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\include__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\mtx.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\conversions.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\att_det.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\global.c"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
 #define SHOW_COMPILE_STEPS             0
-#define CREATE_DEBUG_MEXFILE           0
+#define CREATE_DEBUG_MEXFILE           1
 #define SAVE_CODE_ONLY                 0
 #define SFUNWIZ_REVISION               3.0
 
@@ -136,6 +156,7 @@
 
 extern void p_derivative_Outputs_wrapper(const real32_T *A,
   const real32_T *B,
+  const real32_T *C,
   const real32_T *lamb,
   real32_T *y0);
 
@@ -279,6 +300,13 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortDirectFeedThrough(S, 2, INPUT_2_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 2, 1);/*direct input signal access*/
 
+  /* Input Port 3 */
+  ssSetInputPortWidth(S, 3, INPUT_3_NUM_ELEMS);
+  ssSetInputPortDataType(S, 3, SS_SINGLE);
+  ssSetInputPortComplexSignal(S, 3, INPUT_3_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 3, INPUT_3_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 3, 1);/*direct input signal access*/
+
   /*
    * Configure the Units for Input Ports
    */
@@ -308,6 +336,15 @@ static void mdlInitializeSizes(SimStruct *S)
     ssRegisterUnitFromExpr(S, INPUT_2_UNIT, &inUnitIdReg);
     if (inUnitIdReg != INVALID_UNIT_ID) {
       ssSetInputPortUnit(S, 2, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port C of S-Function p_derivative");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, INPUT_3_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 3, inUnitIdReg);
     } else {
       ssSetLocalErrorStatus(S,
                             "Invalid Unit provided for input port lamb of S-Function p_derivative");
@@ -347,7 +384,7 @@ static void mdlInitializeSizes(SimStruct *S)
 
   }
 
-  if (!ssSetNumDWork(S, 4))
+  if (!ssSetNumDWork(S, 5))
     return;
 
   /*
@@ -369,22 +406,31 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 1, COMPLEX_NO);
 
   /*
-   * Configure the dwork 2 (lamb_t)
+   * Configure the dwork 2 (C_t)
    */
   ssSetDWorkDataType(S, 2, ssGetInputPortDataType(S, 2));
   ssSetDWorkUsageType(S, 2, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 2, "lamb_t");
+  ssSetDWorkName(S, 2, "C_t");
   ssSetDWorkWidth(S, 2, ssGetInputPortWidth(S, 2));
   ssSetDWorkComplexSignal(S, 2, COMPLEX_NO);
 
   /*
-   * Configure the dwork 3 (y0_t)
+   * Configure the dwork 3 (lamb_t)
    */
-  ssSetDWorkDataType(S, 3, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkDataType(S, 3, ssGetInputPortDataType(S, 3));
   ssSetDWorkUsageType(S, 3, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 3, "y0_t");
-  ssSetDWorkWidth(S, 3, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkName(S, 3, "lamb_t");
+  ssSetDWorkWidth(S, 3, ssGetInputPortWidth(S, 3));
   ssSetDWorkComplexSignal(S, 3, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 4 (y0_t)
+   */
+  ssSetDWorkDataType(S, 4, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkUsageType(S, 4, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 4, "y0_t");
+  ssSetDWorkWidth(S, 4, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkComplexSignal(S, 4, COMPLEX_NO);
   ssSetNumPWork(S, 0);
   ssSetNumSampleTimes(S, 1);
   ssSetNumRWork(S, 0);
@@ -481,7 +527,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 {
   const real32_T *A = (real32_T *) ssGetInputPortRealSignal(S, 0);
   const real32_T *B = (real32_T *) ssGetInputPortRealSignal(S, 1);
-  const real32_T *lamb = (real32_T *) ssGetInputPortRealSignal(S, 2);
+  const real32_T *C = (real32_T *) ssGetInputPortRealSignal(S, 2);
+  const real32_T *lamb = (real32_T *) ssGetInputPortRealSignal(S, 3);
   real32_T *y0 = (real32_T *) ssGetOutputPortRealSignal(S, 0);
 
   /* S-Function Builder Row Major Support has been enabled for custom
@@ -489,16 +536,19 @@ static void mdlOutputs(SimStruct *S, int_T tid)
    */
   real32_T *A_t = (real32_T *)ssGetDWork(S, 0);
   real32_T *B_t = (real32_T *)ssGetDWork(S, 1);
-  real32_T *lamb_t = (real32_T *)ssGetDWork(S, 2);
-  real32_T *y0_t = (real32_T *)ssGetDWork(S, 3);
+  real32_T *C_t = (real32_T *)ssGetDWork(S, 2);
+  real32_T *lamb_t = (real32_T *)ssGetDWork(S, 3);
+  real32_T *y0_t = (real32_T *)ssGetDWork(S, 4);
   NDTransposeBySrcSpecs((void*)A_t, (const void*)A, ssGetInputPortDimensions(S,
     0), ssGetInputPortNumDimensions(S, 0), sizeof(real32_T));
   NDTransposeBySrcSpecs((void*)B_t, (const void*)B, ssGetInputPortDimensions(S,
     1), ssGetInputPortNumDimensions(S, 1), sizeof(real32_T));
+  NDTransposeBySrcSpecs((void*)C_t, (const void*)C, ssGetInputPortDimensions(S,
+    2), ssGetInputPortNumDimensions(S, 2), sizeof(real32_T));
   NDTransposeBySrcSpecs((void*)lamb_t, (const void*)lamb,
-                        ssGetInputPortDimensions(S, 2),
-                        ssGetInputPortNumDimensions(S, 2), sizeof(real32_T));
-  p_derivative_Outputs_wrapper(A_t, B_t, lamb_t, y0_t);
+                        ssGetInputPortDimensions(S, 3),
+                        ssGetInputPortNumDimensions(S, 3), sizeof(real32_T));
+  p_derivative_Outputs_wrapper(A_t, B_t, C_t, lamb_t, y0_t);
   NDTransposeByDstSpecs((void*)y0, (const void*)y0_t, ssGetOutputPortDimensions
                         (S, 0), ssGetOutputPortNumDimensions(S, 0), sizeof
                         (real32_T));

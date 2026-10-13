@@ -1,5 +1,5 @@
 %% File : create_phicone_des_q.tlc
-%% Created : Tue Apr 28 13:07:91 2026
+%% Created : Mon Oct 12 23:14:48 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -46,9 +46,11 @@
     SFB_EXTERN_C void create_phicone_des_q_Outputs_wrapper_accel(const %<uint8Type> *op_mode,
 			const %<singleType> *pos_vec,
 			const %<singleType> *sun_vec,
-			const %<singleType> *des_RN_q,
 			const %<singleType> *phi_cone_angle,
-			%<singleType> *phi_vec_normlzd);
+			const %<singleType> *b_eci,
+			%<singleType> *phi_vec_normlzd,
+			%<singleType> *des_RN_q,
+			%<singleType> *dcm_NR);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -78,22 +80,28 @@
     SFB_EXTERN_C void create_phicone_des_q_Outputs_wrapper(const %<uint8Type> *op_mode,
 			const %<singleType> *pos_vec,
 			const %<singleType> *sun_vec,
-			const %<singleType> *des_RN_q,
 			const %<singleType> *phi_cone_angle,
-			%<singleType> *phi_vec_normlzd);
+			const %<singleType> *b_eci,
+			%<singleType> *phi_vec_normlzd,
+			%<singleType> *des_RN_q,
+			%<singleType> *dcm_NR);
     SFB_EXTERN_C void create_phicone_des_q_Terminate_wrapper(void);
     void create_phicone_des_q_Outputs_wrapper_accel(const %<uint8Type> *op_mode,
 			const %<singleType> *pos_vec,
 			const %<singleType> *sun_vec,
-			const %<singleType> *des_RN_q,
 			const %<singleType> *phi_cone_angle,
-			%<singleType> *phi_vec_normlzd){
+			const %<singleType> *b_eci,
+			%<singleType> *phi_vec_normlzd,
+			%<singleType> *des_RN_q,
+			%<singleType> *dcm_NR){
     create_phicone_des_q_Outputs_wrapper(op_mode,
 			pos_vec,
 			sun_vec,
-			des_RN_q,
 			phi_cone_angle,
-			phi_vec_normlzd);
+			b_eci,
+			phi_vec_normlzd,
+			des_RN_q,
+			dcm_NR);
     }
 #undef SFB_EXTERN_C
 
@@ -115,9 +123,11 @@
     SFB_EXTERN_C void create_phicone_des_q_Outputs_wrapper(const %<uint8Type> *op_mode,
 			const %<singleType> *pos_vec,
 			const %<singleType> *sun_vec,
-			const %<singleType> *des_RN_q,
 			const %<singleType> *phi_cone_angle,
-			%<singleType> *phi_vec_normlzd);
+			const %<singleType> *b_eci,
+			%<singleType> *phi_vec_normlzd,
+			%<singleType> *des_RN_q,
+			%<singleType> *dcm_NR);
 
     SFB_EXTERN_C void create_phicone_des_q_Terminate_wrapper(void);
 
@@ -143,11 +153,13 @@
   %assign pu3 = LibBlockInputSignalAddr(3, "", "", 0)
   %assign pu4 = LibBlockInputSignalAddr(4, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
+  %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
+  %assign py2 = LibBlockOutputSignalAddr(2, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    create_phicone_des_q_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<py0>);
+    create_phicone_des_q_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<py0>, %<py1>, %<py2>);
   %else
-    create_phicone_des_q_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<py0>);
+    create_phicone_des_q_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<pu4>, %<py0>, %<py1>, %<py2>);
   %endif
 
   %%

@@ -1,5 +1,5 @@
 %% File : calculateOmega.tlc
-%% Created : Mon May 18 16:29:91 2026
+%% Created : Mon Oct 12 20:08:13 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -44,8 +44,8 @@
     #endif
     SFB_EXTERN_C void calculateOmega_Outputs_wrapper_accel(const %<singleType> *prev_vec,
 			const %<singleType> *current_vec,
-			const %<singleType> *des_rates_bf,
-			%<singleType> *q_BN);
+			const %<singleType> *q_BN,
+			%<singleType> *des_rates_bf);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -74,17 +74,17 @@
     SFB_EXTERN_C void calculateOmega_Start_wrapper(void);
     SFB_EXTERN_C void calculateOmega_Outputs_wrapper(const %<singleType> *prev_vec,
 			const %<singleType> *current_vec,
-			const %<singleType> *des_rates_bf,
-			%<singleType> *q_BN);
+			const %<singleType> *q_BN,
+			%<singleType> *des_rates_bf);
     SFB_EXTERN_C void calculateOmega_Terminate_wrapper(void);
     void calculateOmega_Outputs_wrapper_accel(const %<singleType> *prev_vec,
 			const %<singleType> *current_vec,
-			const %<singleType> *des_rates_bf,
-			%<singleType> *q_BN){
+			const %<singleType> *q_BN,
+			%<singleType> *des_rates_bf){
     calculateOmega_Outputs_wrapper(prev_vec,
 			current_vec,
-			des_rates_bf,
-			q_BN);
+			q_BN,
+			des_rates_bf);
     }
 #undef SFB_EXTERN_C
 
@@ -105,8 +105,8 @@
 
     SFB_EXTERN_C void calculateOmega_Outputs_wrapper(const %<singleType> *prev_vec,
 			const %<singleType> *current_vec,
-			const %<singleType> *des_rates_bf,
-			%<singleType> *q_BN);
+			const %<singleType> *q_BN,
+			%<singleType> *des_rates_bf);
 
     SFB_EXTERN_C void calculateOmega_Terminate_wrapper(void);
 

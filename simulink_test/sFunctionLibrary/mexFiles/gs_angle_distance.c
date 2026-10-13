@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Tue Apr 28 13:29:16 2026
+ * Created: Mon Oct 12 20:19:07 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,20 +34,20 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     3
+#define NUM_INPUTS                     2
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 sc_pos_vec_ecef
-#define INPUT_0_DIMS_ND                {1,1}
-#define INPUT_0_NUM_ELEMS              1
-#define INPUT_0_WIDTH                  1
+#define INPUT_0_DIMS_ND                {3,1}
+#define INPUT_0_NUM_ELEMS              3
+#define INPUT_0_WIDTH                  3
 #define INPUT_DIMS_0_COL               1
 #define INPUT_0_DTYPE                  real32_T
 #define INPUT_0_COMPLEX                COMPLEX_NO
 #define INPUT_0_UNIT                   ""
 #define IN_0_BUS_BASED                 0
 #define IN_0_BUS_NAME
-#define IN_0_DIMS                      1-D
+#define IN_0_DIMS                      2-D
 #define INPUT_0_FEEDTHROUGH            1
 #define IN_0_ISSIGNED                  1
 #define IN_0_WORDLENGTH                8
@@ -58,16 +58,16 @@
 
 /* Input Port  1 */
 #define IN_PORT_1_NAME                 gnd_stn_pos_vec_ecef
-#define INPUT_1_DIMS_ND                {1,1}
-#define INPUT_1_NUM_ELEMS              1
-#define INPUT_1_WIDTH                  1
+#define INPUT_1_DIMS_ND                {3,1}
+#define INPUT_1_NUM_ELEMS              3
+#define INPUT_1_WIDTH                  3
 #define INPUT_DIMS_1_COL               1
 #define INPUT_1_DTYPE                  real32_T
 #define INPUT_1_COMPLEX                COMPLEX_NO
 #define INPUT_1_UNIT                   ""
 #define IN_1_BUS_BASED                 0
 #define IN_1_BUS_NAME
-#define IN_1_DIMS                      1-D
+#define IN_1_DIMS                      2-D
 #define INPUT_1_FEEDTHROUGH            1
 #define IN_1_ISSIGNED                  1
 #define IN_1_WORDLENGTH                8
@@ -75,27 +75,7 @@
 #define IN_1_FRACTIONLENGTH            3
 #define IN_1_BIAS                      0
 #define IN_1_SLOPE                     0.125
-
-/* Input Port  2 */
-#define IN_PORT_2_NAME                 angle
-#define INPUT_2_DIMS_ND                {1,1}
-#define INPUT_2_NUM_ELEMS              1
-#define INPUT_2_WIDTH                  1
-#define INPUT_DIMS_2_COL               1
-#define INPUT_2_DTYPE                  real32_T
-#define INPUT_2_COMPLEX                COMPLEX_NO
-#define INPUT_2_UNIT                   ""
-#define IN_2_BUS_BASED                 0
-#define IN_2_BUS_NAME
-#define IN_2_DIMS                      1-D
-#define INPUT_2_FEEDTHROUGH            1
-#define IN_2_ISSIGNED                  1
-#define IN_2_WORDLENGTH                8
-#define IN_2_FIXPOINTSCALING           1
-#define IN_2_FRACTIONLENGTH            3
-#define IN_2_BIAS                      0
-#define IN_2_SLOPE                     0.125
-#define NUM_OUTPUTS                    1
+#define NUM_OUTPUTS                    2
 
 /* Output Port  0 */
 #define OUT_PORT_0_NAME                distance
@@ -115,6 +95,25 @@
 #define OUT_0_FRACTIONLENGTH           3
 #define OUT_0_BIAS                     0
 #define OUT_0_SLOPE                    0.125
+
+/* Output Port  1 */
+#define OUT_PORT_1_NAME                angle
+#define OUTPUT_1_DIMS_ND               {1,1}
+#define OUTPUT_1_NUM_ELEMS             1
+#define OUTPUT_1_WIDTH                 1
+#define OUTPUT_DIMS_1_COL              1
+#define OUTPUT_1_DTYPE                 real32_T
+#define OUTPUT_1_COMPLEX               COMPLEX_NO
+#define OUTPUT_1_UNIT                  ""
+#define OUT_1_BUS_BASED                0
+#define OUT_1_BUS_NAME
+#define OUT_1_DIMS                     1-D
+#define OUT_1_ISSIGNED                 1
+#define OUT_1_WORDLENGTH               8
+#define OUT_1_FIXPOINTSCALING          1
+#define OUT_1_FRACTIONLENGTH           3
+#define OUT_1_BIAS                     0
+#define OUT_1_SLOPE                    0.125
 #define NPARAMS                        0
 #define SAMPLE_TIME_0                  INHERITED_SAMPLE_TIME
 #define NUM_DISC_STATES                0
@@ -122,11 +121,11 @@
 #define NUM_CONT_STATES                0
 #define CONT_STATES_IC                 [0]
 #define SFUNWIZ_GENERATE_TLC           1
-#define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight__SFB__INC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\include__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\mtx.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\conversions.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\att_det.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\global.c__SFB__"
+#define SOURCEFILES                    "__SFB__SRC_PATH ..\..\..\maxwell_adcs\flight__SFB__INC_PATH ..\..\..\maxwell_adcs\flight\include__SFB__..\..\..\maxwell_adcs\flight\drivers\mtx.c__SFB__..\..\..\maxwell_adcs\flight\tasks\conversions.c__SFB__..\..\..\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__..\..\..\maxwell_adcs\flight\tasks\att_det.c__SFB__..\..\..\maxwell_adcs\flight\drivers\global.c"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
-#define SHOW_COMPILE_STEPS             0
-#define CREATE_DEBUG_MEXFILE           0
+#define SHOW_COMPILE_STEPS             1
+#define CREATE_DEBUG_MEXFILE           1
 #define SAVE_CODE_ONLY                 0
 #define SFUNWIZ_REVISION               3.0
 
@@ -136,8 +135,8 @@
 
 extern void gs_angle_distance_Outputs_wrapper(const real32_T *sc_pos_vec_ecef,
   const real32_T *gnd_stn_pos_vec_ecef,
-  const real32_T *angle,
-  real32_T *distance);
+  real32_T *distance,
+  real32_T *angle);
 
 /*=============================*
  * Data Transposition Routines *
@@ -246,6 +245,7 @@ void NDTransposeByDstSpecs(void *dst, const void *src, const int dstdims[],
  */
 static void mdlInitializeSizes(SimStruct *S)
 {
+  DECL_AND_INIT_DIMSINFO(inputDimsInfo);
   ssSetNumSFcnParams(S, NPARAMS);
   if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
     return;                            /* Parameter mismatch will be reported by Simulink */
@@ -259,25 +259,27 @@ static void mdlInitializeSizes(SimStruct *S)
     return;
 
   /* Input Port 0 */
-  ssSetInputPortWidth(S, 0, INPUT_0_NUM_ELEMS);
+  ssAllowSignalsWithMoreThan2D(S);
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_0_NUM_ELEMS;
+  int_T in0Dims[] = INPUT_0_DIMS_ND;
+  inputDimsInfo.dims = in0Dims;
+  ssSetInputPortDimensionInfo(S, 0, &inputDimsInfo);
   ssSetInputPortDataType(S, 0, SS_SINGLE);
   ssSetInputPortComplexSignal(S, 0, INPUT_0_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 0, INPUT_0_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 0, 1);/*direct input signal access*/
 
   /* Input Port 1 */
-  ssSetInputPortWidth(S, 1, INPUT_1_NUM_ELEMS);
+  inputDimsInfo.numDims = 2;
+  inputDimsInfo.width = INPUT_1_NUM_ELEMS;
+  int_T in1Dims[] = INPUT_1_DIMS_ND;
+  inputDimsInfo.dims = in1Dims;
+  ssSetInputPortDimensionInfo(S, 1, &inputDimsInfo);
   ssSetInputPortDataType(S, 1, SS_SINGLE);
   ssSetInputPortComplexSignal(S, 1, INPUT_1_COMPLEX);
   ssSetInputPortDirectFeedThrough(S, 1, INPUT_1_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 1, 1);/*direct input signal access*/
-
-  /* Input Port 2 */
-  ssSetInputPortWidth(S, 2, INPUT_2_NUM_ELEMS);
-  ssSetInputPortDataType(S, 2, SS_SINGLE);
-  ssSetInputPortComplexSignal(S, 2, INPUT_2_COMPLEX);
-  ssSetInputPortDirectFeedThrough(S, 2, INPUT_2_FEEDTHROUGH);
-  ssSetInputPortRequiredContiguous(S, 2, 1);/*direct input signal access*/
 
   /*
    * Configure the Units for Input Ports
@@ -305,15 +307,6 @@ static void mdlInitializeSizes(SimStruct *S)
       return;
     }
 
-    ssRegisterUnitFromExpr(S, INPUT_2_UNIT, &inUnitIdReg);
-    if (inUnitIdReg != INVALID_UNIT_ID) {
-      ssSetInputPortUnit(S, 2, inUnitIdReg);
-    } else {
-      ssSetLocalErrorStatus(S,
-                            "Invalid Unit provided for input port angle of S-Function gs_angle_distance");
-      return;
-    }
-
 #endif
 
   }
@@ -325,6 +318,11 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetOutputPortWidth(S, 0, OUTPUT_0_NUM_ELEMS);
   ssSetOutputPortDataType(S, 0, SS_SINGLE);
   ssSetOutputPortComplexSignal(S, 0, OUTPUT_0_COMPLEX);
+
+  /* Output Port 1 */
+  ssSetOutputPortWidth(S, 1, OUTPUT_1_NUM_ELEMS);
+  ssSetOutputPortDataType(S, 1, SS_SINGLE);
+  ssSetOutputPortComplexSignal(S, 1, OUTPUT_1_COMPLEX);
 
   /*
    * Configure the Units for Output Ports
@@ -340,6 +338,15 @@ static void mdlInitializeSizes(SimStruct *S)
     } else {
       ssSetLocalErrorStatus(S,
                             "Invalid Unit provided for output port distance of S-Function gs_angle_distance");
+      return;
+    }
+
+    ssRegisterUnitFromExpr(S, OUTPUT_1_UNIT, &outUnitIdReg);
+    if (outUnitIdReg != INVALID_UNIT_ID) {
+      ssSetOutputPortUnit(S, 1, outUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for output port angle of S-Function gs_angle_distance");
       return;
     }
 
@@ -369,21 +376,21 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 1, COMPLEX_NO);
 
   /*
-   * Configure the dwork 2 (angle_t)
+   * Configure the dwork 2 (distance_t)
    */
-  ssSetDWorkDataType(S, 2, ssGetInputPortDataType(S, 2));
+  ssSetDWorkDataType(S, 2, ssGetOutputPortDataType(S, 0));
   ssSetDWorkUsageType(S, 2, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 2, "angle_t");
-  ssSetDWorkWidth(S, 2, ssGetInputPortWidth(S, 2));
+  ssSetDWorkName(S, 2, "distance_t");
+  ssSetDWorkWidth(S, 2, ssGetOutputPortWidth(S, 0));
   ssSetDWorkComplexSignal(S, 2, COMPLEX_NO);
 
   /*
-   * Configure the dwork 3 (distance_t)
+   * Configure the dwork 3 (angle_t)
    */
-  ssSetDWorkDataType(S, 3, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkDataType(S, 3, ssGetOutputPortDataType(S, 1));
   ssSetDWorkUsageType(S, 3, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 3, "distance_t");
-  ssSetDWorkWidth(S, 3, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkName(S, 3, "angle_t");
+  ssSetDWorkWidth(S, 3, ssGetOutputPortWidth(S, 1));
   ssSetDWorkComplexSignal(S, 3, COMPLEX_NO);
   ssSetNumPWork(S, 0);
   ssSetNumSampleTimes(S, 1);
@@ -425,6 +432,36 @@ static void mdlSetOutputPortDimensionInfo(SimStruct *S,
 }
 
 #endif
+
+#define MDL_SET_DEFAULT_PORT_DIMENSION_INFO
+
+static void mdlSetDefaultPortDimensionInfo(SimStruct *S)
+{
+  DECL_AND_INIT_DIMSINFO(portDimsInfo);
+  int_T dims[2];
+
+  /* Setting default dimensions for input port 0 */
+  portDimsInfo.width = INPUT_0_NUM_ELEMS;
+  dims[0] = INPUT_0_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 0) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 0, 1 , 1);
+  }
+
+  /* Setting default dimensions for input port 1 */
+  portDimsInfo.width = INPUT_1_NUM_ELEMS;
+  dims[0] = INPUT_1_NUM_ELEMS;
+  dims[1] = 1;
+  portDimsInfo.dims = dims;
+  portDimsInfo.numDims = 2;
+  if (ssGetInputPortWidth(S, 1) == DYNAMICALLY_SIZED) {
+    ssSetInputPortMatrixDimensions(S, 1, 1 , 1);
+  }
+
+  return;
+}
 
 /* Function: mdlInitializeSampleTimes =========================================
  * Abstract:
@@ -482,30 +519,30 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   const real32_T *sc_pos_vec_ecef = (real32_T *) ssGetInputPortRealSignal(S, 0);
   const real32_T *gnd_stn_pos_vec_ecef = (real32_T *) ssGetInputPortRealSignal(S,
     1);
-  const real32_T *angle = (real32_T *) ssGetInputPortRealSignal(S, 2);
   real32_T *distance = (real32_T *) ssGetOutputPortRealSignal(S, 0);
+  real32_T *angle = (real32_T *) ssGetOutputPortRealSignal(S, 1);
 
   /* S-Function Builder Row Major Support has been enabled for custom
    * code, a transposed copy will be created for any array signals.
    */
   real32_T *sc_pos_vec_ecef_t = (real32_T *)ssGetDWork(S, 0);
   real32_T *gnd_stn_pos_vec_ecef_t = (real32_T *)ssGetDWork(S, 1);
-  real32_T *angle_t = (real32_T *)ssGetDWork(S, 2);
-  real32_T *distance_t = (real32_T *)ssGetDWork(S, 3);
+  real32_T *distance_t = (real32_T *)ssGetDWork(S, 2);
+  real32_T *angle_t = (real32_T *)ssGetDWork(S, 3);
   NDTransposeBySrcSpecs((void*)sc_pos_vec_ecef_t, (const void*)sc_pos_vec_ecef,
                         ssGetInputPortDimensions(S, 0),
                         ssGetInputPortNumDimensions(S, 0), sizeof(real32_T));
   NDTransposeBySrcSpecs((void*)gnd_stn_pos_vec_ecef_t, (const void*)
                         gnd_stn_pos_vec_ecef, ssGetInputPortDimensions(S, 1),
                         ssGetInputPortNumDimensions(S, 1), sizeof(real32_T));
-  NDTransposeBySrcSpecs((void*)angle_t, (const void*)angle,
-                        ssGetInputPortDimensions(S, 2),
-                        ssGetInputPortNumDimensions(S, 2), sizeof(real32_T));
   gs_angle_distance_Outputs_wrapper(sc_pos_vec_ecef_t, gnd_stn_pos_vec_ecef_t,
-    angle_t, distance_t);
+    distance_t, angle_t);
   NDTransposeByDstSpecs((void*)distance, (const void*)distance_t,
                         ssGetOutputPortDimensions(S, 0),
                         ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));
+  NDTransposeByDstSpecs((void*)angle, (const void*)angle_t,
+                        ssGetOutputPortDimensions(S, 1),
+                        ssGetOutputPortNumDimensions(S, 1), sizeof(real32_T));
 }
 
 /* Function: mdlTerminate =====================================================

@@ -16,10 +16,13 @@
 
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
 #include <math.h>
+#include "mtx.h"
+#include "att_det.h"
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */
 #define u_width 1
 #define u_1_width 1
 #define u_2_width 1
+#define u_3_width 1
 #define y_width 1
 
 /*
@@ -36,23 +39,18 @@
  */
 extern void p_derivative_Outputs_wrapper(const real32_T *A,
 			const real32_T *B,
+			const real32_T *C,
 			const real32_T *lamb,
 			real32_T *y0);
 
 void p_derivative_Outputs_wrapper(const real32_T *A,
 			const real32_T *B,
+			const real32_T *C,
 			const real32_T *lamb,
 			real32_T *y0)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-/* This sample sets the output equal to the input
-      y0[0] = u0[0]; 
- For complex signals use: y0[0].re = u0[0].re; 
-      y0[0].im = u0[0].im;
-      y1[0].re = u1[0].re;
-      y1[0].im = u1[0].im;
- */
- p_derivative(A, B, lamb);
+  y0[0] = p_derivative(*A, *B, *C, *lamb);
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

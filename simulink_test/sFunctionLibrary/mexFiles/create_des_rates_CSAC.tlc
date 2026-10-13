@@ -1,5 +1,5 @@
 %% File : create_des_rates_CSAC.tlc
-%% Created : Tue Apr 28 13:34:11 2026
+%% Created : Mon Oct 12 23:18:90 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -24,7 +24,6 @@
 %function BlockTypeSetup(block, system) void
     %assign uint8Type = LibGetDataTypeNameFromId(::CompiledModel.tSS_UINT8)
     %assign singleType = LibGetDataTypeNameFromId(::CompiledModel.tSS_SINGLE)
-    %assign doubleType = LibGetDataTypeNameFromId(::CompiledModel.tSS_DOUBLE)
 
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
     %assign hFileName = "create_des_rates_CSAC_accel_wrapper"
@@ -47,7 +46,8 @@
     SFB_EXTERN_C void create_des_rates_CSAC_Outputs_wrapper_accel(const %<uint8Type> *opmode,
 			const %<singleType> *q_BN,
 			const %<singleType> *phi_cone,
-			%<doubleType> *des_rates_bf);
+			const %<uint8Type> *new_mode,
+			%<singleType> *des_rates_bf);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -77,15 +77,18 @@
     SFB_EXTERN_C void create_des_rates_CSAC_Outputs_wrapper(const %<uint8Type> *opmode,
 			const %<singleType> *q_BN,
 			const %<singleType> *phi_cone,
-			%<doubleType> *des_rates_bf);
+			const %<uint8Type> *new_mode,
+			%<singleType> *des_rates_bf);
     SFB_EXTERN_C void create_des_rates_CSAC_Terminate_wrapper(void);
     void create_des_rates_CSAC_Outputs_wrapper_accel(const %<uint8Type> *opmode,
 			const %<singleType> *q_BN,
 			const %<singleType> *phi_cone,
-			%<doubleType> *des_rates_bf){
+			const %<uint8Type> *new_mode,
+			%<singleType> *des_rates_bf){
     create_des_rates_CSAC_Outputs_wrapper(opmode,
 			q_BN,
 			phi_cone,
+			new_mode,
 			des_rates_bf);
     }
 #undef SFB_EXTERN_C
@@ -108,7 +111,8 @@
     SFB_EXTERN_C void create_des_rates_CSAC_Outputs_wrapper(const %<uint8Type> *opmode,
 			const %<singleType> *q_BN,
 			const %<singleType> *phi_cone,
-			%<doubleType> *des_rates_bf);
+			const %<uint8Type> *new_mode,
+			%<singleType> *des_rates_bf);
 
     SFB_EXTERN_C void create_des_rates_CSAC_Terminate_wrapper(void);
 
@@ -131,12 +135,13 @@
   %assign pu0 = LibBlockInputSignalAddr(0, "", "", 0)
   %assign pu1 = LibBlockInputSignalAddr(1, "", "", 0)
   %assign pu2 = LibBlockInputSignalAddr(2, "", "", 0)
+  %assign pu3 = LibBlockInputSignalAddr(3, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    create_des_rates_CSAC_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<py0>);
+    create_des_rates_CSAC_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>);
   %else
-    create_des_rates_CSAC_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<py0>);
+    create_des_rates_CSAC_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>);
   %endif
 
   %%

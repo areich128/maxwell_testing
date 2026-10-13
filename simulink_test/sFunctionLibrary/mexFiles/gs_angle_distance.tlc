@@ -1,5 +1,5 @@
 %% File : gs_angle_distance.tlc
-%% Created : Tue Apr 28 13:29:16 2026
+%% Created : Mon Oct 12 20:19:07 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -44,8 +44,8 @@
     #endif
     SFB_EXTERN_C void gs_angle_distance_Outputs_wrapper_accel(const %<singleType> *sc_pos_vec_ecef,
 			const %<singleType> *gnd_stn_pos_vec_ecef,
-			const %<singleType> *angle,
-			%<singleType> *distance);
+			%<singleType> *distance,
+			%<singleType> *angle);
     #undef SFB_EXTERN_C
     #endif
     %closefile hFile
@@ -74,17 +74,17 @@
     SFB_EXTERN_C void gs_angle_distance_Start_wrapper(void);
     SFB_EXTERN_C void gs_angle_distance_Outputs_wrapper(const %<singleType> *sc_pos_vec_ecef,
 			const %<singleType> *gnd_stn_pos_vec_ecef,
-			const %<singleType> *angle,
-			%<singleType> *distance);
+			%<singleType> *distance,
+			%<singleType> *angle);
     SFB_EXTERN_C void gs_angle_distance_Terminate_wrapper(void);
     void gs_angle_distance_Outputs_wrapper_accel(const %<singleType> *sc_pos_vec_ecef,
 			const %<singleType> *gnd_stn_pos_vec_ecef,
-			const %<singleType> *angle,
-			%<singleType> *distance){
+			%<singleType> *distance,
+			%<singleType> *angle){
     gs_angle_distance_Outputs_wrapper(sc_pos_vec_ecef,
 			gnd_stn_pos_vec_ecef,
-			angle,
-			distance);
+			distance,
+			angle);
     }
 #undef SFB_EXTERN_C
 
@@ -105,8 +105,8 @@
 
     SFB_EXTERN_C void gs_angle_distance_Outputs_wrapper(const %<singleType> *sc_pos_vec_ecef,
 			const %<singleType> *gnd_stn_pos_vec_ecef,
-			const %<singleType> *angle,
-			%<singleType> *distance);
+			%<singleType> *distance,
+			%<singleType> *angle);
 
     SFB_EXTERN_C void gs_angle_distance_Terminate_wrapper(void);
 
@@ -128,13 +128,13 @@
   %%
   %assign pu0 = LibBlockInputSignalAddr(0, "", "", 0)
   %assign pu1 = LibBlockInputSignalAddr(1, "", "", 0)
-  %assign pu2 = LibBlockInputSignalAddr(2, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
+  %assign py1 = LibBlockOutputSignalAddr(1, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    gs_angle_distance_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<py0>);
+    gs_angle_distance_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<py0>, %<py1>);
   %else
-    gs_angle_distance_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<py0>);
+    gs_angle_distance_Outputs_wrapper(%<pu0>, %<pu1>, %<py0>, %<py1>);
   %endif
 
   %%

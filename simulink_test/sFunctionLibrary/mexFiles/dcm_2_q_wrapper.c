@@ -17,6 +17,7 @@
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
 #include <math.h>
 #include "mtx.h"
+#include "att_det.h"
 #include "mex.h"
 #include "uart_dbg.h"
 /* %%%-SFUNWIZ_wrapper_includes_Changes_END --- EDIT HERE TO _BEGIN */

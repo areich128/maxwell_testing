@@ -27,6 +27,7 @@
 #define u_4_width 1
 #define u_5_width 1
 #define u_6_width 1
+#define u_7_width 1
 #define y_width 3
 
 /*
@@ -48,6 +49,7 @@ extern void create_des_rates_DCOMM_Outputs_wrapper(const uint8_T *opmode,
 			const uint8_T *leapsec,
 			const uint32_T *J2000_time,
 			const real32_T *J2000_frac_time,
+			const uint8_T *new_mode,
 			real32_T *des_rates_bf);
 
 void create_des_rates_DCOMM_Outputs_wrapper(const uint8_T *opmode,
@@ -57,6 +59,7 @@ void create_des_rates_DCOMM_Outputs_wrapper(const uint8_T *opmode,
 			const uint8_T *leapsec,
 			const uint32_T *J2000_time,
 			const real32_T *J2000_frac_time,
+			const uint8_T *new_mode,
 			real32_T *des_rates_bf)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
@@ -69,9 +72,7 @@ g_J2000_frac_time = *J2000_frac_time;
 
 for (i = 0; i < 3; i++) { pos_loc[i] = pos_ecef[i]; gnd_loc[i] = gnd_ecef[i]; }
 for (i = 0; i < 4; i++) q_loc[i] = q_BN[i];
-
-create_des_rates_DCOMM(*opmode, pos_loc, gnd_loc, rates_loc, q_loc, *leapsec);
-
+create_des_rates_DCOMM(*opmode, pos_loc, gnd_loc, rates_loc, q_loc, *leapsec, *new_mode);
 for (i = 0; i < 3; i++) des_rates_bf[i] = rates_loc[i];
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }

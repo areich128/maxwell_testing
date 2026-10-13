@@ -26,7 +26,7 @@
  * | See matlabroot/simulink/src/sfuntmpl_doc.c for a more detailed template |
  *  -------------------------------------------------------------------------
  *
- * Created: Thu Oct 08 13:21:34 2026
+ * Created: Mon Oct 12 19:49:33 2026
  */
 
 #define S_FUNCTION_LEVEL               2
@@ -34,7 +34,7 @@
 
 /*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 /* %%%-SFUNWIZ_defines_Changes_BEGIN --- EDIT HERE TO _END */
-#define NUM_INPUTS                     7
+#define NUM_INPUTS                     8
 
 /* Input Port  0 */
 #define IN_PORT_0_NAME                 opmode
@@ -175,6 +175,26 @@
 #define IN_6_FRACTIONLENGTH            3
 #define IN_6_BIAS                      0
 #define IN_6_SLOPE                     0.125
+
+/* Input Port  7 */
+#define IN_PORT_7_NAME                 new_mode
+#define INPUT_7_DIMS_ND                {1,1}
+#define INPUT_7_NUM_ELEMS              1
+#define INPUT_7_WIDTH                  1
+#define INPUT_DIMS_7_COL               1
+#define INPUT_7_DTYPE                  uint8_T
+#define INPUT_7_COMPLEX                COMPLEX_NO
+#define INPUT_7_UNIT                   ""
+#define IN_7_BUS_BASED                 0
+#define IN_7_BUS_NAME
+#define IN_7_DIMS                      1-D
+#define INPUT_7_FEEDTHROUGH            1
+#define IN_7_ISSIGNED                  1
+#define IN_7_WORDLENGTH                8
+#define IN_7_FIXPOINTSCALING           1
+#define IN_7_FRACTIONLENGTH            3
+#define IN_7_BIAS                      0
+#define IN_7_SLOPE                     0.125
 #define NUM_OUTPUTS                    1
 
 /* Output Port  0 */
@@ -202,10 +222,10 @@
 #define NUM_CONT_STATES                0
 #define CONT_STATES_IC                 [0]
 #define SFUNWIZ_GENERATE_TLC           1
-#define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight__SFB__INC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\include__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\mtx.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\att_det.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\global.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\conversions.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\ref_rotation.c__SFB__"
+#define SOURCEFILES                    "__SFB__SRC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight__SFB__INC_PATH C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\include__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\mtx.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\att_det.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\drivers\global.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\conversions.c__SFB__C:\Users\palla\OneDrive\Desktop\MAXWELL FILES\maxwell_adcs\flight\tasks\ref_rotation.c"
 #define PANELINDEX                     N/A
 #define USE_SIMSTRUCT                  0
-#define SHOW_COMPILE_STEPS             0
+#define SHOW_COMPILE_STEPS             1
 #define CREATE_DEBUG_MEXFILE           1
 #define SAVE_CODE_ONLY                 0
 #define SFUNWIZ_REVISION               3.0
@@ -221,6 +241,7 @@ extern void create_des_rates_DCOMM_Outputs_wrapper(const uint8_T *opmode,
   const uint8_T *leapsec,
   const uint32_T *J2000_time,
   const real32_T *J2000_frac_time,
+  const uint8_T *new_mode,
   real32_T *des_rates_bf);
 
 /*=============================*
@@ -406,6 +427,13 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetInputPortDirectFeedThrough(S, 6, INPUT_6_FEEDTHROUGH);
   ssSetInputPortRequiredContiguous(S, 6, 1);/*direct input signal access*/
 
+  /* Input Port 7 */
+  ssSetInputPortWidth(S, 7, INPUT_7_NUM_ELEMS);
+  ssSetInputPortDataType(S, 7, SS_UINT8);
+  ssSetInputPortComplexSignal(S, 7, INPUT_7_COMPLEX);
+  ssSetInputPortDirectFeedThrough(S, 7, INPUT_7_FEEDTHROUGH);
+  ssSetInputPortRequiredContiguous(S, 7, 1);/*direct input signal access*/
+
   /*
    * Configure the Units for Input Ports
    */
@@ -477,6 +505,15 @@ static void mdlInitializeSizes(SimStruct *S)
       return;
     }
 
+    ssRegisterUnitFromExpr(S, INPUT_7_UNIT, &inUnitIdReg);
+    if (inUnitIdReg != INVALID_UNIT_ID) {
+      ssSetInputPortUnit(S, 7, inUnitIdReg);
+    } else {
+      ssSetLocalErrorStatus(S,
+                            "Invalid Unit provided for input port new_mode of S-Function create_des_rates_DCOMM");
+      return;
+    }
+
 #endif
 
   }
@@ -514,7 +551,7 @@ static void mdlInitializeSizes(SimStruct *S)
 
   }
 
-  if (!ssSetNumDWork(S, 8))
+  if (!ssSetNumDWork(S, 9))
     return;
 
   /*
@@ -581,13 +618,22 @@ static void mdlInitializeSizes(SimStruct *S)
   ssSetDWorkComplexSignal(S, 6, COMPLEX_NO);
 
   /*
-   * Configure the dwork 7 (des_rates_bf_t)
+   * Configure the dwork 7 (new_mode_t)
    */
-  ssSetDWorkDataType(S, 7, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkDataType(S, 7, ssGetInputPortDataType(S, 7));
   ssSetDWorkUsageType(S, 7, SS_DWORK_USED_AS_SCRATCH);
-  ssSetDWorkName(S, 7, "des_rates_bf_t");
-  ssSetDWorkWidth(S, 7, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkName(S, 7, "new_mode_t");
+  ssSetDWorkWidth(S, 7, ssGetInputPortWidth(S, 7));
   ssSetDWorkComplexSignal(S, 7, COMPLEX_NO);
+
+  /*
+   * Configure the dwork 8 (des_rates_bf_t)
+   */
+  ssSetDWorkDataType(S, 8, ssGetOutputPortDataType(S, 0));
+  ssSetDWorkUsageType(S, 8, SS_DWORK_USED_AS_SCRATCH);
+  ssSetDWorkName(S, 8, "des_rates_bf_t");
+  ssSetDWorkWidth(S, 8, ssGetOutputPortWidth(S, 0));
+  ssSetDWorkComplexSignal(S, 8, COMPLEX_NO);
   ssSetNumPWork(S, 0);
   ssSetNumSampleTimes(S, 1);
   ssSetNumRWork(S, 0);
@@ -738,6 +784,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   const uint8_T *leapsec = (uint8_T *) ssGetInputPortRealSignal(S, 4);
   const uint32_T *J2000_time = (uint32_T *) ssGetInputPortRealSignal(S, 5);
   const real32_T *J2000_frac_time = (real32_T *) ssGetInputPortRealSignal(S, 6);
+  const uint8_T *new_mode = (uint8_T *) ssGetInputPortRealSignal(S, 7);
   real32_T *des_rates_bf = (real32_T *) ssGetOutputPortRealSignal(S, 0);
 
   /* S-Function Builder Row Major Support has been enabled for custom
@@ -750,7 +797,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   uint8_T *leapsec_t = (uint8_T *)ssGetDWork(S, 4);
   uint32_T *J2000_time_t = (uint32_T *)ssGetDWork(S, 5);
   real32_T *J2000_frac_time_t = (real32_T *)ssGetDWork(S, 6);
-  real32_T *des_rates_bf_t = (real32_T *)ssGetDWork(S, 7);
+  uint8_T *new_mode_t = (uint8_T *)ssGetDWork(S, 7);
+  real32_T *des_rates_bf_t = (real32_T *)ssGetDWork(S, 8);
   NDTransposeBySrcSpecs((void*)opmode_t, (const void*)opmode,
                         ssGetInputPortDimensions(S, 0),
                         ssGetInputPortNumDimensions(S, 0), sizeof(uint8_T));
@@ -772,8 +820,12 @@ static void mdlOutputs(SimStruct *S, int_T tid)
   NDTransposeBySrcSpecs((void*)J2000_frac_time_t, (const void*)J2000_frac_time,
                         ssGetInputPortDimensions(S, 6),
                         ssGetInputPortNumDimensions(S, 6), sizeof(real32_T));
+  NDTransposeBySrcSpecs((void*)new_mode_t, (const void*)new_mode,
+                        ssGetInputPortDimensions(S, 7),
+                        ssGetInputPortNumDimensions(S, 7), sizeof(uint8_T));
   create_des_rates_DCOMM_Outputs_wrapper(opmode_t, pos_ecef_t, gnd_ecef_t,
-    q_BN_t, leapsec_t, J2000_time_t, J2000_frac_time_t, des_rates_bf_t);
+    q_BN_t, leapsec_t, J2000_time_t, J2000_frac_time_t, new_mode_t,
+    des_rates_bf_t);
   NDTransposeByDstSpecs((void*)des_rates_bf, (const void*)des_rates_bf_t,
                         ssGetOutputPortDimensions(S, 0),
                         ssGetOutputPortNumDimensions(S, 0), sizeof(real32_T));

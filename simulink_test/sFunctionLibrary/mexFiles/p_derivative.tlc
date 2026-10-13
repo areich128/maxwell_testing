@@ -1,5 +1,5 @@
 %% File : p_derivative.tlc
-%% Created : Tue Apr 28 12:58:13 2026
+%% Created : Mon Oct 12 20:03:92 2026
 %%
 %% Description: 
 %%   Simulink Coder wrapper functions interface generated for 
@@ -44,6 +44,7 @@
     #endif
     SFB_EXTERN_C void p_derivative_Outputs_wrapper_accel(const %<singleType> *A,
 			const %<singleType> *B,
+			const %<singleType> *C,
 			const %<singleType> *lamb,
 			%<singleType> *y0);
     #undef SFB_EXTERN_C
@@ -74,15 +75,18 @@
     SFB_EXTERN_C void p_derivative_Start_wrapper(void);
     SFB_EXTERN_C void p_derivative_Outputs_wrapper(const %<singleType> *A,
 			const %<singleType> *B,
+			const %<singleType> *C,
 			const %<singleType> *lamb,
 			%<singleType> *y0);
     SFB_EXTERN_C void p_derivative_Terminate_wrapper(void);
     void p_derivative_Outputs_wrapper_accel(const %<singleType> *A,
 			const %<singleType> *B,
+			const %<singleType> *C,
 			const %<singleType> *lamb,
 			%<singleType> *y0){
     p_derivative_Outputs_wrapper(A,
 			B,
+			C,
 			lamb,
 			y0);
     }
@@ -105,6 +109,7 @@
 
     SFB_EXTERN_C void p_derivative_Outputs_wrapper(const %<singleType> *A,
 			const %<singleType> *B,
+			const %<singleType> *C,
 			const %<singleType> *lamb,
 			%<singleType> *y0);
 
@@ -129,12 +134,13 @@
   %assign pu0 = LibBlockInputSignalAddr(0, "", "", 0)
   %assign pu1 = LibBlockInputSignalAddr(1, "", "", 0)
   %assign pu2 = LibBlockInputSignalAddr(2, "", "", 0)
+  %assign pu3 = LibBlockInputSignalAddr(3, "", "", 0)
   %assign py0 = LibBlockOutputSignalAddr(0, "", "", 0)
   
   %if IsModelReferenceSimTarget() || CodeFormat == "S-Function" || ::isRAccel
-    p_derivative_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<py0>);
+    p_derivative_Outputs_wrapper_accel(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>);
   %else
-    p_derivative_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<py0>);
+    p_derivative_Outputs_wrapper(%<pu0>, %<pu1>, %<pu2>, %<pu3>, %<py0>);
   %endif
 
   %%
