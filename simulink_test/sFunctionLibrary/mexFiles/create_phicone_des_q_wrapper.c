@@ -59,7 +59,6 @@ void create_phicone_des_q_Outputs_wrapper(const uint8_T *op_mode,
 			real32_T *dcm_NR)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-
 float pos_loc[3], sun_loc[3], b_loc[3];
 float dcm_arr[9] = {0.0f};
 struct mtx_matrix dcm_m;
@@ -70,7 +69,6 @@ create_phicone_des_q(*op_mode, pos_loc, sun_loc, des_RN_q, *phi_cone_angle, phi_
 for (i = 0; i < 3; i++)
     for (j = 0; j < 3; j++)
         dcm_NR[3*i + j] = mtx_get(i+1, j+1, &dcm_m);
-    
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }
 

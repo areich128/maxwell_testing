@@ -41,6 +41,7 @@ function testResults = est_quest_rp_Test()
         B = refA(qt) * R;
         [q, D, st] = run1(B, R, [0.5; 0.5]);
         e = attErr(q, qt); eD = norm(D - refA(q));
+        if k == 1, disp('dcm_out:'), disp(D), disp('A(q):'), disp(refA(q)), end
         pass = e < 0.01 && eD < 1e-5 && st == 0;
         report(sprintf('noise-free %d', k), e, eD, st, pass);
     end
