@@ -15,7 +15,7 @@
 
 
 /* %%%-SFUNWIZ_wrapper_includes_Changes_BEGIN --- EDIT HERE TO _END */
-   #include "mex.h"
+#include "mex.h"
    #include <stdio.h>
    #include "mtx.h"
    #include "att_det.h"
@@ -54,7 +54,7 @@ void create_desRN_Outputs_wrapper(const uint8_T *opmode,
 			real32_T *dcm_NR_out)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-   float dcm_NR_arr[9] = {0.0f};
+float dcm_NR_arr[9] = {0.0f};
    struct mtx_matrix dcm_NR_m;
    int i, j;
 

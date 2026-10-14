@@ -64,7 +64,7 @@ void WheelTorque_Command_Outputs_wrapper(const real32_T *wheel_speeds,
 			int32_T *status)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
-   int32_t statusFlag = WheelTorque_Command((float *)wheel_speeds,
+int32_t statusFlag = WheelTorque_Command((float *)wheel_speeds,
                        (float *)mag_bf,
                        (float *)GsValues,
                        (float *)pwm_dipole,
