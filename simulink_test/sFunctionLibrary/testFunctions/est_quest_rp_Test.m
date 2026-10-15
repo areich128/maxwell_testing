@@ -32,7 +32,7 @@ function testResults = est_quest_rp_Test()
     run1 = @(B, R, w) runQuest(mdl, B, R, w);
     rng(5);
     names = {}; ok = [];
-    fprintf('%-34s %12s %10s %8s  %s\n', 'case', 'att err deg', 'dcm err', 'status', 'result');
+    fprintf('%-40s %12s %10s %8s  %s\n', 'case', 'att err deg', 'dcm err', 'status', 'result');
 
     %% 1. Noise-free random attitudes
     for k = 1:10
@@ -41,12 +41,11 @@ function testResults = est_quest_rp_Test()
         B = refA(qt) * R;
         [q, D, st] = run1(B, R, [0.5; 0.5]);
         e = attErr(q, qt); eD = norm(D - refA(q));
-        if k == 1, disp('dcm_out:'), disp(D), disp('A(q):'), disp(refA(q)), end
         pass = e < 0.01 && eD < 1e-5 && st == 0;
         report(sprintf('noise-free %d', k), e, eD, st, pass);
     end
 
-       %% 2. Column order: perturb only the sun vector (column 2) by 5 deg.
+    %% 2. Column order: perturb only the sun vector (column 2) by 5 deg.
     % The trusted column should end up with near-zero residual.
     qt = unit([0.8; 0.2; -0.4; 0.3]);
     R = [unit([0.2; 0.9; -0.3]), unit([0.7; -0.1; 0.7])];
@@ -77,15 +76,25 @@ function testResults = est_quest_rp_Test()
     [~, ~, st] = run1([zeros(3,1), R(:,2)], R, [0.5;0.5]);
     report('zero mag vector', NaN, NaN, st, st == -1);
 
-    %% 5. Near 180 deg (open finding: Gibbs-vector singularity)
+    %% 5. Near 180 deg (Shuster sequential rotations)
     R = [unit([0.3; 0.5; 0.8]), unit([0.9; -0.2; 0.1])];
-    for c = {{[0;0;1],179}, {[0;0;1],179.9}, {[0;0;1],180}, {[1;0;0],180}}
-        ax = c{1}{1}; deg = c{1}{2};
+    near180 = {{[0;0;1],179}, {[0;0;1],179.9}, {[0;0;1],179.99}, {[0;0;1],179.9999}, ...
+               {[0;0;1],180}, {[1;0;0],180}, {[0;1;0],180}, {[0.3;-0.8;0.5],180}, {[0.3;-0.8;0.5],179.9999}};
+    for c = near180
+        ax = unit(c{1}{1}); deg = c{1}{2};
         qt = [cosd(deg/2); sind(deg/2) * ax];
         B = refA(qt) * R;
-        [q, ~, st] = run1(B, R, [0.5; 0.5]);
-        e = attErr(q, qt);
-        report(sprintf('%.1f deg about [%d %d %d]', deg, ax), e, NaN, st, e < 0.01 && st == 0);
+        [q, D, st] = run1(B, R, [0.5; 0.5]);
+        e = attErr(q, qt); eD = norm(D - refA(q));
+        report(sprintf('%.4f deg about [%.2f %.2f %.2f]', deg, ax), e, eD, st, e < 0.01 && eD < 1e-5 && st == 0);
+    end
+    for k = 1:10
+        qt = [0; unit(randn(3,1))];
+        Rr = [unit(randn(3,1)), unit(randn(3,1))];
+        while vecAng(Rr(:,1), Rr(:,2)) < 30, Rr(:,2) = unit(randn(3,1)); end
+        [q, D, st] = run1(refA(qt) * Rr, Rr, w);
+        e = attErr(q, qt); eD = norm(D - refA(q));
+        report(sprintf('180 deg random axis %d', k), e, eD, st, e < 0.01 && eD < 1e-5 && st == 0);
     end
 
     testResults = struct();
@@ -97,7 +106,7 @@ function testResults = est_quest_rp_Test()
     function report(name, e, eD, st, pass)
         names{end+1} = name; ok(end+1) = pass; %#ok<SETNU>
         if pass, r = 'PASS'; else, r = 'FAIL'; end
-        fprintf('%-34s %12.4f %10.1e %8d  %s\n', name, e, eD, st, r);
+        fprintf('%-40s %12.4f %10.1e %8d  %s\n', name, e, eD, st, r);
     end
 end
 
