@@ -1,5 +1,6 @@
-function testResults = csac_reference_Test()
+function testResults = csac_reference_Test(show)
 % create_phicone_des_q and create_des_rates_CSAC (flight C).
+% csac_reference_Test(true) leaves the harness model open after the run.
 % phi = cos(phi_cone)*pos_hat + sin(phi_cone)*(sun orthogonalised to pos); CSAC points -X along phi.
 
     libDir = fileparts(fileparts(mfilename('fullpath')));
@@ -78,7 +79,12 @@ function testResults = csac_reference_Test()
 
     testResults.passed = logical(ok(:));
     fprintf('\n%d passed, %d failed\n', sum(ok), sum(~ok));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 
     function o = runPhi(pos, sun, phiDeg, b)
         set_param([mdl '/pos'], 'Value', mat2str(double(single(pos)), 17));

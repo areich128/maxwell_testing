@@ -1,5 +1,6 @@
-function testResults = WheelTorque_Command_value_Test()
+function testResults = WheelTorque_Command_value_Test(show)
 % WheelTorque_Command (flight C) against physical properties of the MMCL.
+% WheelTorque_Command_value_Test(true) leaves the harness model open after the run.
 % Body torque from wheels = -Gs*us, rod torque = mu x B. Units: wheel speeds rad/s,
 % mag_bf Gauss, out_u N m, rw_torque N m, pwm_dipole mA m^2.
 
@@ -104,7 +105,12 @@ function testResults = WheelTorque_Command_value_Test()
              'dump ang: angle (deg) between rod torque and -(dh)perp B (property 2, out_u = 0 only)\n' ...
              'dump mag: |rod torque| / |c (dh)perp B| (= 1 when not saturated)\n']);
     fprintf('%d passed, %d failed\n', sum(ok), sum(~ok));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 
     function r = runCase(Om, magG, dw, L)
         set_param([mdl '/wheel_speeds'],   'Value', mat2str(double(single(Om)), 17));

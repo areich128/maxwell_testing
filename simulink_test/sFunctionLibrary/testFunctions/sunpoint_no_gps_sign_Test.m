@@ -1,5 +1,6 @@
-function testResults = sunpoint_no_gps_sign_Test()
+function testResults = sunpoint_no_gps_sign_Test(show)
 % GPS-off sun pointing: create_sun_des_q -> control_fdbk, flight C code.
+% sunpoint_no_gps_sign_Test(true) leaves the harness model open after the run.
 % Correct behaviour: torque along des x sun_B (turns the -X panels toward the sun)
 % and A(q_BR)*des = sun_B (q_BR is [BR]). Convention from the 3.1 test.
 
@@ -103,7 +104,12 @@ function testResults = sunpoint_no_gps_sign_Test()
     fprintf('\ntorque vs ideal: 0 deg = turns panels toward the sun, 180 deg = away\n');
     fprintf('A(qBR)*des: 0 deg = q_BR is [BR] (correct sign for -Kp*q_vec)\n');
     fprintf('%d passed, %d failed\n', sum(testResults.passed), sum(~testResults.passed));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 end
 
 function A = refA(q)

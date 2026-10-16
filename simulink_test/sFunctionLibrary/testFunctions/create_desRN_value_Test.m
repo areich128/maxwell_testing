@@ -1,5 +1,6 @@
-function testResults = create_desRN_value_Test()
+function testResults = create_desRN_value_Test(show)
 % Test 3.3: create_desRN (flight C) against frame properties.
+% create_desRN_value_Test(true) leaves the harness model open after the run.
 % Convention from test 3.1: A(q) = [BN]-style, scalar-first. des_RN = q_RN, so A(des_RN) = dcm_NR'.
 % Modes from global.h: CTRL_SUN 0x1, DCOMM 0x2, CSAC 0x3, BDOT 0x5.
 
@@ -96,7 +97,12 @@ function testResults = create_desRN_value_Test()
     fprintf('\nx axis: angle (rad) between dcm_NR(:,1) and the expected pointing axis\n');
     fprintf('y perp: |dcm_NR(:,2) . roll reference|, roll reference = b_eci (or [1 0 0] in the fallback)\n');
     fprintf('%d passed, %d failed\n', sum(testResults.passed), sum(~testResults.passed));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 end
 
 %% Helpers

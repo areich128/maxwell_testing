@@ -1,5 +1,6 @@
-function testResults = quat_dcm_conventions_Test()
+function testResults = quat_dcm_conventions_Test(show)
 % Test 3.1: quaternion and DCM conventions of the q_2_dcm and dcm_2_q blocks.
+% quat_dcm_conventions_Test(true) leaves the harness model open after the run.
 % Runs the flight C code through the S-function blocks and compares it
 % against an independent MATLAB reference. Quaternions are scalar first.
 
@@ -95,7 +96,12 @@ function testResults = quat_dcm_conventions_Test()
     fprintf('  [0  1 0]: dcm maps body components into inertial components (dcm = [NB])\n');
     fprintf('\n%d passed, %d failed\n', sum(testResults.passed), sum(~testResults.passed));
 
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 end
 
 %% Helpers

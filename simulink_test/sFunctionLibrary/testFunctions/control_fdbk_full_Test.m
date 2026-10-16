@@ -1,5 +1,6 @@
-function testResults = control_fdbk_full_Test()
+function testResults = control_fdbk_full_Test(show)
 % control_fdbk (flight C): mode routing, PD law, validity flags, shortest path,
+% control_fdbk_full_Test(true) leaves the harness model open after the run.
 % DCOMM integral, B-dot. Modes (global.h): CTRL_SUN 1, DCOMM 2, CSAC 3, BDOT 5.
 % ctl_gain = [Kp Kd Ki Kbdot]. gyro in deg/s, des_rates in rad/s.
 
@@ -138,7 +139,12 @@ function testResults = control_fdbk_full_Test()
     testResults.passed = logical(ok(:));
     fprintf('\nwheel err: |out_u(1:3) - expected|; rods: |out_u(4:6)|\n');
     fprintf('%d passed, %d failed\n', sum(ok), sum(~ok));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 
     %% ---- nested helpers ----
     function c = randCase()

@@ -1,5 +1,6 @@
-function testResults = control_fdbk_gps_on_Test()
+function testResults = control_fdbk_gps_on_Test(show)
 % Does GPS-on control_fdbk use the attitude error from q_BN and q_des_RN,
+% control_fdbk_gps_on_Test(true) leaves the harness model open after the run.
 % or the stale q_BR passed in? The q_BR_noGPS input is set to a sentinel that
 % disagrees with the true error. Kp = 1, Kd = Ki = 0, CTRL_SUN (0x1), GPS on.
 
@@ -69,7 +70,12 @@ function testResults = control_fdbk_gps_on_Test()
     end
     fprintf('\nPASS: torque follows the true attitude error. FAIL with torque = "from sentinel": GPS-on uses the stale q_BR input.\n');
     fprintf('%d passed, %d failed\n', sum(testResults.passed), sum(~testResults.passed));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 end
 
 function s = vstr(v), s = sprintf('[%6.3f %6.3f %6.3f]', v); end

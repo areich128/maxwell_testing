@@ -1,5 +1,6 @@
-function testResults = q_from_2uvecs_Test()
+function testResults = q_from_2uvecs_Test(show)
 % Test 3.2: q_from_2uvecs block against an independent reference.
+% q_from_2uvecs_Test(true) leaves the harness model open after the run.
 % Convention from test 3.1: dcm = A(q) = [BN], scalar-first q.
 % Expected relation: A(q)' * v1hat = v2hat.
 
@@ -77,7 +78,12 @@ function testResults = q_from_2uvecs_Test()
     end
     fprintf('\nangles in rad, tolerance %.0e rad (%.4f deg)\n', tol, rad2deg(tol));
     fprintf('%d passed, %d failed\n', sum(testResults.passed), sum(~testResults.passed));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 end
 
 %% Helpers

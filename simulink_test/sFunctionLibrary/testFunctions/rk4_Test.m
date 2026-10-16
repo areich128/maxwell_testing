@@ -1,5 +1,6 @@
-function testResults = rk4_Test()
+function testResults = rk4_Test(show)
 % Task 5: flight rk4 (propagator.c) vs an independent reference.
+% rk4_Test(true) leaves the harness model open after the run.
 % Reference: two-body + J2..J4 with the acceleration taken as the numerical
 % gradient of the zonal potential (no formulas shared with the flight code),
 % integrated with ode113 at RelTol 1e-12. Same constants as param_table_default.
@@ -77,7 +78,12 @@ function testResults = rk4_Test()
     testResults.passed = logical(ok(:));
     fprintf('\nPass: position error after 90 min < 0.5 km (float rounding alone gives about 0.1 km).\n');
     fprintf('%d passed, %d failed\n', sum(ok), sum(~ok));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 end
 
 %% Reference dynamics: acceleration = gradient of the zonal potential

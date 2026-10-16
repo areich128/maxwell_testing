@@ -1,5 +1,6 @@
-function testResults = est_quest_rp_Test()
+function testResults = est_quest_rp_Test(show)
 % Test 3.4: est_quest_rp (flight C). Column 1 = magnetometer, column 2 = sun.
+% est_quest_rp_Test(true) leaves the harness model open after the run.
 % Expected: A(q) * eci_k(:,i) = b_k(:,i), with A(q) the [BN] matrix from test 3.1.
 
     libDir = fileparts(fileparts(mfilename('fullpath')));
@@ -101,7 +102,12 @@ function testResults = est_quest_rp_Test()
     testResults.passed = logical(ok(:));
     fprintf('\natt err: angle between estimated and true attitude (deg); status 0 = success, -1 = failure\n');
     fprintf('%d passed, %d failed\n', sum(ok), sum(~ok));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 
     function report(name, e, eD, st, pass)
         names{end+1} = name; ok(end+1) = pass; %#ok<SETNU>

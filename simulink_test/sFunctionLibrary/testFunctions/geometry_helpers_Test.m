@@ -1,5 +1,6 @@
-function testResults = geometry_helpers_Test()
+function testResults = geometry_helpers_Test(show)
 % sc_to_gs_vec, gs_to_sc_vec, sc_to_gs_unitvec, gs_angle_distance, calc_q_err,
+% geometry_helpers_Test(true) leaves the harness model open after the run.
 % calculateOmega (flight C) against exact vector geometry.
 
     libDir = fileparts(fileparts(mfilename('fullpath')));
@@ -70,7 +71,12 @@ function testResults = geometry_helpers_Test()
 
     testResults.passed = logical(ok(:));
     fprintf('\nerrors relative except ang (deg) and q_err (matrix norm)\n%d passed, %d failed\n', sum(ok), sum(~ok));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 
     function o = runAll(sc, gnd, q1, q2, p, c, qb)
         vals = {'sc',sc; 'gnd',gnd; 'q1',q1; 'q2',q2; 'prev',p; 'cur',c; 'qBN',qb};

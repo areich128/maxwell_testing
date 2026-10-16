@@ -1,5 +1,6 @@
-function testResults = igrf_eci_Test()
+function testResults = igrf_eci_Test(show)
 % Task 4: flight igrf_eci (igrf_model.c) vs MATLAB igrfmagm (IGRF-14).
+% igrf_eci_Test(true) leaves the harness model open after the run.
 % Input: ECI position (km), J2000 time (s since 2000-01-01 12:00, treated as UTC here).
 % Reference: ECI -> ECEF with dcmeci2ecef('IAU-2000/2006'), geodetic lat/lon/height,
 % igrfmagm NED field, NED -> ECEF -> ECI.
@@ -73,7 +74,12 @@ function testResults = igrf_eci_Test()
     fprintf('\ndAz/dEl: azimuth/elevation of the field direction in ECI, flight minus reference.\n');
     fprintf('A constant dAz with small dEl points to a rotation about the ECI z axis (GMST).\n');
     fprintf('%d passed, %d failed\n', sum(ok), sum(~ok));
-    close_system(mdl, 0);
+    if nargin >= 1 && show
+        Simulink.BlockDiagram.arrangeSystem(mdl);   % blocks were added without positions
+        open_system(mdl);   % leave the harness open (Constants show the last case)
+    else
+        close_system(mdl, 0);
+    end
 end
 
 %% Helpers
