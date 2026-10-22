@@ -64,6 +64,7 @@ void WheelTorque_Command_Outputs_wrapper(const real32_T *wheel_speeds,
 			int32_T *status)
 {
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_BEGIN --- EDIT HERE TO _END */
+static const int32_t bias_drpm[4] = {25000, -25000, 25000, -25000}; // flight spoolup_setpoints default (global.c), deci-RPM
 int32_t statusFlag = WheelTorque_Command((float *)wheel_speeds,
                        (float *)mag_bf,
                        (float *)GsValues,
@@ -71,7 +72,8 @@ int32_t statusFlag = WheelTorque_Command((float *)wheel_speeds,
                        (float *)rw_torque,
                        *disabled_wheel,
                        (float *)out_u,
-                       *c_desat);
+                       *c_desat,
+                       bias_drpm);
    *status = statusFlag;
 /* %%%-SFUNWIZ_wrapper_Outputs_Changes_END --- EDIT HERE TO _BEGIN */
 }

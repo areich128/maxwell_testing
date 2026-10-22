@@ -17,7 +17,7 @@ function testResults = WheelTorque_Command_value_Test(show)
     fprintf('TORQ_ROD_DIPOLE_MAX = %s mA m^2, limit used = %.4f A m^2\n\n', tok{1}, muMax);
 
     Iws = 0.000029382450521;
-    OmD = 250 * 2*pi/60;                                % bias, rad/s
+    OmD = [25000; -25000; 25000; -25000] * 2*pi/600;   % bias = flight spoolup_setpoints (deci-RPM), rad/s
     c   = 0.05;                                         % global.c c_desat
     Gs  = [0.390731  0.390731  0.390731  0.390731;
            0        -0.920505  0.920505  0;
@@ -31,7 +31,7 @@ function testResults = WheelTorque_Command_value_Test(show)
         'StopTime', '0', 'ReturnWorkspaceOutputs', 'on', 'ParameterPrecisionLossMsg', 'none');
     C = @(name, val, dt) add_block('simulink/Sources/Constant', [mdl '/' name], 'Value', val, ...
         'OutDataTypeStr', dt, 'VectorParams1D', 'off', 'SampleTime', '1');
-    C('wheel_speeds',   mat2str(OmD*ones(4,1)), 'single');
+    C('wheel_speeds',   mat2str(OmD), 'single');
     C('mag_bf',         '[0.2;0.1;-0.2]',       'single');
     C('GsValues',       mat2str(Gs, 17),        'single');
     C('disabled_wheel', '0',                    'int32');
@@ -54,7 +54,7 @@ function testResults = WheelTorque_Command_value_Test(show)
     %% 1. Attitude torque only (wheels at bias, no dump)
     for k = 1:4
         L = 1e-4 * randn(3,1);
-        r = runCase(OmD*ones(4,1), 0.3*Bdir(), 0, L);
+        r = runCase(OmD, 0.3*Bdir(), 0, L);
         report(sprintf('attitude only %d', k), r, r.eBody < 1e-4 && r.muRatio < 1e-6);
     end
 
@@ -122,7 +122,7 @@ function testResults = WheelTorque_Command_value_Test(show)
         r.us  = double(lastSample(out.us,  [4 1]));
         r.st  = double(lastSample(out.st,  [1 1]));
         statuses(end+1) = r.st;
-        GsE = Gs; OmDv = OmD*ones(4,1);
+        GsE = Gs; OmDv = OmD;
         if dw >= 1 && dw <= 4, GsE(:,dw) = 0; OmDv(dw) = 0; end
         mu = r.pwm / 1000;  bT = double(single(magG)) * 1e-4;
         tauR = cross(mu, bT);
